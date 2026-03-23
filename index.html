@@ -49,6 +49,7 @@
       margin-bottom: 8px;
     }
     .task-item.completed { opacity: 0.5; }
+    .task-item.pending-verify { background: #fef3c7; border: 2px solid #f59e0b; }
     .task-item.locked { opacity: 0.6; background: #f1f5f9; }
     .task-item.expired { opacity: 0.5; background: #fef3c7; }
     .task-name { display: flex; align-items: center; gap: 8px; }
@@ -60,6 +61,7 @@
     }
     .task-check.done { background: #22c55e; color: white; }
     .task-check.pending { background: #e2e8f0; }
+    .task-check.pending-verify { background: #f59e0b; color: white; }
     .task-check.locked { background: #cbd5e1; color: #64748b; }
     .task-xp { color: #22c55e; font-weight: bold; font-size: 14px; margin-right: 8px; }
     .btn {
@@ -72,6 +74,7 @@
       cursor: pointer;
     }
     .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .btn-verify { background: #f59e0b; }
     .progress-bar {
       width: 100%;
       height: 12px;
@@ -178,6 +181,14 @@
       color: #64748b;
       margin-top: 8px;
     }
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .status-pending { background: #f59e0b; color: white; }
+    .status-verified { background: #22c55e; color: white; }
   </style>
 </head>
 <body>
@@ -207,7 +218,7 @@
     
     <div class="section">
       <div class="verify-section">
-        <button class="verify-btn" onclick="showVerifyPage()">📋 任务校对（大人专用）</button>
+        <button class="verify-btn" onclick="showVerifyPage()">📋 任务校对（大人专用）<span id="verify-badge" style="background:#ef4444;color:white;padding:2px 8px;border-radius:4px;margin-left:8px;font-size:12px;">0</span></button>
         <div class="verify-count" id="verify-count">待校对任务：0 个</div>
       </div>
     </div>
@@ -238,6 +249,16 @@
     </div>
     
     <div class="section">
+      <div class="card-title">📚 作业任务（21:00 前完成）</div>
+      <div id="homework-tasks"></div>
+    </div>
+    
+    <div class="section">
+      <div class="card-title">🧠 额外挑战（完成作业后解锁）</div>
+      <div id="challenge-tasks"></div>
+    </div>
+    
+    <div class="section">
       <div class="card-title">🏠 生活任务</div>
       <div id="life-tasks"></div>
       
@@ -254,15 +275,16 @@
         </div>
       </div>
     </div>
-    
+  </div>
+  
+  <div id="verify-page" class="page">
     <div class="section">
-      <div class="card-title">📚 作业任务（21:00 前完成）</div>
-      <div id="homework-tasks"></div>
-    </div>
-    
-    <div class="section">
-      <div class="card-title">🧠 额外挑战（完成作业后解锁）</div>
-      <div id="challenge-tasks"></div>
+      <div class="card">
+        <div class="card-title">📋 任务校对</div>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 16px;">请确认小塔完成的任务，确认后发放 XP</p>
+        <div id="verify-list"></div>
+        <button class="verify-btn" onclick="confirmAllTasks()" style="margin-top: 16px;">✅ 全部确认</button>
+      </div>
     </div>
   </div>
   
@@ -275,17 +297,6 @@
       <div class="card">
         <div class="card-title">🏆 头衔等级</div>
         <div id="ranks-list"></div>
-      </div>
-    </div>
-  </div>
-  
-  <div id="verify-page" class="page">
-    <div class="section">
-      <div class="card">
-        <div class="card-title">📋 任务校对</div>
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 16px;">请确认小塔完成的任务，确认后发放 XP</p>
-        <div id="verify-list"></div>
-        <button class="verify-btn" onclick="confirmAllTasks()" style="margin-top: 16px;">✅ 全部确认</button>
       </div>
     </div>
   </div>
@@ -308,7 +319,7 @@
         </div>
         <div class="setting-item">
           <span>版本</span>
-          <span style="color: #64748b;">v2.0.0</span>
+          <span style="color: #64748b;">v2.1.0</span>
         </div>
         <div class="setting-item">
           <span>清除数据</span>
@@ -352,12 +363,13 @@
       taskTime: {},
     };
     
+    // 按天数换算 XP（每天最多 100 XP）
     const ranks = [
-      { days: 0, title: '👔 实习员工' },
-      { days: 10, title: '📋 正式员工' },
-      { days: 20, title: '📊 高级员工' },
-      { days: 40, title: '🎯 部门主管' },
-      { days: 70, title: '👔 Siatar 合伙人' },
+      { xp: 0, title: '👔 实习员工' },
+      { xp: 1000, title: '📋 正式员工' },
+      { xp: 2000, title: '📊 高级员工' },
+      { xp: 4000, title: '🎯 部门主管' },
+      { xp: 7000, title: '👔 Siatar 合伙人' },
     ];
     
     const XP_REWARDS = {
@@ -367,7 +379,7 @@
     };
     
     let state = loadState();
-    let verifyPassword = localStorage.getItem('xta-verify-password') || '1234';
+    let verifyPassword = localStorage.getItem('xta-verify-password');
     
     function loadState() {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -504,6 +516,19 @@
     }
     
     function showVerifyPage() {
+      // 第一次使用需要设置密码
+      if (!verifyPassword) {
+        const newPwd = prompt('第一次使用，请设置校对密码（至少 4 位）：');
+        if (newPwd && newPwd.length >= 4) {
+          verifyPassword = newPwd;
+          localStorage.setItem('xta-verify-password', newPwd);
+          showToast('✅ 密码设置成功');
+        } else if (newPwd !== null) {
+          showToast('❌ 密码至少 4 位');
+          return;
+        }
+      }
+      
       const password = prompt('请输入校对密码：');
       if (password === verifyPassword) {
         switchPage('verify', document.querySelectorAll('.nav-item')[1]);
@@ -513,12 +538,26 @@
     }
     
     function changePassword() {
+      // 第一次设置密码
+      if (!verifyPassword) {
+        const newPwd = prompt('第一次设置，请输入密码（至少 4 位）：');
+        if (newPwd && newPwd.length >= 4) {
+          verifyPassword = newPwd;
+          localStorage.setItem('xta-verify-password', newPwd);
+          showToast('✅ 密码设置成功');
+        } else if (newPwd !== null) {
+          showToast('❌ 密码至少 4 位');
+        }
+        return;
+      }
+      
+      // 修改密码
       const oldPwd = prompt('请输入旧密码：');
       if (oldPwd !== verifyPassword) {
         showToast('❌ 旧密码错误');
         return;
       }
-      const newPwd = prompt('请输入新密码：');
+      const newPwd = prompt('请输入新密码（至少 4 位）：');
       if (newPwd && newPwd.length >= 4) {
         verifyPassword = newPwd;
         localStorage.setItem('xta-verify-password', newPwd);
@@ -531,6 +570,7 @@
     function renderVerify() {
       const count = state.pendingVerify.length;
       document.getElementById('verify-count').textContent = '待校对任务：' + count + '个';
+      document.getElementById('verify-badge').textContent = count;
       
       if (count === 0) {
         document.getElementById('verify-list').innerHTML = '<p style="text-align:center;color:#64748b;padding:20px;">暂无待确认任务</p>';
@@ -544,14 +584,14 @@
           cleanDesk: '🧹 整理书桌', water: '💧 喝水', packBag: '🎒 收拾书包',
           breakfast: '🌅 早餐', lunch: '☀️ 午餐', dinner: '🌙 晚餐', focus: '⚡ 专注充能',
         };
-        return '<div class="task-item">' +
+        return '<div class="task-item pending-verify">' +
           '<div class="task-name">' +
-          '<div class="task-check pending">⏳</div>' +
+          '<div class="task-check pending-verify">⏳</div>' +
           '<span>' + (taskNames[task.id] || task.id) + '</span>' +
           '</div>' +
           '<div>' +
           '<span class="task-xp">+' + task.xp + ' XP</span>' +
-          '<button class="btn" onclick="confirmTask({id:\'' + task.id + '\',xp:' + task.xp + '})">确认</button>' +
+          '<button class="btn btn-verify" onclick="confirmTask({id:\'' + task.id + '\',xp:' + task.xp + '})">确认</button>' +
           '</div>' +
           '</div>';
       }).join('');
@@ -560,20 +600,19 @@
     
     function renderAchievements() {
       document.getElementById('rank-xp').textContent = state.xp;
-      const days = state.streak;
       let currentRank = ranks[0];
       for (const rank of ranks) {
-        if (days >= rank.days) currentRank = rank;
+        if (state.xp >= rank.xp) currentRank = rank;
       }
       document.getElementById('rank-title').textContent = currentRank.title;
       const html = ranks.map((r) => {
-        const unlocked = days >= r.days;
+        const unlocked = state.xp >= r.xp;
         return '<div class="task-item ' + (unlocked ? '' : 'completed') + '">' +
           '<div class="task-name">' +
           '<div class="task-check ' + (unlocked ? 'done' : 'pending') + '">' + (unlocked ? '✓' : '') + '</div>' +
           '<span style="' + (unlocked ? '' : 'text-decoration:line-through;color:#94a3b8;') + '">' + r.title + '</span>' +
           '</div>' +
-          '<div style="color:#64748b;font-size:12px;">连续' + r.days + '天</div>' +
+          '<div style="color:#64748b;font-size:12px;">' + r.xp + ' XP</div>' +
           '</div>';
       }).join('');
       document.getElementById('ranks-list').innerHTML = html;
@@ -586,10 +625,17 @@
         localStorage.removeItem('xta-last-exchange');
         localStorage.removeItem('xta-verify-password');
         state = { ...initialState };
-        verifyPassword = '1234';
+        verifyPassword = null;
         render();
         showToast('✅ 数据已清除');
       }
+    }
+    
+    function getTaskStatus(id) {
+      const pending = state.pendingVerify.find(t => t.id === id);
+      if (pending) return 'pending-verify';
+      if (state.todayTasks[id]) return 'done';
+      return 'pending';
     }
     
     function render() {
@@ -606,12 +652,6 @@
       const hour = now.getHours();
       const homeworkExpired = hour >= 21;
       
-      const lifeTasks = [
-        { id: 'packBag', name: '🎒 收拾书包', xp: 5 },
-        { id: 'cleanDesk', name: '🧹 整理书桌', xp: 5 },
-        { id: 'water', name: '💧 喝水 1500ml', xp: 5 },
-      ];
-      
       const homeworkTasks = [
         { id: 'chinese', name: '📖 语文作业', xp: 20 },
         { id: 'math', name: '📐 数学作业', xp: 20 },
@@ -624,36 +664,33 @@
         { id: 'basketball', name: '🏀 今日篮球', xp: 5 },
       ];
       
-      const homeworkDone = state.todayTasks.chinese && state.todayTasks.math && state.todayTasks.english;
+      const lifeTasks = [
+        { id: 'packBag', name: '🎒 收拾书包', xp: 5 },
+        { id: 'cleanDesk', name: '🧹 整理书桌', xp: 5 },
+        { id: 'water', name: '💧 喝水 1500ml', xp: 5 },
+      ];
       
-      document.getElementById('life-tasks').innerHTML = '';
-      lifeTasks.forEach(t => {
-        const done = state.todayTasks[t.id];
-        const html = '<div class="task-item ' + (done ? 'completed' : '') + '">' +
-          '<div class="task-name">' +
-          '<div class="task-check ' + (done ? 'done' : 'pending') + '">' + (done ? '✓' : '') + '</div>' +
-          '<span style="' + (done ? 'text-decoration:line-through;color:#94a3b8;' : '') + '">' + t.name + '</span>' +
-          '</div>' +
-          '<div>' +
-          '<span class="task-xp">+' + t.xp + ' XP</span>' +
-          (!done ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'life\', ' + t.xp + ')">完成</button>' : '') +
-          '</div>' +
-          '</div>';
-        document.getElementById('life-tasks').innerHTML += html;
-      });
+      const homeworkDone = state.todayTasks.chinese && state.todayTasks.math && state.todayTasks.english;
       
       document.getElementById('homework-tasks').innerHTML = '';
       homeworkTasks.forEach(t => {
-        const done = state.todayTasks[t.id];
-        const expired = homeworkExpired && !done;
-        const html = '<div class="task-item ' + (done ? 'completed' : '') + (expired ? ' expired' : '') + '">' +
+        const status = getTaskStatus(t.id);
+        const expired = homeworkExpired && status === 'pending';
+        let statusHtml = '';
+        if (status === 'pending-verify') {
+          statusHtml = '<span class="status-badge status-pending">待确认</span>';
+        } else if (status === 'done') {
+          statusHtml = '<span class="status-badge status-verified">已确认</span>';
+        }
+        const html = '<div class="task-item ' + (status === 'done' ? 'completed' : '') + (expired ? ' expired' : '') + '">' +
           '<div class="task-name">' +
-          '<div class="task-check ' + (done ? 'done' : 'pending') + '">' + (done ? '✓' : '') + '</div>' +
-          '<span style="' + (done ? 'text-decoration:line-through;color:#94a3b8;' : (expired ? 'color:#f59e0b;' : '')) + '">' + t.name + (expired ? '（已过期）' : '') + '</span>' +
+          '<div class="task-check ' + (status === 'done' ? 'done' : (status === 'pending-verify' ? 'pending-verify' : 'pending')) + '">' + (status === 'done' ? '✓' : (status === 'pending-verify' ? '⏳' : '')) + '</div>' +
+          '<span style="' + (status === 'done' ? 'text-decoration:line-through;color:#94a3b8;' : (expired ? 'color:#f59e0b;' : '')) + '">' + t.name + (expired ? '（已过期）' : '') + '</span>' +
           '</div>' +
           '<div>' +
           '<span class="task-xp">+' + t.xp + ' XP</span>' +
-          (!done && !expired ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'homework\', ' + t.xp + ')">完成</button>' : (expired ? '<button class="btn" disabled>已过期</button>' : '')) +
+          statusHtml +
+          (status === 'pending' && !expired ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'homework\', ' + t.xp + ')">完成</button>' : (expired ? '<button class="btn" disabled>已过期</button>' : '')) +
           '</div>' +
           '</div>';
         document.getElementById('homework-tasks').innerHTML += html;
@@ -661,19 +698,49 @@
       
       document.getElementById('challenge-tasks').innerHTML = '';
       challengeTasks.forEach(t => {
-        const done = state.todayTasks[t.id];
-        const locked = !homeworkDone && !done;
-        const html = '<div class="task-item ' + (done ? 'completed' : '') + (locked ? ' locked' : '') + '">' +
+        const status = getTaskStatus(t.id);
+        const locked = !homeworkDone && status === 'pending';
+        let statusHtml = '';
+        if (status === 'pending-verify') {
+          statusHtml = '<span class="status-badge status-pending">待确认</span>';
+        } else if (status === 'done') {
+          statusHtml = '<span class="status-badge status-verified">已确认</span>';
+        }
+        const html = '<div class="task-item ' + (status === 'done' ? 'completed' : '') + (locked ? ' locked' : '') + '">' +
           '<div class="task-name">' +
-          '<div class="task-check ' + (done ? 'done' : (locked ? 'locked' : 'pending')) + '">' + (done ? '✓' : (locked ? '🔒' : '')) + '</div>' +
-          '<span style="' + (done ? 'text-decoration:line-through;color:#94a3b8;' : (locked ? 'color:#cbd5e1;' : '')) + '">' + t.name + (locked ? '（需先完成作业）' : '') + '</span>' +
+          '<div class="task-check ' + (status === 'done' ? 'done' : (status === 'pending-verify' ? 'pending-verify' : (locked ? 'locked' : 'pending'))) + '">' + (status === 'done' ? '✓' : (status === 'pending-verify' ? '⏳' : (locked ? '🔒' : ''))) + '</div>' +
+          '<span style="' + (status === 'done' ? 'text-decoration:line-through;color:#94a3b8;' : (locked ? 'color:#cbd5e1;' : '')) + '">' + t.name + (locked ? '（需先完成作业）' : '') + '</span>' +
           '</div>' +
           '<div>' +
           '<span class="task-xp">+' + t.xp + ' XP</span>' +
-          (!done && !locked ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'challenge\', ' + t.xp + ')">完成</button>' : (locked ? '<button class="btn" disabled style="background:#cbd5e1;">🔒 锁定</button>' : '')) +
+          statusHtml +
+          (status === 'pending' && !locked ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'challenge\', ' + t.xp + ')">完成</button>' : (locked ? '<button class="btn" disabled style="background:#cbd5e1;">🔒 锁定</button>' : '')) +
           '</div>' +
           '</div>';
         document.getElementById('challenge-tasks').innerHTML += html;
+      });
+      
+      document.getElementById('life-tasks').innerHTML = '';
+      lifeTasks.forEach(t => {
+        const status = getTaskStatus(t.id);
+        let statusHtml = '';
+        if (status === 'pending-verify') {
+          statusHtml = '<span class="status-badge status-pending">待确认</span>';
+        } else if (status === 'done') {
+          statusHtml = '<span class="status-badge status-verified">已确认</span>';
+        }
+        const html = '<div class="task-item ' + (status === 'done' ? 'completed' : '') + '">' +
+          '<div class="task-name">' +
+          '<div class="task-check ' + (status === 'done' ? 'done' : (status === 'pending-verify' ? 'pending-verify' : 'pending')) + '">' + (status === 'done' ? '✓' : (status === 'pending-verify' ? '⏳' : '')) + '</div>' +
+          '<span style="' + (status === 'done' ? 'text-decoration:line-through;color:#94a3b8;' : '') + '">' + t.name + '</span>' +
+          '</div>' +
+          '<div>' +
+          '<span class="task-xp">+' + t.xp + ' XP</span>' +
+          statusHtml +
+          (status === 'pending' ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'life\', ' + t.xp + ')">完成</button>' : '') +
+          '</div>' +
+          '</div>';
+        document.getElementById('life-tasks').innerHTML += html;
       });
       
       ['breakfast', 'lunch', 'dinner'].forEach(m => {
@@ -688,6 +755,7 @@
       updateStreak();
       render();
       renderVerify();
+      renderAchievements();
       document.getElementById('exchange-btn').onclick = exchangeSC;
       document.getElementById('focus-btn').onclick = startFocus;
       document.getElementById('meal-breakfast').onclick = () => completeTask('breakfast', 'meal', XP_REWARDS.meal);
