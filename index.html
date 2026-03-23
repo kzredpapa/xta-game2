@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小塔学习游戏</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      padding-bottom: 80px;
+    }
+    .header {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: white;
+      padding: 24px;
+    }
+    .header h1 { font-size: 24px; margin-bottom: 4px; }
+    .header p { color: #c7d2fe; font-size: 14px; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+    .stat-card {
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-value { font-size: 20px; font-weight: bold; }
+    .stat-label { font-size: 12px; color: #c7d2fe; margin-top: 4px; }
+    .xp-value { color: #86efac; }
+    .sc-value { color: #fcd34d; }
+    .section { padding: 16px; }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card-title { font-weight: bold; margin-bottom: 12px; font-size: 16px; }
+    .task-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .task-item.completed { opacity: 0.5; }
+    .task-name { display: flex; align-items: center; gap: 8px; }
+    .task-check {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+    .task-check.done { background: #22c55e; color: white; }
+    .task-check.pending { background: #e2e8f0; }
+    .task-xp { color: #22c55e; font-weight: bold; font-size: 14px; margin-right: 8px; }
+    .btn {
+      background: #6366f1;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #22c55e;
+      transition: width 0.3s;
+    }
+    .focus-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-around;
+      padding: 12px;
+    }
+    .nav-item { text-align: center; color: #94a3b8; font-size: 12px; }
+    .nav-item.active { color: #6366f1; }
+    .nav-icon { font-size: 20px; margin-bottom: 2px; }
+    .meal-btns { display: flex; gap: 8px; }
+    .meal-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .meal-btn.done { background: #22c55e; color: white; }
+    .meal-btn.pending { background: #f1f5f9; color: #64748b; }
+    .exchange-btn {
+      background: #f59e0b;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- 头部 -->
+  <div class="header">
+    <h1>👋 小塔</h1>
+    <p>加油，今天也要努力！</p>
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="level">1</div>
+        <div class="stat-label">等级</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value xp-value" id="total-xp">0 XP</div>
+        <div class="stat-label">总经验</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value sc-value">🪙 <span id="sc">0</span></div>
+        <div class="stat-label">SC 币</div>
+      </div>
+    </div>
+    <div style="margin-top: 16px; text-align: right;">
+      <div style="font-size: 24px; font-weight: bold;">🔥 <span id="streak">0</span></div>
+      <div style="font-size: 12px; color: #c7d2fe;">连续天数</div>
+    </div>
+  </div>
+  
+  <!-- 今日进度 -->
+  <div class="section">
+    <div class="card">
+      <div class="card-title">📊 今日进度</div>
+      <div style="display: flex; justify-content: space-between; font-size: 14px; color: #64748b;">
+        <span>今日 XP</span>
+        <span><span id="today-xp">0</span> / 100</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+      </div>
+      <div style="font-size: 14px; color: #64748b;">
+        🪙 可兑换：<strong style="color: #f59e0b;"><span id="can-exchange">0</span> SC</strong>
+        <button class="exchange-btn" id="exchange-btn">去兑换</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 精力充能 -->
+  <div class="section">
+    <button class="focus-btn" id="focus-btn">
+      <span>⚡ 精力充能</span>
+      <span>▶️</span>
+    </button>
+    <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: 8px;">专注 25 分钟，+10 XP</p>
+  </div>
+  
+  <!-- 作业任务 -->
+  <div class="section">
+    <div class="card-title">📚 作业任务</div>
+    <div id="homework-tasks"></div>
+  </div>
+  
+  <!-- 额外挑战 -->
+  <div class="section">
+    <div class="card-title">🧠 额外挑战</div>
+    <div id="challenge-tasks"></div>
+  </div>
+  
+  <!-- 生活任务 -->
+  <div class="section">
+    <div class="card-title">🏠 生活任务</div>
+    <div id="life-tasks"></div>
+    
+    <!-- 餐食打卡 -->
+    <div class="card" style="margin-top: 12px;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+        <span style="font-weight: bold;">🍽️ 吃饭营养打卡</span>
+        <span style="color: #22c55e; font-weight: bold; font-size: 14px;">+10 XP/餐</span>
+      </div>
+      <div class="meal-btns">
+        <button class="meal-btn pending" id="meal-breakfast">🌅 早餐</button>
+        <button class="meal-btn pending" id="meal-lunch">☀️ 午餐</button>
+        <button class="meal-btn pending" id="meal-dinner">🌙 晚餐</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 底部导航 -->
+  <nav class="nav">
+    <div class="nav-item active">
+      <div class="nav-icon">🏠</div>
+      <div>首页</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">🏆</div>
+      <div>成就</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">📊</div>
+      <div>统计</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">⚙️</div>
+      <div>设置</div>
+    </div>
+  </nav>
+  
+  <script>
+    // 小塔学习游戏 - 纯静态版本
+    const STORAGE_KEY = 'xta-game-data'
+    const initialState = {
+      xp: 0, sc: 0, level: 1, streak: 0, lastActiveDate: null,
+      todayXP: 0, completedTasks: 0, achievements: [],
+      todayTasks: {
+        chinese: false, math: false, english: false,
+        preview: false, review: false, basketball: false,
+        cleanDesk: false, water: false,
+        meals: { breakfast: false, lunch: false, dinner: false },
+      },
+    }
+    
+    function loadState() {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      return saved ? JSON.parse(saved) : { ...initialState }
+    }
+    
+    function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)) }
+    
+    const XP_REWARDS = {
+      chinese: 20, math: 20, english: 20,
+      preview: 15, review: 15, basketball: 15,
+      cleanDesk: 10, water: 10, meal: 10, focus: 10,
+    }
+    
+    let state = loadState()
+    
+    function updateStreak() {
+      const today = new Date().toDateString()
+      if (state.lastActiveDate === today) return
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1)
+      state.streak = state.lastActiveDate === yesterday.toDateString() ? state.streak + 1 : 1
+      state.lastActiveDate = today
+      
+      const lastTasksDate = localStorage.getItem('xta-tasks-date')
+      if (lastTasksDate !== today) {
+        state.todayTasks = initialState.todayTasks
+        state.todayXP = 0
+        localStorage.setItem('xta-tasks-date', today)
+      }
+      saveState(state)
+      render()
+    }
+    
+    function addXP(amount) {
+      state.xp += amount
+      state.todayXP += amount
+      state.level = Math.floor(state.xp / 100) + 1
+      state.completedTasks += 1
+      saveState(state)
+      render()
+    }
+    
+    function completeTask(id, type, xp) {
+      if (type === 'meal') {
+        if (state.todayTasks.meals[id]) return
+        state.todayTasks.meals[id] = true
+      } else {
+        if (state.todayTasks[id]) return
+        state.todayTasks[id] = true
+      }
+      saveState(state)
+      addXP(xp)
+      showToast(`✅ 完成！+${xp} XP`)
+    }
+    
+    function exchangeSC() {
+      if (state.todayXP < 100) { showToast('❌ XP 不足'); return }
+      const today = new Date().toDateString()
+      if (localStorage.getItem('xta-last-exchange') === today) { showToast('❌ 今日已兑换'); return }
+      state.xp -= 100; state.todayXP -= 100; state.sc += 1
+      saveState(state)
+      localStorage.setItem('xta-last-exchange', today)
+      showToast('🪙 兑换成功！获得 1 SC')
+      render()
+    }
+    
+    function showToast(msg) {
+      const t = document.createElement('div')
+      t.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:white;padding:12px 24px;border-radius:8px;z-index:1000;'
+      t.textContent = msg
+      document.body.appendChild(t)
+      setTimeout(() => t.remove(), 2000)
+    }
+    
+    function startFocus() {
+      let remaining = 25 * 60
+      const overlay = document.createElement('div')
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;'
+      overlay.innerHTML = '<div style="font-size:48px;font-weight:bold;margin-bottom:24px;" id="focus-timer">25:00</div><div style="font-size:16px;color:#94a3b8;">专注中，不要离开哦～</div><button id="cancel-focus" style="margin-top:32px;padding:12px 32px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;">放弃</button>'
+      document.body.appendChild(overlay)
+      
+      const updateTimer = () => {
+        const m = Math.floor(remaining / 60).toString().padStart(2, '0')
+        const s = (remaining % 60).toString().padStart(2, '0')
+        document.getElementById('focus-timer').textContent = `${m}:${s}`
+        if (remaining > 0) { remaining--; setTimeout(updateTimer, 1000) }
+        else { overlay.remove(); completeTask('focus', 'focus', XP_REWARDS.focus) }
+      }
+      updateTimer()
+      document.getElementById('cancel-focus').onclick = () => { overlay.remove(); showToast('❌ 已放弃') }
+    }
+    
+    function render() {
+      const canExchange = Math.floor(state.todayXP / 100)
+      document.getElementById('streak').textContent = state.streak
+      document.getElementById('level').textContent = state.level
+      document.getElementById('total-xp').textContent = state.xp + ' XP'
+      document.getElementById('sc').textContent = state.sc
+      document.getElementById('today-xp').textContent = state.todayXP
+      document.getElementById('can-exchange').textContent = canExchange
+      document.getElementById('progress-fill').style.width = Math.min(100, state.todayXP) + '%'
+      
+      const tasks = [
+        { id: 'chinese', name: '📖 语文作业', xp: 20, section: 'homework' },
+        { id: 'math', name: '📐 数学作业', xp: 20, section: 'homework' },
+        { id: 'english', name: '🔤 英语作业', xp: 20, section: 'homework' },
+        { id: 'preview', name: '📚 提前预习', xp: 15, section: 'challenge' },
+        { id: 'review', name: '🔄 今日复习', xp: 15, section: 'challenge' },
+        { id: 'basketball', name: '🏀 今日篮球', xp: 15, section: 'challenge' },
+        { id: 'cleanDesk', name: '🧹 整理书桌', xp: 10, section: 'life' },
+        { id: 'water', name: '💧 喝水 1500ml', xp: 10, section: 'life' },
+      ]
+      
+      tasks.forEach(t => {
+        const done = state.todayTasks[t.id]
+        const html = `
+          <div class="task-item ${done ? 'completed' : ''}">
+            <div class="task-name">
+              <div class="task-check ${done ? 'done' : 'pending'}">${done ? '✓' : ''}</div>
+              <span style="${done ? 'text-decoration:line-through;color:#94a3b8;' : ''}">${t.name}</span>
+            </div>
+            <div>
+              <span class="task-xp">+${t.xp} XP</span>
+              ${!done ? `<button class="btn" onclick="completeTask('${t.id}', 'task', ${t.xp})">完成</button>` : ''}
+            </div>
+          </div>
+        `
+        document.getElementById(`${t.section}-tasks`).innerHTML += html
+      })
+      
+      ['breakfast', 'lunch', 'dinner'].forEach(m => {
+        const done = state.todayTasks.meals[m]
+        const btn = document.getElementById(`meal-${m}`)
+        btn.className = `meal-btn ${done ? 'done' : 'pending'}`
+        btn.disabled = done
+      })
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      updateStreak()
+      render()
+      document.getElementById('exchange-btn').onclick = exchangeSC
+      document.getElementById('focus-btn').onclick = startFocus
+      document.getElementById('meal-breakfast').onclick = () => completeTask('breakfast', 'meal', XP_REWARDS.meal)
+      document.getElementById('meal-lunch').onclick = () => completeTask('lunch', 'meal', XP_REWARDS.meal)
+      document.getElementById('meal-dinner').onclick = () => completeTask('dinner', 'meal', XP_REWARDS.meal)
+    })
+  </script>
+</body>
+</html>

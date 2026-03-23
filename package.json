@@ -1,0 +1,7 @@
+{
+  "name": "xta-game",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'"
+  }
+}
