@@ -245,7 +245,13 @@
         <span>🎯 专注充能</span>
         <span>▶️</span>
       </button>
-      <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: 8px;">作业专注 25 分钟倒计时 <span style="color: #22c55e; font-weight: bold;">+10 XP</span></p>
+      <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: 8px;">
+        <span style="color: #22c55e; font-weight: bold;">+10 XP</span>
+        <span style="margin: 0 8px;">|</span>
+        <span>每日最多 2 次</span>
+        <span style="margin: 0 8px;">|</span>
+        <span>剩余：<strong id="focus-remaining" style="color: #6366f1;">2</strong> 次</span>
+      </p>
     </div>
     
     <div class="section">
@@ -354,6 +360,7 @@
       xp: 0, sc: 0, level: 1, streak: 0, lastActiveDate: null,
       todayXP: 0, completedTasks: 0,
       pendingVerify: [],
+      focusCount: 0,
       todayTasks: {
         chinese: false, math: false, english: false,
         preview: false, review: false, basketball: false,
@@ -490,6 +497,11 @@
     }
     
     function startFocus() {
+      if (state.focusCount >= 2) {
+        showToast('❌ 今日专注次数已用完（最多 2 次）');
+        return;
+      }
+      
       let remaining = 25 * 60;
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;';
@@ -500,7 +512,13 @@
         const s = (remaining % 60).toString().padStart(2, '0');
         document.getElementById('focus-timer').textContent = m + ':' + s;
         if (remaining > 0) { remaining--; setTimeout(updateTimer, 1000); }
-        else { overlay.remove(); completeTask('focus', 'focus', XP_REWARDS.focus); }
+        else { 
+          overlay.remove(); 
+          state.focusCount++;
+          saveState(state);
+          render();
+          completeTask('focus', 'focus', XP_REWARDS.focus); 
+        }
       };
       updateTimer();
       document.getElementById('cancel-focus').onclick = () => {
@@ -652,6 +670,14 @@
       document.getElementById('today-xp').textContent = state.todayXP;
       document.getElementById('can-exchange').textContent = canExchange;
       document.getElementById('progress-fill').style.width = Math.min(100, state.todayXP) + '%';
+      
+      const focusRemaining = 2 - state.focusCount;
+      document.getElementById('focus-remaining').textContent = focusRemaining;
+      if (focusRemaining === 0) {
+        document.getElementById('focus-remaining').style.color = '#ef4444';
+        document.getElementById('focus-btn').disabled = true;
+        document.getElementById('focus-btn').style.background = '#cbd5e1';
+      }
       
       const now = new Date();
       const hour = now.getHours();
