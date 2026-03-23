@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>小塔学习游戏</title>
+  <title>小塔的努力记录</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
@@ -50,6 +50,7 @@
     }
     .task-item.completed { opacity: 0.5; }
     .task-item.locked { opacity: 0.6; background: #f1f5f9; }
+    .task-item.expired { opacity: 0.5; background: #fef3c7; }
     .task-name { display: flex; align-items: center; gap: 8px; }
     .task-check {
       width: 24px; height: 24px;
@@ -154,6 +155,29 @@
       border-radius: 8px;
       margin-bottom: 12px;
     }
+    .verify-section {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .verify-btn {
+      background: #f59e0b;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+    .verify-count {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
@@ -182,6 +206,13 @@
     </div>
     
     <div class="section">
+      <div class="verify-section">
+        <button class="verify-btn" onclick="showVerifyPage()">📋 任务校对（大人专用）</button>
+        <div class="verify-count" id="verify-count">待校对任务：0 个</div>
+      </div>
+    </div>
+    
+    <div class="section">
       <div class="card">
         <div class="card-title">📊 今日进度</div>
         <div style="display: flex; justify-content: space-between; font-size: 14px; color: #64748b;">
@@ -200,20 +231,10 @@
     
     <div class="section">
       <button class="focus-btn" id="focus-btn">
-        <span>⚡ 精力充能</span>
+        <span>🎯 专注充能</span>
         <span>▶️</span>
       </button>
-      <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: 8px;">专注 25 分钟，+10 XP</p>
-    </div>
-    
-    <div class="section">
-      <div class="card-title">📚 作业任务</div>
-      <div id="homework-tasks"></div>
-    </div>
-    
-    <div class="section">
-      <div class="card-title">🧠 额外挑战</div>
-      <div id="challenge-tasks"></div>
+      <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: 8px;">作业专注 25 分钟倒计时</p>
     </div>
     
     <div class="section">
@@ -233,17 +254,38 @@
         </div>
       </div>
     </div>
+    
+    <div class="section">
+      <div class="card-title">📚 作业任务（21:00 前完成）</div>
+      <div id="homework-tasks"></div>
+    </div>
+    
+    <div class="section">
+      <div class="card-title">🧠 额外挑战（完成作业后解锁）</div>
+      <div id="challenge-tasks"></div>
+    </div>
   </div>
   
   <div id="achievements-page" class="page">
     <div class="section">
       <div class="rank-card">
-        <div class="rank-title" id="rank-title">🌱 学习新手</div>
+        <div class="rank-title" id="rank-title">👔 实习员工</div>
         <div class="rank-xp">总积分 <span id="rank-xp">0</span> XP</div>
       </div>
       <div class="card">
         <div class="card-title">🏆 头衔等级</div>
         <div id="ranks-list"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="verify-page" class="page">
+    <div class="section">
+      <div class="card">
+        <div class="card-title">📋 任务校对</div>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 16px;">请确认小塔完成的任务，确认后发放 XP</p>
+        <div id="verify-list"></div>
+        <button class="verify-btn" onclick="confirmAllTasks()" style="margin-top: 16px;">✅ 全部确认</button>
       </div>
     </div>
   </div>
@@ -261,8 +303,12 @@
           </select>
         </div>
         <div class="setting-item">
+          <span>校对密码</span>
+          <button class="btn" onclick="changePassword()" style="background: #22c55e;">修改密码</button>
+        </div>
+        <div class="setting-item">
           <span>版本</span>
-          <span style="color: #64748b;">v1.0.0</span>
+          <span style="color: #64748b;">v2.0.0</span>
         </div>
         <div class="setting-item">
           <span>清除数据</span>
@@ -276,6 +322,10 @@
     <div class="nav-item active" onclick="switchPage('home', this)">
       <div class="nav-icon">🏠</div>
       <div>首页</div>
+    </div>
+    <div class="nav-item" onclick="switchPage('verify', this)">
+      <div class="nav-icon">📋</div>
+      <div>校对</div>
     </div>
     <div class="nav-item" onclick="switchPage('achievements', this)">
       <div class="nav-icon">🏆</div>
@@ -292,21 +342,32 @@
     const initialState = {
       xp: 0, sc: 0, level: 1, streak: 0, lastActiveDate: null,
       todayXP: 0, completedTasks: 0,
+      pendingVerify: [],
       todayTasks: {
         chinese: false, math: false, english: false,
         preview: false, review: false, basketball: false,
-        cleanDesk: false, water: false,
+        cleanDesk: false, water: false, packBag: false,
         meals: { breakfast: false, lunch: false, dinner: false },
       },
+      taskTime: {},
     };
     
     const ranks = [
-      { xp: 0, title: '👔 实习员工' },
-      { xp: 100, title: '📋 正式员工' },
-      { xp: 500, title: '📊 高级员工' },
-      { xp: 1000, title: '🎯 部门主管' },
-      { xp: 3000, title: '👔 Siatar 合伙人' },
+      { days: 0, title: '👔 实习员工' },
+      { days: 10, title: '📋 正式员工' },
+      { days: 20, title: '📊 高级员工' },
+      { days: 40, title: '🎯 部门主管' },
+      { days: 70, title: '👔 Siatar 合伙人' },
     ];
+    
+    const XP_REWARDS = {
+      chinese: 20, math: 20, english: 20,
+      preview: 5, review: 5, basketball: 5,
+      cleanDesk: 5, water: 5, packBag: 5, meal: 5, focus: 5,
+    };
+    
+    let state = loadState();
+    let verifyPassword = localStorage.getItem('xta-verify-password') || '1234';
     
     function loadState() {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -314,14 +375,6 @@
     }
     
     function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
-    
-    const XP_REWARDS = {
-      chinese: 20, math: 20, english: 20,
-      preview: 5, review: 5, basketball: 5,
-      cleanDesk: 5, water: 5, meal: 5, focus: 5,
-    };
-    
-    let state = loadState();
     
     function updateStreak() {
       const today = new Date().toDateString();
@@ -334,6 +387,7 @@
       if (lastTasksDate !== today) {
         state.todayTasks = initialState.todayTasks;
         state.todayXP = 0;
+        state.pendingVerify = [];
         localStorage.setItem('xta-tasks-date', today);
       }
       saveState(state);
@@ -351,6 +405,14 @@
     }
     
     function completeTask(id, type, xp) {
+      const now = new Date();
+      const hour = now.getHours();
+      
+      if (type === 'homework' && hour >= 21) {
+        showToast('❌ 已过期（21:00 后完成无 XP）');
+        return;
+      }
+      
       if (type === 'meal') {
         if (state.todayTasks.meals[id]) return;
         state.todayTasks.meals[id] = true;
@@ -358,20 +420,44 @@
         if (state.todayTasks[id]) return;
         state.todayTasks[id] = true;
       }
+      
+      state.taskTime[id] = now.toISOString();
+      state.pendingVerify.push({ id, type, xp, time: now.toLocaleTimeString() });
       saveState(state);
-      addXP(xp);
-      showToast('✅ 完成！+' + xp + ' XP');
+      render();
+      renderVerify();
+      showToast('⏳ 已完成，等待大人确认');
+    }
+    
+    function confirmTask(task) {
+      const index = state.pendingVerify.findIndex(t => t.id === task.id);
+      if (index > -1) {
+        state.pendingVerify.splice(index, 1);
+        addXP(task.xp);
+        showToast('✅ 确认成功！+' + task.xp + ' XP');
+      }
+    }
+    
+    function confirmAllTasks() {
+      if (state.pendingVerify.length === 0) {
+        showToast('ℹ️ 没有待确认任务');
+        return;
+      }
+      state.pendingVerify.forEach(task => addXP(task.xp));
+      state.pendingVerify = [];
+      saveState(state);
+      render();
+      renderVerify();
+      showToast('✅ 全部确认成功！');
     }
     
     function exchangeSC() {
       if (state.todayXP < 100) { showToast('❌ XP 不足'); return; }
       const today = new Date().toDateString();
       if (localStorage.getItem('xta-last-exchange') === today) { showToast('❌ 今日已兑换，明天再来吧'); return; }
-      if (state.sc - (state.lastExchangeSC || 0) >= 1 && localStorage.getItem('xta-last-exchange') === today) { showToast('❌ 每日限兑 1 个 SC'); return; }
       state.xp -= 100;
       state.todayXP -= 100;
       state.sc += 1;
-      state.lastExchangeSC = state.sc;
       saveState(state);
       localStorage.setItem('xta-last-exchange', today);
       showToast('🪙 兑换成功！获得 1 SC');
@@ -390,7 +476,7 @@
       let remaining = 25 * 60;
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;';
-      overlay.innerHTML = '<div style="font-size:48px;font-weight:bold;margin-bottom:24px;" id="focus-timer">25:00</div><div style="font-size:16px;color:#94a3b8;">专注中，不要离开哦～</div><button id="cancel-focus" style="margin-top:32px;padding:12px 32px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;">放弃</button>';
+      overlay.innerHTML = '<div style="font-size:48px;font-weight:bold;margin-bottom:24px;" id="focus-timer">25:00</div><div style="font-size:16px;color:#94a3b8;">作业专注 25 分钟倒计时</div><button id="cancel-focus" style="margin-top:32px;padding:12px 32px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;">放弃</button>';
       document.body.appendChild(overlay);
       const updateTimer = () => {
         const m = Math.floor(remaining / 60).toString().padStart(2, '0');
@@ -400,7 +486,12 @@
         else { overlay.remove(); completeTask('focus', 'focus', XP_REWARDS.focus); }
       };
       updateTimer();
-      document.getElementById('cancel-focus').onclick = () => { overlay.remove(); showToast('❌ 已放弃'); };
+      document.getElementById('cancel-focus').onclick = () => {
+        if (confirm('确认放弃吗？')) {
+          overlay.remove();
+          showToast('❌ 已放弃');
+        }
+      };
     }
     
     function switchPage(pageName, element) {
@@ -409,23 +500,80 @@
       document.getElementById(pageName + '-page').classList.add('active');
       element.classList.add('active');
       if (pageName === 'achievements') renderAchievements();
+      if (pageName === 'verify') renderVerify();
+    }
+    
+    function showVerifyPage() {
+      const password = prompt('请输入校对密码：');
+      if (password === verifyPassword) {
+        switchPage('verify', document.querySelectorAll('.nav-item')[1]);
+      } else if (password !== null) {
+        showToast('❌ 密码错误');
+      }
+    }
+    
+    function changePassword() {
+      const oldPwd = prompt('请输入旧密码：');
+      if (oldPwd !== verifyPassword) {
+        showToast('❌ 旧密码错误');
+        return;
+      }
+      const newPwd = prompt('请输入新密码：');
+      if (newPwd && newPwd.length >= 4) {
+        verifyPassword = newPwd;
+        localStorage.setItem('xta-verify-password', newPwd);
+        showToast('✅ 密码修改成功');
+      } else if (newPwd !== null) {
+        showToast('❌ 密码至少 4 位');
+      }
+    }
+    
+    function renderVerify() {
+      const count = state.pendingVerify.length;
+      document.getElementById('verify-count').textContent = '待校对任务：' + count + '个';
+      
+      if (count === 0) {
+        document.getElementById('verify-list').innerHTML = '<p style="text-align:center;color:#64748b;padding:20px;">暂无待确认任务</p>';
+        return;
+      }
+      
+      const html = state.pendingVerify.map(task => {
+        const taskNames = {
+          chinese: '📖 语文作业', math: '📐 数学作业', english: '🔤 英语作业',
+          preview: '📚 提前预习', review: '🔄 今日复习', basketball: '🏀 今日篮球',
+          cleanDesk: '🧹 整理书桌', water: '💧 喝水', packBag: '🎒 收拾书包',
+          breakfast: '🌅 早餐', lunch: '☀️ 午餐', dinner: '🌙 晚餐', focus: '⚡ 专注充能',
+        };
+        return '<div class="task-item">' +
+          '<div class="task-name">' +
+          '<div class="task-check pending">⏳</div>' +
+          '<span>' + (taskNames[task.id] || task.id) + '</span>' +
+          '</div>' +
+          '<div>' +
+          '<span class="task-xp">+' + task.xp + ' XP</span>' +
+          '<button class="btn" onclick="confirmTask({id:\'' + task.id + '\',xp:' + task.xp + '})">确认</button>' +
+          '</div>' +
+          '</div>';
+      }).join('');
+      document.getElementById('verify-list').innerHTML = html;
     }
     
     function renderAchievements() {
       document.getElementById('rank-xp').textContent = state.xp;
+      const days = state.streak;
       let currentRank = ranks[0];
       for (const rank of ranks) {
-        if (state.xp >= rank.xp) currentRank = rank;
+        if (days >= rank.days) currentRank = rank;
       }
       document.getElementById('rank-title').textContent = currentRank.title;
       const html = ranks.map((r) => {
-        const unlocked = state.xp >= r.xp;
+        const unlocked = days >= r.days;
         return '<div class="task-item ' + (unlocked ? '' : 'completed') + '">' +
           '<div class="task-name">' +
           '<div class="task-check ' + (unlocked ? 'done' : 'pending') + '">' + (unlocked ? '✓' : '') + '</div>' +
           '<span style="' + (unlocked ? '' : 'text-decoration:line-through;color:#94a3b8;') + '">' + r.title + '</span>' +
           '</div>' +
-          '<div style="color:#64748b;font-size:12px;">' + r.xp + ' XP</div>' +
+          '<div style="color:#64748b;font-size:12px;">连续' + r.days + '天</div>' +
           '</div>';
       }).join('');
       document.getElementById('ranks-list').innerHTML = html;
@@ -436,7 +584,9 @@
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem('xta-tasks-date');
         localStorage.removeItem('xta-last-exchange');
+        localStorage.removeItem('xta-verify-password');
         state = { ...initialState };
+        verifyPassword = '1234';
         render();
         showToast('✅ 数据已清除');
       }
@@ -452,30 +602,67 @@
       document.getElementById('can-exchange').textContent = canExchange;
       document.getElementById('progress-fill').style.width = Math.min(100, state.todayXP) + '%';
       
-      const tasks = [
-        { id: 'chinese', name: '📖 语文作业', xp: 20, section: 'homework' },
-        { id: 'math', name: '📐 数学作业', xp: 20, section: 'homework' },
-        { id: 'english', name: '🔤 英语作业', xp: 20, section: 'homework' },
-        { id: 'preview', name: '📚 提前预习', xp: 15, section: 'challenge' },
-        { id: 'review', name: '🔄 今日复习', xp: 15, section: 'challenge' },
-        { id: 'basketball', name: '🏀 今日篮球', xp: 15, section: 'challenge' },
-        { id: 'cleanDesk', name: '🧹 整理书桌', xp: 10, section: 'life' },
-        { id: 'water', name: '💧 喝水 1500ml', xp: 10, section: 'life' },
+      const now = new Date();
+      const hour = now.getHours();
+      const homeworkExpired = hour >= 21;
+      
+      const lifeTasks = [
+        { id: 'packBag', name: '🎒 收拾书包', xp: 5 },
+        { id: 'cleanDesk', name: '🧹 整理书桌', xp: 5 },
+        { id: 'water', name: '💧 喝水 1500ml', xp: 5 },
       ];
       
-      // 清空任务列表，避免重复
-      document.getElementById('homework-tasks').innerHTML = '';
-      document.getElementById('challenge-tasks').innerHTML = '';
-      document.getElementById('life-tasks').innerHTML = '';
+      const homeworkTasks = [
+        { id: 'chinese', name: '📖 语文作业', xp: 20 },
+        { id: 'math', name: '📐 数学作业', xp: 20 },
+        { id: 'english', name: '🔤 英语作业', xp: 20 },
+      ];
       
-      // 检查 3 项作业是否完成
+      const challengeTasks = [
+        { id: 'preview', name: '📚 提前预习', xp: 5 },
+        { id: 'review', name: '🔄 今日复习', xp: 5 },
+        { id: 'basketball', name: '🏀 今日篮球', xp: 5 },
+      ];
+      
       const homeworkDone = state.todayTasks.chinese && state.todayTasks.math && state.todayTasks.english;
       
-      tasks.forEach(t => {
+      document.getElementById('life-tasks').innerHTML = '';
+      lifeTasks.forEach(t => {
         const done = state.todayTasks[t.id];
-        const isExtraChallenge = t.section === 'challenge';
-        const locked = isExtraChallenge && !homeworkDone && !done;
-        
+        const html = '<div class="task-item ' + (done ? 'completed' : '') + '">' +
+          '<div class="task-name">' +
+          '<div class="task-check ' + (done ? 'done' : 'pending') + '">' + (done ? '✓' : '') + '</div>' +
+          '<span style="' + (done ? 'text-decoration:line-through;color:#94a3b8;' : '') + '">' + t.name + '</span>' +
+          '</div>' +
+          '<div>' +
+          '<span class="task-xp">+' + t.xp + ' XP</span>' +
+          (!done ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'life\', ' + t.xp + ')">完成</button>' : '') +
+          '</div>' +
+          '</div>';
+        document.getElementById('life-tasks').innerHTML += html;
+      });
+      
+      document.getElementById('homework-tasks').innerHTML = '';
+      homeworkTasks.forEach(t => {
+        const done = state.todayTasks[t.id];
+        const expired = homeworkExpired && !done;
+        const html = '<div class="task-item ' + (done ? 'completed' : '') + (expired ? ' expired' : '') + '">' +
+          '<div class="task-name">' +
+          '<div class="task-check ' + (done ? 'done' : 'pending') + '">' + (done ? '✓' : '') + '</div>' +
+          '<span style="' + (done ? 'text-decoration:line-through;color:#94a3b8;' : (expired ? 'color:#f59e0b;' : '')) + '">' + t.name + (expired ? '（已过期）' : '') + '</span>' +
+          '</div>' +
+          '<div>' +
+          '<span class="task-xp">+' + t.xp + ' XP</span>' +
+          (!done && !expired ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'homework\', ' + t.xp + ')">完成</button>' : (expired ? '<button class="btn" disabled>已过期</button>' : '')) +
+          '</div>' +
+          '</div>';
+        document.getElementById('homework-tasks').innerHTML += html;
+      });
+      
+      document.getElementById('challenge-tasks').innerHTML = '';
+      challengeTasks.forEach(t => {
+        const done = state.todayTasks[t.id];
+        const locked = !homeworkDone && !done;
         const html = '<div class="task-item ' + (done ? 'completed' : '') + (locked ? ' locked' : '') + '">' +
           '<div class="task-name">' +
           '<div class="task-check ' + (done ? 'done' : (locked ? 'locked' : 'pending')) + '">' + (done ? '✓' : (locked ? '🔒' : '')) + '</div>' +
@@ -483,10 +670,10 @@
           '</div>' +
           '<div>' +
           '<span class="task-xp">+' + t.xp + ' XP</span>' +
-          (!done && !locked ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'task\', ' + t.xp + ')">完成</button>' : (locked ? '<button class="btn" disabled style="background:#cbd5e1;">🔒 锁定</button>' : '')) +
+          (!done && !locked ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'challenge\', ' + t.xp + ')">完成</button>' : (locked ? '<button class="btn" disabled style="background:#cbd5e1;">🔒 锁定</button>' : '')) +
           '</div>' +
           '</div>';
-        document.getElementById(t.section + '-tasks').innerHTML += html;
+        document.getElementById('challenge-tasks').innerHTML += html;
       });
       
       ['breakfast', 'lunch', 'dinner'].forEach(m => {
@@ -500,6 +687,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       updateStreak();
       render();
+      renderVerify();
       document.getElementById('exchange-btn').onclick = exchangeSC;
       document.getElementById('focus-btn').onclick = startFocus;
       document.getElementById('meal-breakfast').onclick = () => completeTask('breakfast', 'meal', XP_REWARDS.meal);
@@ -514,11 +702,10 @@
         document.getElementById('font-size-select').value = savedFontSize;
         document.body.style.fontSize = savedFontSize + 'px';
       }
-      
-      // 自动刷新：每 30 秒刷新一次（全球标准）
       setInterval(() => {
         updateStreak();
         render();
+        renderVerify();
       }, 30000);
     });
   </script>
