@@ -458,6 +458,11 @@
         { id: 'water', name: '💧 喝水 1500ml', xp: 10, section: 'life' },
       ];
       
+      // 清空任务列表，避免重复
+      document.getElementById('homework-tasks').innerHTML = '';
+      document.getElementById('challenge-tasks').innerHTML = '';
+      document.getElementById('life-tasks').innerHTML = '';
+      
       tasks.forEach(t => {
         const done = state.todayTasks[t.id];
         const html = '<div class="task-item ' + (done ? 'completed' : '') + '">' +
