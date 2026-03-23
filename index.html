@@ -505,6 +505,12 @@
         document.getElementById('font-size-select').value = savedFontSize;
         document.body.style.fontSize = savedFontSize + 'px';
       }
+      
+      // 自动刷新：每 30 秒刷新一次（全球标准）
+      setInterval(() => {
+        updateStreak();
+        render();
+      }, 30000);
     });
   </script>
 </body>
