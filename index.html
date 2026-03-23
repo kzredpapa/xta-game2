@@ -363,10 +363,12 @@
     function exchangeSC() {
       if (state.todayXP < 100) { showToast('❌ XP 不足'); return; }
       const today = new Date().toDateString();
-      if (localStorage.getItem('xta-last-exchange') === today) { showToast('❌ 今日已兑换'); return; }
+      if (localStorage.getItem('xta-last-exchange') === today) { showToast('❌ 今日已兑换，明天再来吧'); return; }
+      if (state.sc - (state.lastExchangeSC || 0) >= 1 && localStorage.getItem('xta-last-exchange') === today) { showToast('❌ 每日限兑 1 个 SC'); return; }
       state.xp -= 100;
       state.todayXP -= 100;
       state.sc += 1;
+      state.lastExchangeSC = state.sc;
       saveState(state);
       localStorage.setItem('xta-last-exchange', today);
       showToast('🪙 兑换成功！获得 1 SC');
