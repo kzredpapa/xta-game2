@@ -49,6 +49,7 @@
       margin-bottom: 8px;
     }
     .task-item.completed { opacity: 0.5; }
+    .task-item.locked { opacity: 0.6; background: #f1f5f9; }
     .task-name { display: flex; align-items: center; gap: 8px; }
     .task-check {
       width: 24px; height: 24px;
@@ -58,6 +59,7 @@
     }
     .task-check.done { background: #22c55e; color: white; }
     .task-check.pending { background: #e2e8f0; }
+    .task-check.locked { background: #cbd5e1; color: #64748b; }
     .task-xp { color: #22c55e; font-weight: bold; font-size: 14px; margin-right: 8px; }
     .btn {
       background: #6366f1;
@@ -313,9 +315,9 @@
     function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
     
     const XP_REWARDS = {
-      chinese: 25, math: 25, english: 25,
-      preview: 15, review: 15, basketball: 15,
-      cleanDesk: 10, water: 10, meal: 10, focus: 10,
+      chinese: 20, math: 20, english: 20,
+      preview: 5, review: 5, basketball: 5,
+      cleanDesk: 5, water: 5, meal: 5, focus: 5,
     };
     
     let state = loadState();
@@ -465,16 +467,22 @@
       document.getElementById('challenge-tasks').innerHTML = '';
       document.getElementById('life-tasks').innerHTML = '';
       
+      // 检查 3 项作业是否完成
+      const homeworkDone = state.todayTasks.chinese && state.todayTasks.math && state.todayTasks.english;
+      
       tasks.forEach(t => {
         const done = state.todayTasks[t.id];
-        const html = '<div class="task-item ' + (done ? 'completed' : '') + '">' +
+        const isExtraChallenge = t.section === 'challenge';
+        const locked = isExtraChallenge && !homeworkDone && !done;
+        
+        const html = '<div class="task-item ' + (done ? 'completed' : '') + (locked ? ' locked' : '') + '">' +
           '<div class="task-name">' +
-          '<div class="task-check ' + (done ? 'done' : 'pending') + '">' + (done ? '✓' : '') + '</div>' +
-          '<span style="' + (done ? 'text-decoration:line-through;color:#94a3b8;' : '') + '">' + t.name + '</span>' +
+          '<div class="task-check ' + (done ? 'done' : (locked ? 'locked' : 'pending')) + '">' + (done ? '✓' : (locked ? '🔒' : '')) + '</div>' +
+          '<span style="' + (done ? 'text-decoration:line-through;color:#94a3b8;' : (locked ? 'color:#cbd5e1;' : '')) + '">' + t.name + (locked ? '（需先完成作业）' : '') + '</span>' +
           '</div>' +
           '<div>' +
           '<span class="task-xp">+' + t.xp + ' XP</span>' +
-          (!done ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'task\', ' + t.xp + ')">完成</button>' : '') +
+          (!done && !locked ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'task\', ' + t.xp + ')">完成</button>' : (locked ? '<button class="btn" disabled style="background:#cbd5e1;">🔒 锁定</button>' : '')) +
           '</div>' +
           '</div>';
         document.getElementById(t.section + '-tasks').innerHTML += html;
