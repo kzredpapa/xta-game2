@@ -107,7 +107,7 @@
       justify-content: space-around;
       padding: 12px;
     }
-    .nav-item { text-align: center; color: #94a3b8; font-size: 12px; }
+    .nav-item { text-align: center; color: #94a3b8; font-size: 12px; cursor: pointer; }
     .nav-item.active { color: #6366f1; }
     .nav-icon { font-size: 20px; margin-bottom: 2px; }
     .meal-btns { display: flex; gap: 8px; }
@@ -131,225 +131,321 @@
       margin-left: 8px;
       cursor: pointer;
     }
+    .page { display: none; }
+    .page.active { display: block; }
+    .rank-card {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .rank-title { font-size: 32px; margin-bottom: 8px; }
+    .rank-xp { font-size: 14px; opacity: 0.9; }
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
   </style>
 </head>
 <body>
-  <!-- 头部 -->
-  <div class="header">
-    <h1>👋 小塔</h1>
-    <p>加油，今天也要努力！</p>
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-value" id="level">1</div>
-        <div class="stat-label">等级</div>
+  <div id="home-page" class="page active">
+    <div class="header">
+      <h1>👋 小塔</h1>
+      <p>加油，今天也要努力！</p>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-value" id="level">1</div>
+          <div class="stat-label">等级</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value xp-value" id="total-xp">0 XP</div>
+          <div class="stat-label">总经验</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value sc-value">🪙 <span id="sc">0</span></div>
+          <div class="stat-label">SC 币</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-value xp-value" id="total-xp">0 XP</div>
-        <div class="stat-label">总经验</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value sc-value">🪙 <span id="sc">0</span></div>
-        <div class="stat-label">SC 币</div>
-      </div>
-    </div>
-    <div style="margin-top: 16px; text-align: right;">
-      <div style="font-size: 24px; font-weight: bold;">🔥 <span id="streak">0</span></div>
-      <div style="font-size: 12px; color: #c7d2fe;">连续天数</div>
-    </div>
-  </div>
-  
-  <!-- 今日进度 -->
-  <div class="section">
-    <div class="card">
-      <div class="card-title">📊 今日进度</div>
-      <div style="display: flex; justify-content: space-between; font-size: 14px; color: #64748b;">
-        <span>今日 XP</span>
-        <span><span id="today-xp">0</span> / 100</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
-      </div>
-      <div style="font-size: 14px; color: #64748b;">
-        🪙 可兑换：<strong style="color: #f59e0b;"><span id="can-exchange">0</span> SC</strong>
-        <button class="exchange-btn" id="exchange-btn">去兑换</button>
+      <div style="margin-top: 16px; text-align: right;">
+        <div style="font-size: 24px; font-weight: bold;">🔥 <span id="streak">0</span></div>
+        <div style="font-size: 12px; color: #c7d2fe;">连续天数</div>
       </div>
     </div>
-  </div>
-  
-  <!-- 精力充能 -->
-  <div class="section">
-    <button class="focus-btn" id="focus-btn">
-      <span>⚡ 精力充能</span>
-      <span>▶️</span>
-    </button>
-    <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: 8px;">专注 25 分钟，+10 XP</p>
-  </div>
-  
-  <!-- 作业任务 -->
-  <div class="section">
-    <div class="card-title">📚 作业任务</div>
-    <div id="homework-tasks"></div>
-  </div>
-  
-  <!-- 额外挑战 -->
-  <div class="section">
-    <div class="card-title">🧠 额外挑战</div>
-    <div id="challenge-tasks"></div>
-  </div>
-  
-  <!-- 生活任务 -->
-  <div class="section">
-    <div class="card-title">🏠 生活任务</div>
-    <div id="life-tasks"></div>
     
-    <!-- 餐食打卡 -->
-    <div class="card" style="margin-top: 12px;">
-      <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-        <span style="font-weight: bold;">🍽️ 吃饭营养打卡</span>
-        <span style="color: #22c55e; font-weight: bold; font-size: 14px;">+10 XP/餐</span>
+    <div class="section">
+      <div class="card">
+        <div class="card-title">📊 今日进度</div>
+        <div style="display: flex; justify-content: space-between; font-size: 14px; color: #64748b;">
+          <span>今日 XP</span>
+          <span><span id="today-xp">0</span> / 100</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <div style="font-size: 14px; color: #64748b;">
+          🪙 可兑换：<strong style="color: #f59e0b;"><span id="can-exchange">0</span> SC</strong>
+          <button class="exchange-btn" id="exchange-btn">去兑换</button>
+        </div>
       </div>
-      <div class="meal-btns">
-        <button class="meal-btn pending" id="meal-breakfast">🌅 早餐</button>
-        <button class="meal-btn pending" id="meal-lunch">☀️ 午餐</button>
-        <button class="meal-btn pending" id="meal-dinner">🌙 晚餐</button>
+    </div>
+    
+    <div class="section">
+      <button class="focus-btn" id="focus-btn">
+        <span>⚡ 精力充能</span>
+        <span>▶️</span>
+      </button>
+      <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: 8px;">专注 25 分钟，+10 XP</p>
+    </div>
+    
+    <div class="section">
+      <div class="card-title">📚 作业任务</div>
+      <div id="homework-tasks"></div>
+    </div>
+    
+    <div class="section">
+      <div class="card-title">🧠 额外挑战</div>
+      <div id="challenge-tasks"></div>
+    </div>
+    
+    <div class="section">
+      <div class="card-title">🏠 生活任务</div>
+      <div id="life-tasks"></div>
+      
+      <div class="card" style="margin-top: 12px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+          <span style="font-weight: bold;">🍽️ 吃饭营养打卡</span>
+          <span style="color: #22c55e; font-weight: bold; font-size: 14px;">+10 XP/餐</span>
+        </div>
+        <div class="meal-btns">
+          <button class="meal-btn pending" id="meal-breakfast">🌅 早餐</button>
+          <button class="meal-btn pending" id="meal-lunch">☀️ 午餐</button>
+          <button class="meal-btn pending" id="meal-dinner">🌙 晚餐</button>
+        </div>
       </div>
     </div>
   </div>
   
-  <!-- 底部导航 -->
+  <div id="achievements-page" class="page">
+    <div class="section">
+      <div class="rank-card">
+        <div class="rank-title" id="rank-title">🌱 学习新手</div>
+        <div class="rank-xp">总积分 <span id="rank-xp">0</span> XP</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏆 头衔等级</div>
+        <div id="ranks-list"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="settings-page" class="page">
+    <div class="section">
+      <div class="card">
+        <div class="card-title">⚙️ 设置</div>
+        <div class="setting-item">
+          <span>字体大小</span>
+          <select id="font-size-select" class="btn">
+            <option value="14">小</option>
+            <option value="16" selected>标准</option>
+            <option value="18">大</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <span>版本</span>
+          <span style="color: #64748b;">v1.0.0</span>
+        </div>
+        <div class="setting-item">
+          <span>清除数据</span>
+          <button class="btn" onclick="clearData()" style="background: #ef4444;">清除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <nav class="nav">
-    <div class="nav-item active">
+    <div class="nav-item active" onclick="switchPage('home', this)">
       <div class="nav-icon">🏠</div>
       <div>首页</div>
     </div>
-    <div class="nav-item">
+    <div class="nav-item" onclick="switchPage('achievements', this)">
       <div class="nav-icon">🏆</div>
       <div>成就</div>
     </div>
-    <div class="nav-item">
-      <div class="nav-icon">📊</div>
-      <div>统计</div>
-    </div>
-    <div class="nav-item">
+    <div class="nav-item" onclick="switchPage('settings', this)">
       <div class="nav-icon">⚙️</div>
       <div>设置</div>
     </div>
   </nav>
   
   <script>
-    // 小塔学习游戏 - 纯静态版本
-    const STORAGE_KEY = 'xta-game-data'
+    const STORAGE_KEY = 'xta-game-data';
     const initialState = {
       xp: 0, sc: 0, level: 1, streak: 0, lastActiveDate: null,
-      todayXP: 0, completedTasks: 0, achievements: [],
+      todayXP: 0, completedTasks: 0,
       todayTasks: {
         chinese: false, math: false, english: false,
         preview: false, review: false, basketball: false,
         cleanDesk: false, water: false,
         meals: { breakfast: false, lunch: false, dinner: false },
       },
-    }
+    };
+    
+    const ranks = [
+      { xp: 0, title: '🌱 学习新手' },
+      { xp: 100, title: '📚 学习达人' },
+      { xp: 500, title: '⭐ 学习之星' },
+      { xp: 1000, title: '🏆 学习王者' },
+      { xp: 3000, title: '👑 学习传奇' },
+    ];
     
     function loadState() {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      return saved ? JSON.parse(saved) : { ...initialState }
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : { ...initialState };
     }
     
-    function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)) }
+    function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
     
     const XP_REWARDS = {
       chinese: 20, math: 20, english: 20,
       preview: 15, review: 15, basketball: 15,
       cleanDesk: 10, water: 10, meal: 10, focus: 10,
-    }
+    };
     
-    let state = loadState()
+    let state = loadState();
     
     function updateStreak() {
-      const today = new Date().toDateString()
-      if (state.lastActiveDate === today) return
-      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1)
-      state.streak = state.lastActiveDate === yesterday.toDateString() ? state.streak + 1 : 1
-      state.lastActiveDate = today
-      
-      const lastTasksDate = localStorage.getItem('xta-tasks-date')
+      const today = new Date().toDateString();
+      if (state.lastActiveDate === today) return;
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      state.streak = state.lastActiveDate === yesterday.toDateString() ? state.streak + 1 : 1;
+      state.lastActiveDate = today;
+      const lastTasksDate = localStorage.getItem('xta-tasks-date');
       if (lastTasksDate !== today) {
-        state.todayTasks = initialState.todayTasks
-        state.todayXP = 0
-        localStorage.setItem('xta-tasks-date', today)
+        state.todayTasks = initialState.todayTasks;
+        state.todayXP = 0;
+        localStorage.setItem('xta-tasks-date', today);
       }
-      saveState(state)
-      render()
+      saveState(state);
+      render();
     }
     
     function addXP(amount) {
-      state.xp += amount
-      state.todayXP += amount
-      state.level = Math.floor(state.xp / 100) + 1
-      state.completedTasks += 1
-      saveState(state)
-      render()
+      state.xp += amount;
+      state.todayXP += amount;
+      state.level = Math.floor(state.xp / 100) + 1;
+      state.completedTasks += 1;
+      saveState(state);
+      render();
+      renderAchievements();
     }
     
     function completeTask(id, type, xp) {
       if (type === 'meal') {
-        if (state.todayTasks.meals[id]) return
-        state.todayTasks.meals[id] = true
+        if (state.todayTasks.meals[id]) return;
+        state.todayTasks.meals[id] = true;
       } else {
-        if (state.todayTasks[id]) return
-        state.todayTasks[id] = true
+        if (state.todayTasks[id]) return;
+        state.todayTasks[id] = true;
       }
-      saveState(state)
-      addXP(xp)
-      showToast(`✅ 完成！+${xp} XP`)
+      saveState(state);
+      addXP(xp);
+      showToast('✅ 完成！+' + xp + ' XP');
     }
     
     function exchangeSC() {
-      if (state.todayXP < 100) { showToast('❌ XP 不足'); return }
-      const today = new Date().toDateString()
-      if (localStorage.getItem('xta-last-exchange') === today) { showToast('❌ 今日已兑换'); return }
-      state.xp -= 100; state.todayXP -= 100; state.sc += 1
-      saveState(state)
-      localStorage.setItem('xta-last-exchange', today)
-      showToast('🪙 兑换成功！获得 1 SC')
-      render()
+      if (state.todayXP < 100) { showToast('❌ XP 不足'); return; }
+      const today = new Date().toDateString();
+      if (localStorage.getItem('xta-last-exchange') === today) { showToast('❌ 今日已兑换'); return; }
+      state.xp -= 100;
+      state.todayXP -= 100;
+      state.sc += 1;
+      saveState(state);
+      localStorage.setItem('xta-last-exchange', today);
+      showToast('🪙 兑换成功！获得 1 SC');
+      render();
     }
     
     function showToast(msg) {
-      const t = document.createElement('div')
-      t.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:white;padding:12px 24px;border-radius:8px;z-index:1000;'
-      t.textContent = msg
-      document.body.appendChild(t)
-      setTimeout(() => t.remove(), 2000)
+      const t = document.createElement('div');
+      t.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:white;padding:12px 24px;border-radius:8px;z-index:1000;';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2000);
     }
     
     function startFocus() {
-      let remaining = 25 * 60
-      const overlay = document.createElement('div')
-      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;'
-      overlay.innerHTML = '<div style="font-size:48px;font-weight:bold;margin-bottom:24px;" id="focus-timer">25:00</div><div style="font-size:16px;color:#94a3b8;">专注中，不要离开哦～</div><button id="cancel-focus" style="margin-top:32px;padding:12px 32px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;">放弃</button>'
-      document.body.appendChild(overlay)
-      
+      let remaining = 25 * 60;
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;';
+      overlay.innerHTML = '<div style="font-size:48px;font-weight:bold;margin-bottom:24px;" id="focus-timer">25:00</div><div style="font-size:16px;color:#94a3b8;">专注中，不要离开哦～</div><button id="cancel-focus" style="margin-top:32px;padding:12px 32px;background:#ef4444;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;">放弃</button>';
+      document.body.appendChild(overlay);
       const updateTimer = () => {
-        const m = Math.floor(remaining / 60).toString().padStart(2, '0')
-        const s = (remaining % 60).toString().padStart(2, '0')
-        document.getElementById('focus-timer').textContent = `${m}:${s}`
-        if (remaining > 0) { remaining--; setTimeout(updateTimer, 1000) }
-        else { overlay.remove(); completeTask('focus', 'focus', XP_REWARDS.focus) }
+        const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+        const s = (remaining % 60).toString().padStart(2, '0');
+        document.getElementById('focus-timer').textContent = m + ':' + s;
+        if (remaining > 0) { remaining--; setTimeout(updateTimer, 1000); }
+        else { overlay.remove(); completeTask('focus', 'focus', XP_REWARDS.focus); }
+      };
+      updateTimer();
+      document.getElementById('cancel-focus').onclick = () => { overlay.remove(); showToast('❌ 已放弃'); };
+    }
+    
+    function switchPage(pageName, element) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(pageName + '-page').classList.add('active');
+      element.classList.add('active');
+      if (pageName === 'achievements') renderAchievements();
+    }
+    
+    function renderAchievements() {
+      document.getElementById('rank-xp').textContent = state.xp;
+      let currentRank = ranks[0];
+      for (const rank of ranks) {
+        if (state.xp >= rank.xp) currentRank = rank;
       }
-      updateTimer()
-      document.getElementById('cancel-focus').onclick = () => { overlay.remove(); showToast('❌ 已放弃') }
+      document.getElementById('rank-title').textContent = currentRank.title;
+      const html = ranks.map((r) => {
+        const unlocked = state.xp >= r.xp;
+        return '<div class="task-item ' + (unlocked ? '' : 'completed') + '">' +
+          '<div class="task-name">' +
+          '<div class="task-check ' + (unlocked ? 'done' : 'pending') + '">' + (unlocked ? '✓' : '') + '</div>' +
+          '<span style="' + (unlocked ? '' : 'text-decoration:line-through;color:#94a3b8;') + '">' + r.title + '</span>' +
+          '</div>' +
+          '<div style="color:#64748b;font-size:12px;">' + r.xp + ' XP</div>' +
+          '</div>';
+      }).join('');
+      document.getElementById('ranks-list').innerHTML = html;
+    }
+    
+    function clearData() {
+      if (confirm('确定清除所有数据吗？此操作不可恢复！')) {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem('xta-tasks-date');
+        localStorage.removeItem('xta-last-exchange');
+        state = { ...initialState };
+        render();
+        showToast('✅ 数据已清除');
+      }
     }
     
     function render() {
-      const canExchange = Math.floor(state.todayXP / 100)
-      document.getElementById('streak').textContent = state.streak
-      document.getElementById('level').textContent = state.level
-      document.getElementById('total-xp').textContent = state.xp + ' XP'
-      document.getElementById('sc').textContent = state.sc
-      document.getElementById('today-xp').textContent = state.todayXP
-      document.getElementById('can-exchange').textContent = canExchange
-      document.getElementById('progress-fill').style.width = Math.min(100, state.todayXP) + '%'
+      const canExchange = Math.floor(state.todayXP / 100);
+      document.getElementById('streak').textContent = state.streak;
+      document.getElementById('level').textContent = state.level;
+      document.getElementById('total-xp').textContent = state.xp + ' XP';
+      document.getElementById('sc').textContent = state.sc;
+      document.getElementById('today-xp').textContent = state.todayXP;
+      document.getElementById('can-exchange').textContent = canExchange;
+      document.getElementById('progress-fill').style.width = Math.min(100, state.todayXP) + '%';
       
       const tasks = [
         { id: 'chinese', name: '📖 语文作业', xp: 20, section: 'homework' },
@@ -360,42 +456,49 @@
         { id: 'basketball', name: '🏀 今日篮球', xp: 15, section: 'challenge' },
         { id: 'cleanDesk', name: '🧹 整理书桌', xp: 10, section: 'life' },
         { id: 'water', name: '💧 喝水 1500ml', xp: 10, section: 'life' },
-      ]
+      ];
       
       tasks.forEach(t => {
-        const done = state.todayTasks[t.id]
-        const html = `
-          <div class="task-item ${done ? 'completed' : ''}">
-            <div class="task-name">
-              <div class="task-check ${done ? 'done' : 'pending'}">${done ? '✓' : ''}</div>
-              <span style="${done ? 'text-decoration:line-through;color:#94a3b8;' : ''}">${t.name}</span>
-            </div>
-            <div>
-              <span class="task-xp">+${t.xp} XP</span>
-              ${!done ? `<button class="btn" onclick="completeTask('${t.id}', 'task', ${t.xp})">完成</button>` : ''}
-            </div>
-          </div>
-        `
-        document.getElementById(`${t.section}-tasks`).innerHTML += html
-      })
+        const done = state.todayTasks[t.id];
+        const html = '<div class="task-item ' + (done ? 'completed' : '') + '">' +
+          '<div class="task-name">' +
+          '<div class="task-check ' + (done ? 'done' : 'pending') + '">' + (done ? '✓' : '') + '</div>' +
+          '<span style="' + (done ? 'text-decoration:line-through;color:#94a3b8;' : '') + '">' + t.name + '</span>' +
+          '</div>' +
+          '<div>' +
+          '<span class="task-xp">+' + t.xp + ' XP</span>' +
+          (!done ? '<button class="btn" onclick="completeTask(\'' + t.id + '\', \'task\', ' + t.xp + ')">完成</button>' : '') +
+          '</div>' +
+          '</div>';
+        document.getElementById(t.section + '-tasks').innerHTML += html;
+      });
       
       ['breakfast', 'lunch', 'dinner'].forEach(m => {
-        const done = state.todayTasks.meals[m]
-        const btn = document.getElementById(`meal-${m}`)
-        btn.className = `meal-btn ${done ? 'done' : 'pending'}`
-        btn.disabled = done
-      })
+        const done = state.todayTasks.meals[m];
+        const btn = document.getElementById('meal-' + m);
+        btn.className = 'meal-btn ' + (done ? 'done' : 'pending');
+        btn.disabled = done;
+      });
     }
     
     document.addEventListener('DOMContentLoaded', () => {
-      updateStreak()
-      render()
-      document.getElementById('exchange-btn').onclick = exchangeSC
-      document.getElementById('focus-btn').onclick = startFocus
-      document.getElementById('meal-breakfast').onclick = () => completeTask('breakfast', 'meal', XP_REWARDS.meal)
-      document.getElementById('meal-lunch').onclick = () => completeTask('lunch', 'meal', XP_REWARDS.meal)
-      document.getElementById('meal-dinner').onclick = () => completeTask('dinner', 'meal', XP_REWARDS.meal)
-    })
+      updateStreak();
+      render();
+      document.getElementById('exchange-btn').onclick = exchangeSC;
+      document.getElementById('focus-btn').onclick = startFocus;
+      document.getElementById('meal-breakfast').onclick = () => completeTask('breakfast', 'meal', XP_REWARDS.meal);
+      document.getElementById('meal-lunch').onclick = () => completeTask('lunch', 'meal', XP_REWARDS.meal);
+      document.getElementById('meal-dinner').onclick = () => completeTask('dinner', 'meal', XP_REWARDS.meal);
+      document.getElementById('font-size-select').onchange = (e) => {
+        document.body.style.fontSize = e.target.value + 'px';
+        localStorage.setItem('xta-font-size', e.target.value);
+      };
+      const savedFontSize = localStorage.getItem('xta-font-size');
+      if (savedFontSize) {
+        document.getElementById('font-size-select').value = savedFontSize;
+        document.body.style.fontSize = savedFontSize + 'px';
+      }
+    });
   </script>
 </body>
 </html>
