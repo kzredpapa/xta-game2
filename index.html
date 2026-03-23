@@ -194,7 +194,13 @@
 <body>
   <div id="home-page" class="page active">
     <div class="header">
-      <h1>👋 小塔</h1>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h1>👋 小塔</h1>
+        <div style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 18px; font-weight: bold;" id="header-rank">👔 实习员工</div>
+          <div style="font-size: 12px; opacity: 0.9;">当前头衔</div>
+        </div>
+      </div>
       <p>加油，今天也要努力！</p>
       <div class="stats">
         <div class="stat-card">
@@ -676,6 +682,13 @@
       document.getElementById('today-xp').textContent = state.todayXP;
       document.getElementById('can-exchange').textContent = canExchange;
       document.getElementById('progress-fill').style.width = Math.min(100, state.todayXP) + '%';
+      
+      // 更新头衔显示
+      let currentRank = ranks[0];
+      for (const rank of ranks) {
+        if (state.xp >= rank.xp) currentRank = rank;
+      }
+      document.getElementById('header-rank').textContent = currentRank.title;
       
       const focusRemaining = 2 - state.focusCount;
       document.getElementById('focus-remaining').textContent = focusRemaining;
