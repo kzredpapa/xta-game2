@@ -395,7 +395,12 @@
     
     function loadState() {
       const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : { ...initialState };
+      const state = saved ? JSON.parse(saved) : { ...initialState };
+      // 确保 focusCount 存在
+      if (typeof state.focusCount !== 'number') {
+        state.focusCount = 0;
+      }
+      return state;
     }
     
     function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
@@ -412,6 +417,7 @@
         state.todayTasks = initialState.todayTasks;
         state.todayXP = 0;
         state.pendingVerify = [];
+        state.focusCount = 0;
         localStorage.setItem('xta-tasks-date', today);
       }
       saveState(state);
