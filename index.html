@@ -441,19 +441,29 @@
     
     function updateStreak() {
       const today = new Date().toDateString();
-      if (state.lastActiveDate === today) return;
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      state.streak = state.lastActiveDate === yesterday.toDateString() ? state.streak + 1 : 1;
-      state.lastActiveDate = today;
+      const now = new Date();
+      
+      // 检查是否已更新过今日任务
       const lastTasksDate = localStorage.getItem('xta-tasks-date');
+      
+      // 连续天数计算
+      if (state.lastActiveDate !== today) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        state.streak = state.lastActiveDate === yesterday.toDateString() ? state.streak + 1 : 1;
+        state.lastActiveDate = today;
+      }
+      
+      // 每日任务重置：固定在凌晨 0 点后首次检查时更新
       if (lastTasksDate !== today) {
         state.todayTasks = initialState.todayTasks;
         state.todayXP = 0;
         state.pendingVerify = [];
         state.focusCount = 0;
         localStorage.setItem('xta-tasks-date', today);
+        showToast('🌅 新的一天开始了！加油！');
       }
+      
       saveState(state);
       render();
     }
@@ -682,16 +692,32 @@
     }
     
     function clearData() {
-      if (confirm('确定清除所有数据吗？此操作不可恢复！')) {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem('xta-tasks-date');
-        localStorage.removeItem('xta-last-exchange');
-        localStorage.removeItem('xta-verify-password');
-        state = { ...initialState };
-        verifyPassword = null;
-        render();
-        showToast('✅ 数据已清除');
+      // 第一次确认
+      if (!confirm('确定清除所有数据吗？此操作不可恢复！')) {
+        return;
       }
+      
+      // 第二次确认 + 输入校对员密码
+      const password = prompt('⚠️ 危险操作！请输入校对员密码确认：');
+      if (!password) {
+        showToast('❌ 已取消');
+        return;
+      }
+      if (password !== verifyPassword) {
+        showToast('❌ 密码错误！');
+        return;
+      }
+      
+      // 密码正确，清除数据
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem('xta-tasks-date');
+      localStorage.removeItem('xta-last-exchange');
+      localStorage.removeItem('xta-verify-password');
+      localStorage.removeItem('xta-font-size');
+      state = { ...initialState };
+      verifyPassword = null;
+      render();
+      showToast('✅ 数据已清除');
     }
     
     function getTaskStatus(id) {
