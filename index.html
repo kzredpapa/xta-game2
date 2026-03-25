@@ -237,7 +237,7 @@
         </div>
         <div class="stat-card">
           <div class="stat-value xp-value" id="total-xp">0 XP</div>
-          <div class="stat-label">总经验</div>
+          <div class="stat-label">等级 XP</div>
         </div>
         <div class="stat-card">
           <div class="stat-value sc-value"><span class="sc-icon"></span><span id="sc">0</span></div>
@@ -261,7 +261,7 @@
       <div class="card">
         <div class="card-title">📊 今日进度</div>
         <div style="display: flex; justify-content: space-between; font-size: 14px; color: #64748b;">
-          <span>今日 XP</span>
+          <span>每日 XP</span>
           <span><span id="today-xp">0</span> / 100</span>
         </div>
         <div class="progress-bar">
@@ -271,6 +271,7 @@
           <span class="sc-icon" style="width:16px;height:16px;"></span> 可兑换：<strong style="color: #f59e0b;"><span id="can-exchange">0</span> SC</strong>
           <button class="exchange-btn" id="exchange-btn">去兑换</button>
         </div>
+        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">💡 每日 XP 可换 SC，等级 XP 永久累计</p>
       </div>
     </div>
     
@@ -359,7 +360,7 @@
         </div>
         <div class="setting-item">
           <span>版本</span>
-          <span style="color: #64748b;">v2.1.0</span>
+          <span style="color: #64748b;">v2.1.1</span>
         </div>
         <div class="setting-item">
           <span>清除数据</span>
@@ -391,8 +392,14 @@
   <script>
     const STORAGE_KEY = 'xta-game-data';
     const initialState = {
-      xp: 0, sc: 0, level: 1, streak: 0, lastActiveDate: null,
-      todayXP: 0, completedTasks: 0,
+      // 双 XP 系统：2026-03-26 更新
+      levelXP: 0,      // 等级 XP - 永久累计，决定等级和头衔
+      dailyXP: 0,      // 每日 XP - 用于兑换 SC，每日清零
+      sc: 0,           // SC 币
+      level: 1,        // 等级（基于 levelXP 计算）
+      streak: 0,       // 连续天数
+      lastActiveDate: null,
+      completedTasks: 0,
       pendingVerify: [],
       focusCount: 0,
       todayTasks: {
@@ -404,7 +411,7 @@
       taskTime: {},
     };
     
-    // 按天数换算 XP（每天最多 100 XP）
+    // 等级系统（基于永久累计的 levelXP）
     const ranks = [
       { xp: 0, title: '👔 实习员工' },
       { xp: 1000, title: '📋 正式员工' },
@@ -429,11 +436,24 @@
     
     function loadState() {
       const saved = localStorage.getItem(STORAGE_KEY);
-      const state = saved ? JSON.parse(saved) : { ...initialState };
-      // 确保 focusCount 存在
-      if (typeof state.focusCount !== 'number') {
-        state.focusCount = 0;
+      let state = saved ? JSON.parse(saved) : { ...initialState };
+      
+      // 双 XP 系统迁移（2026-03-26）：将旧的 xp 字段迁移到 levelXP
+      if (typeof state.xp === 'number') {
+        state.levelXP = state.xp;
+        delete state.xp;
       }
+      // 将旧的 todayXP 迁移到 dailyXP
+      if (typeof state.todayXP === 'number') {
+        state.dailyXP = state.todayXP;
+        delete state.todayXP;
+      }
+      
+      // 确保必要字段存在
+      if (typeof state.focusCount !== 'number') state.focusCount = 0;
+      if (typeof state.levelXP !== 'number') state.levelXP = 0;
+      if (typeof state.dailyXP !== 'number') state.dailyXP = 0;
+      
       return state;
     }
     
@@ -457,11 +477,11 @@
       // 每日任务重置：固定在凌晨 0 点后首次检查时更新
       if (lastTasksDate !== today) {
         state.todayTasks = initialState.todayTasks;
-        state.todayXP = 0;
+        state.dailyXP = 0;          // 只重置每日 XP（双 XP 系统）
         state.pendingVerify = [];
         state.focusCount = 0;
         localStorage.setItem('xta-tasks-date', today);
-        showToast('🌅 新的一天开始了！加油！');
+        showToast('🌅 新的一天开始了！每日 XP 已重置，等级 XP 保留！');
       }
       
       saveState(state);
@@ -469,9 +489,9 @@
     }
     
     function addXP(amount) {
-      state.xp += amount;
-      state.todayXP += amount;
-      state.level = Math.floor(state.xp / 100) + 1;
+      state.levelXP += amount;      // 等级 XP 永久累计
+      state.dailyXP += amount;      // 每日 XP 用于兑换 SC
+      state.level = Math.floor(state.levelXP / 100) + 1;
       state.completedTasks += 1;
       saveState(state);
       render();
@@ -526,15 +546,15 @@
     }
     
     function exchangeSC() {
-      if (state.todayXP < 100) { showToast('❌ XP 不足'); return; }
+      if (state.dailyXP < 100) { showToast('❌ 每日 XP 不足 100'); return; }
       const today = new Date().toDateString();
       if (localStorage.getItem('xta-last-exchange') === today) { showToast('❌ 今日已兑换，明天再来吧'); return; }
-      state.xp -= 100;
-      state.todayXP -= 100;
+      // 只扣每日 XP，等级 XP 保留（双 XP 系统）
+      state.dailyXP -= 100;
       state.sc += 1;
       saveState(state);
       localStorage.setItem('xta-last-exchange', today);
-      showToast('💰 兑换成功！获得 1 SC');
+      showToast('💰 兑换成功！获得 1 SC（等级 XP 保留）');
       render();
     }
     
@@ -672,14 +692,14 @@
     }
     
     function renderAchievements() {
-      document.getElementById('rank-xp').textContent = state.xp;
+      document.getElementById('rank-xp').textContent = state.levelXP;
       let currentRank = ranks[0];
       for (const rank of ranks) {
-        if (state.xp >= rank.xp) currentRank = rank;
+        if (state.levelXP >= rank.xp) currentRank = rank;
       }
       document.getElementById('rank-title').textContent = currentRank.title;
       const html = ranks.map((r) => {
-        const unlocked = state.xp >= r.xp;
+        const unlocked = state.levelXP >= r.xp;
         return '<div class="task-item ' + (unlocked ? '' : 'locked') + '">' +
           '<div class="task-name">' +
           '<div class="task-check ' + (unlocked ? 'done' : 'locked') + '">' + (unlocked ? '✓' : '') + '</div>' +
@@ -728,19 +748,19 @@
     }
     
     function render() {
-      const canExchange = Math.floor(state.todayXP / 100);
+      const canExchange = Math.floor(state.dailyXP / 100);
       document.getElementById('streak').textContent = state.streak;
       document.getElementById('level').textContent = state.level;
-      document.getElementById('total-xp').textContent = state.xp + ' XP';
+      document.getElementById('total-xp').textContent = state.levelXP + ' XP';
       document.getElementById('sc').textContent = state.sc;
-      document.getElementById('today-xp').textContent = state.todayXP;
+      document.getElementById('today-xp').textContent = state.dailyXP;
       document.getElementById('can-exchange').textContent = canExchange;
-      document.getElementById('progress-fill').style.width = Math.min(100, state.todayXP) + '%';
+      document.getElementById('progress-fill').style.width = Math.min(100, state.dailyXP) + '%';
       
-      // 更新头衔显示
+      // 更新头衔显示（基于等级 XP）
       let currentRank = ranks[0];
       for (const rank of ranks) {
-        if (state.xp >= rank.xp) currentRank = rank;
+        if (state.levelXP >= rank.xp) currentRank = rank;
       }
       document.getElementById('header-rank').textContent = currentRank.title;
       
