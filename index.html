@@ -260,18 +260,32 @@
     <div class="section">
       <div class="card">
         <div class="card-title">📊 今日进度</div>
-        <div style="display: flex; justify-content: space-between; font-size: 14px; color: #64748b;">
-          <span>每日 XP</span>
+        
+        <!-- 每日 XP 进度条（可换 SC） -->
+        <div style="display: flex; justify-content: space-between; font-size: 14px; color: #64748b; margin-bottom: 4px;">
+          <span>💰 每日 XP (可换 SC)</span>
           <span><span id="today-xp">0</span> / 100</span>
         </div>
         <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+          <div class="progress-fill" id="progress-fill" style="width: 0%; background: linear-gradient(90deg, #fcd34d, #f59e0b);"></div>
         </div>
-        <div style="font-size: 14px; color: #64748b;">
+        <div style="font-size: 14px; color: #64748b; margin: 12px 0 8px 0;">
           <span class="sc-icon" style="width:16px;height:16px;"></span> 可兑换：<strong style="color: #f59e0b;"><span id="can-exchange">0</span> SC</strong>
-          <button class="exchange-btn" id="exchange-btn">去兑换</button>
+          <button class="exchange-btn" id="exchange-btn">💰 兑换</button>
         </div>
-        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">💡 每日 XP 可换 SC，等级 XP 永久累计</p>
+        
+        <!-- 等级 XP 进度条（永久累计） -->
+        <div style="display: flex; justify-content: space-between; font-size: 14px; color: #64748b; margin-top: 16px; margin-bottom: 4px;">
+          <span>📈 等级 XP (永久累计)</span>
+          <span id="level-xp-display">0 XP</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="level-progress-fill" style="width: 0%; background: linear-gradient(90deg, #86efac, #22c55e);"></div>
+        </div>
+        
+        <p style="font-size: 12px; color: #ef4444; margin-top: 12px; font-weight: 500;">
+          ⚠️ 每日 XP 凌晨清零，记得当天兑换！
+        </p>
       </div>
     </div>
     
@@ -290,7 +304,12 @@
     </div>
     
     <div class="section">
-      <div class="card-title">📚 作业任务（21:00 前完成）</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div class="card-title" style="margin-bottom: 0;">📚 作业任务</div>
+        <div id="deadline-countdown" style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;">
+          ⏰ 截止：21:00
+        </div>
+      </div>
       <div id="homework-tasks"></div>
     </div>
     
@@ -360,7 +379,7 @@
         </div>
         <div class="setting-item">
           <span>版本</span>
-          <span style="color: #64748b;">v2.1.1</span>
+          <span style="color: #64748b;">v2.1.2</span>
         </div>
         <div class="setting-item">
           <span>清除数据</span>
@@ -757,6 +776,23 @@
       document.getElementById('can-exchange').textContent = canExchange;
       document.getElementById('progress-fill').style.width = Math.min(100, state.dailyXP) + '%';
       
+      // 等级 XP 进度条（下一级需要 100 XP）
+      const nextLevelXP = state.level * 100;
+      const prevLevelXP = (state.level - 1) * 100;
+      const levelProgress = ((state.levelXP - prevLevelXP) / 100) * 100;
+      document.getElementById('level-xp-display').textContent = state.levelXP + ' XP (Lv.' + state.level + ')';
+      document.getElementById('level-progress-fill').style.width = Math.min(100, levelProgress) + '%';
+      
+      // 兑换按钮状态
+      const exchangeBtn = document.getElementById('exchange-btn');
+      if (canExchange > 0) {
+        exchangeBtn.disabled = false;
+        exchangeBtn.style.background = '#f59e0b';
+      } else {
+        exchangeBtn.disabled = true;
+        exchangeBtn.style.background = '#cbd5e1';
+      }
+      
       // 更新头衔显示（基于等级 XP）
       let currentRank = ranks[0];
       for (const rank of ranks) {
@@ -875,11 +911,69 @@
       });
     }
     
+    // 首次弹窗引导
+    function showFirstTimeGuide() {
+      const hasSeenGuide = localStorage.getItem('xta-seen-guide');
+      if (hasSeenGuide) return;
+      
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
+      overlay.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
+        '<div style="font-size:32px;margin-bottom:12px;">💡</div>' +
+        '<h3 style="font-size:18px;font-weight:bold;margin-bottom:16px;color:#1e293b;">SC 换取小贴士</h3>' +
+        '<div style="color:#64748b;font-size:14px;line-height:1.6;margin-bottom:16px;">' +
+        '<p style="margin-bottom:12px;">小塔，你获得的 XP 有两种：</p>' +
+        '<p style="margin-bottom:8px;"><span style="color:#f59e0b;font-weight:bold;">💰 每日 XP</span> → 兑换 SC，凌晨清零</p>' +
+        '<p style="margin-bottom:12px;"><span style="color:#22c55e;font-weight:bold;">📈 等级 XP</span> → 永久累计，提升头衔</p>' +
+        '<p style="background:#fef3c7;padding:12px;border-radius:8px;color:#92400e;font-weight:500;">每 100 每日 XP = 1 SC<br>记得当天兑换，过期就浪费啦！</p>' +
+        '</div>' +
+        '<button onclick="this.closest(\'.guide-overlay\').remove();localStorage.setItem(\'xta-seen-guide\',\'1\');" style="width:100%;background:#6366f1;color:white;border:none;padding:12px;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;">我知道了</button>' +
+        '</div>';
+      overlay.className = 'guide-overlay';
+      document.body.appendChild(overlay);
+    }
+    
+    // 21 点倒计时更新
+    function updateCountdown() {
+      const now = new Date();
+      const deadline = new Date();
+      deadline.setHours(21, 0, 0, 0);
+      
+      const countdownEl = document.getElementById('deadline-countdown');
+      if (!countdownEl) return;
+      
+      if (now >= deadline) {
+        countdownEl.innerHTML = '❌ 已过期';
+        countdownEl.style.background = '#fee2e2';
+        countdownEl.style.color = '#991b1b';
+        return;
+      }
+      
+      const diff = deadline - now;
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (hours > 0) {
+        countdownEl.innerHTML = `⏰ 剩余：${hours}小时${minutes}分`;
+      } else if (minutes > 30) {
+        countdownEl.innerHTML = `⚠️ 剩余：${minutes}分`;
+        countdownEl.style.background = '#fef3c7';
+        countdownEl.style.color = '#92400e';
+      } else {
+        countdownEl.innerHTML = `🚨 紧急：${minutes}分`;
+        countdownEl.style.background = '#fee2e2';
+        countdownEl.style.color = '#991b1b';
+      }
+    }
+    
     document.addEventListener('DOMContentLoaded', () => {
       updateStreak();
       render();
       renderVerify();
       renderAchievements();
+      showFirstTimeGuide();
+      updateCountdown();
+      
       document.getElementById('exchange-btn').onclick = exchangeSC;
       document.getElementById('focus-btn').onclick = startFocus;
       document.getElementById('meal-breakfast').onclick = () => completeTask('breakfast', 'meal', XP_REWARDS.meal);
@@ -894,10 +988,13 @@
         document.getElementById('font-size-select').value = savedFontSize;
         document.body.style.fontSize = savedFontSize + 'px';
       }
+      
+      // 定时更新
       setInterval(() => {
         updateStreak();
         render();
         renderVerify();
+        updateCountdown();
       }, 30000);
     });
   </script>
