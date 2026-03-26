@@ -261,9 +261,9 @@
       <div class="card">
         <div class="card-title">📊 今日进度</div>
         
-        <!-- 每日 XP 进度条（可换 SC） -->
+        <!-- 当日 XP 进度条（可换 SC） -->
         <div style="display: flex; justify-content: space-between; font-size: 14px; color: #64748b; margin-bottom: 4px;">
-          <span>💰 每日 XP (可换 SC)</span>
+          <span>💰 当日 XP (可换 SC)</span>
           <span><span id="today-xp">0</span> / 100</span>
         </div>
         <div class="progress-bar">
@@ -274,9 +274,9 @@
           <button class="exchange-btn" id="exchange-btn">💰 兑换</button>
         </div>
         
-        <!-- 等级 XP 进度条（永久累计） -->
+        <!-- 累积 XP 进度条（永久累计） -->
         <div style="display: flex; justify-content: space-between; font-size: 14px; color: #64748b; margin-top: 16px; margin-bottom: 4px;">
-          <span>📈 等级 XP (永久累计)</span>
+          <span>📈 累积 XP (永久累计)</span>
           <span id="level-xp-display">0 XP</span>
         </div>
         <div class="progress-bar">
@@ -284,8 +284,19 @@
         </div>
         
         <p style="font-size: 12px; color: #ef4444; margin-top: 12px; font-weight: 500;">
-          ⚠️ 每日 XP 凌晨清零，记得当天兑换！
+          ⚠️ 当日 XP 凌晨清零，记得当天兑换！
         </p>
+      </div>
+    </div>
+    
+    <!-- 道具背包快捷栏 -->
+    <div class="section">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div class="card-title" style="margin-bottom: 0;">🎒 道具背包</div>
+          <button onclick="showShopModal()" style="background: #6366f1; color: white; border: none; padding: 4px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">🛒 商店</button>
+        </div>
+        <div id="inventory-bar"></div>
       </div>
     </div>
     
@@ -379,7 +390,7 @@
         </div>
         <div class="setting-item">
           <span>版本</span>
-          <span style="color: #64748b;">v2.1.2</span>
+          <span style="color: #64748b;">v2.1.3</span>
         </div>
         <div class="setting-item">
           <span>清除数据</span>
@@ -412,8 +423,8 @@
     const STORAGE_KEY = 'xta-game-data';
     const initialState = {
       // 双 XP 系统：2026-03-26 更新
-      levelXP: 0,      // 等级 XP - 永久累计，决定等级和头衔
-      dailyXP: 0,      // 每日 XP - 用于兑换 SC，每日清零
+      levelXP: 0,      // 累积 XP - 永久累计，决定等级和头衔
+      dailyXP: 0,      // 当日 XP - 用于兑换 SC，每日清零
       sc: 0,           // SC 币
       level: 1,        // 等级（基于 levelXP 计算）
       streak: 0,       // 连续天数
@@ -421,6 +432,11 @@
       completedTasks: 0,
       pendingVerify: [],
       focusCount: 0,
+      // 道具背包：v2.1.3 新增
+      inventory: {
+        timePause: 0,      // 时间暂停器（个）
+        massage: 0,        // 睡前按摩券（张）
+      },
       todayTasks: {
         chinese: false, math: false, english: false,
         preview: false, review: false, basketball: false,
@@ -467,6 +483,13 @@
         state.dailyXP = state.todayXP;
         delete state.todayXP;
       }
+      
+      // 道具背包迁移（v2.1.3）：确保 inventory 存在
+      if (!state.inventory) {
+        state.inventory = { timePause: 0, massage: 0 };
+      }
+      if (typeof state.inventory.timePause !== 'number') state.inventory.timePause = 0;
+      if (typeof state.inventory.massage !== 'number') state.inventory.massage = 0;
       
       // 确保必要字段存在
       if (typeof state.focusCount !== 'number') state.focusCount = 0;
@@ -565,16 +588,120 @@
     }
     
     function exchangeSC() {
-      if (state.dailyXP < 100) { showToast('❌ 每日 XP 不足 100'); return; }
+      if (state.dailyXP < 100) { showToast('❌ 当日 XP 不足 100'); return; }
       const today = new Date().toDateString();
       if (localStorage.getItem('xta-last-exchange') === today) { showToast('❌ 今日已兑换，明天再来吧'); return; }
-      // 只扣每日 XP，等级 XP 保留（双 XP 系统）
+      // 只扣当日 XP，累积 XP 保留（双 XP 系统）
       state.dailyXP -= 100;
       state.sc += 1;
       saveState(state);
       localStorage.setItem('xta-last-exchange', today);
-      showToast('💰 兑换成功！获得 1 SC（等级 XP 保留）');
+      showToast('💰 兑换成功！获得 1 SC（累积 XP 保留）');
       render();
+    }
+    
+    // 购买时间暂停器（消耗累积 XP）
+    function buyTimePause() {
+      const price = 50;
+      if (state.levelXP < price) { showToast('❌ 累积 XP 不足'); return; }
+      if (state.inventory.timePause >= 5) { showToast('⚠️ 最多携带 5 个'); return; }
+      
+      if (!confirm(`花费 ${price} 累积 XP 购买时间暂停器？\n\n效果：延长 15 分钟\n限制：每天限用 1 次，使用后消失`)) return;
+      
+      state.levelXP -= price;
+      state.inventory.timePause += 1;
+      saveState(state);
+      render();
+      showToast('✅ 购买成功！时间暂停器 ×1');
+    }
+    
+    // 购买睡前按摩券（消耗当日 XP）
+    function buyMassage() {
+      const price = 50;
+      if (state.dailyXP < price) { showToast('❌ 当日 XP 不足'); return; }
+      const weeklyUsed = getWeeklyMassageUsed();
+      if (weeklyUsed >= 2) { showToast('⚠️ 本周已达上限（2 次/周）'); return; }
+      
+      if (!confirm(`花费 ${price} 当日 XP 购买睡前按摩券？\n\n效果：10-15 分钟按摩\n有效期：7 天\n限制：需预约，2 次/周`)) return;
+      
+      state.dailyXP -= price;
+      state.inventory.massage += 1;
+      // 记录购买时间（用于 7 天有效期）
+      if (!state.massageExpiry) state.massageExpiry = [];
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + 7);
+      state.massageExpiry.push(expiryDate.getTime());
+      saveState(state);
+      render();
+      showToast('✅ 购买成功！睡前按摩券 ×1');
+    }
+    
+    // 使用时间暂停器
+    function useTimePause() {
+      if (state.inventory.timePause < 1) { showToast('❌ 没有时间暂停器'); return; }
+      if (state.usedTimePauseToday) { showToast('⚠️ 今天已使用过'); return; }
+      
+      const now = new Date();
+      const deadline = new Date();
+      deadline.setHours(21, 15, 0, 0); // 延长至 21:15
+      
+      if (now >= deadline) { showToast('❌ 已超过可使用时间（21:15）'); return; }
+      
+      if (!confirm(`使用时间暂停器？\n\n作业截止时间延长至 21:15\n使用后道具消失`)) return;
+      
+      state.inventory.timePause -= 1;
+      state.usedTimePauseToday = true;
+      // 更新倒计时
+      updateCountdown(true);
+      saveState(state);
+      render();
+      showToast('⏱️ 时间暂停器已使用！截止至 21:15');
+    }
+    
+    // 使用睡前按摩券
+    function useMassage() {
+      if (state.inventory.massage < 1) { showToast('❌ 没有按摩券'); return; }
+      
+      // 清理过期券
+      const now = Date.now();
+      if (!state.massageExpiry) state.massageExpiry = [];
+      state.massageExpiry = state.massageExpiry.filter(exp => exp > now);
+      
+      if (state.massageExpiry.length === 0) {
+        state.inventory.massage = 0;
+        showToast('❌ 按摩券已过期');
+        saveState(state);
+        render();
+        return;
+      }
+      
+      const expiryDate = new Date(state.massageExpiry[0]);
+      const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+      
+      alert(`🎫 睡前按摩券\n\n有效期：剩余 ${daysLeft} 天\n\n请提前联系 Redpapa 预约时间（21:00-22:00）\n使用后券消失`);
+      
+      state.inventory.massage -= 1;
+      state.massageExpiry.shift();
+      saveState(state);
+      render();
+      showToast('✅ 按摩券已使用！请预约时间');
+    }
+    
+    // 获取本周已使用按摩次数
+    function getWeeklyMassageUsed() {
+      if (!state.massageHistory) return 0;
+      const now = new Date();
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - now.getDay()); // 周日为一周开始
+      weekStart.setHours(0, 0, 0, 0);
+      
+      return state.massageHistory.filter(date => new Date(date) >= weekStart).length;
+    }
+    
+    // 记录按摩使用
+    function recordMassageUsed() {
+      if (!state.massageHistory) state.massageHistory = [];
+      state.massageHistory.push(new Date().toISOString());
     }
     
     function showToast(msg) {
@@ -793,6 +920,9 @@
         exchangeBtn.style.background = '#cbd5e1';
       }
       
+      // 道具快捷栏显示
+      renderInventory();
+      
       // 更新头衔显示（基于等级 XP）
       let currentRank = ranks[0];
       for (const rank of ranks) {
@@ -911,33 +1041,116 @@
       });
     }
     
-    // 首次弹窗引导
+    // 首次弹窗引导（v2.1.3 更新）
     function showFirstTimeGuide() {
-      const hasSeenGuide = localStorage.getItem('xta-seen-guide');
+      const hasSeenGuide = localStorage.getItem('xta-seen-guide-v2');
       if (hasSeenGuide) return;
       
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
-      overlay.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
-        '<div style="font-size:32px;margin-bottom:12px;">💡</div>' +
-        '<h3 style="font-size:18px;font-weight:bold;margin-bottom:16px;color:#1e293b;">SC 换取小贴士</h3>' +
+      overlay.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
+        '<div style="font-size:32px;margin-bottom:12px;">🎉</div>' +
+        '<h3 style="font-size:18px;font-weight:bold;margin-bottom:16px;color:#1e293b;">v2.1.3 道具系统上线！</h3>' +
         '<div style="color:#64748b;font-size:14px;line-height:1.6;margin-bottom:16px;">' +
         '<p style="margin-bottom:12px;">小塔，你获得的 XP 有两种：</p>' +
-        '<p style="margin-bottom:8px;"><span style="color:#f59e0b;font-weight:bold;">💰 每日 XP</span> → 兑换 SC，凌晨清零</p>' +
-        '<p style="margin-bottom:12px;"><span style="color:#22c55e;font-weight:bold;">📈 等级 XP</span> → 永久累计，提升头衔</p>' +
-        '<p style="background:#fef3c7;padding:12px;border-radius:8px;color:#92400e;font-weight:500;">每 100 每日 XP = 1 SC<br>记得当天兑换，过期就浪费啦！</p>' +
+        '<p style="margin-bottom:8px;"><span style="color:#f59e0b;font-weight:bold;">💰 当日 XP</span> → 兑换 SC 或买服务，凌晨清零</p>' +
+        '<p style="margin-bottom:12px;"><span style="color:#22c55e;font-weight:bold;">📈 累积 XP</span> → 提升等级，买装备道具</p>' +
+        '<p style="background:#fef3c7;padding:12px;border-radius:8px;color:#92400e;font-weight:500;margin-bottom:12px;">🛒 道具商店：</p>' +
+        '<p style="margin-bottom:6px;">⏱️ 时间暂停器：50 累积 XP（延长 15 分钟）</p>' +
+        '<p style="margin-bottom:6px;">💆 睡前按摩券：50 当日 XP（10-15 分钟）</p>' +
         '</div>' +
-        '<button onclick="this.closest(\'.guide-overlay\').remove();localStorage.setItem(\'xta-seen-guide\',\'1\');" style="width:100%;background:#6366f1;color:white;border:none;padding:12px;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;">我知道了</button>' +
+        '<button onclick="this.closest(\'.guide-overlay\').remove();localStorage.setItem(\'xta-seen-guide-v2\',\'1\');" style="width:100%;background:#6366f1;color:white;border:none;padding:12px;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;">我知道了</button>' +
         '</div>';
       overlay.className = 'guide-overlay';
       document.body.appendChild(overlay);
     }
     
+    // 道具商店弹窗
+    function showShopModal() {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
+      overlay.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+        '<h3 style="font-size:18px;font-weight:bold;color:#1e293b;">🛒 道具商店</h3>' +
+        '<button onclick="this.closest(\'.shop-modal\').remove()" style="background:none;border:none;font-size:24px;color:#64748b;cursor:pointer;">×</button>' +
+        '</div>' +
+        '<div style="color:#64748b;font-size:13px;margin-bottom:16px;">当前：当日 XP <strong style="color:#f59e0b;">' + state.dailyXP + '</strong> | 累积 XP <strong style="color:#22c55e;">' + state.levelXP + '</strong></div>' +
+        '<div style="display:flex;flex-direction:column;gap:12px;">' +
+        '<div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;padding:16px;border-radius:12px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<div><div style="font-size:20px;margin-bottom:4px;">⏱️</div><div style="font-size:14px;font-weight:bold;">时间暂停器</div><div style="font-size:12px;opacity:0.9;margin-top:4px;">延长 15 分钟，每天限用 1 次</div></div>' +
+        '<div style="text-align:right;"><div style="font-size:16px;font-weight:bold;">50 XP</div><div style="font-size:11px;opacity:0.9;">累积 XP</div></div>' +
+        '</div>' +
+        '<button onclick="buyTimePause();this.closest(\'.shop-modal\').remove()" style="margin-top:12px;width:100%;background:rgba(255,255,255,0.2);color:white;border:none;padding:8px;border-radius:6px;font-size:14px;font-weight:bold;cursor:pointer;">购买</button>' +
+        '</div>' +
+        '<div style="background:linear-gradient(135deg,#f472b6,#ec4899);color:white;padding:16px;border-radius:12px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<div><div style="font-size:20px;margin-bottom:4px;">💆</div><div style="font-size:14px;font-weight:bold;">睡前按摩券</div><div style="font-size:12px;opacity:0.9;margin-top:4px;">10-15 分钟按摩，需预约</div></div>' +
+        '<div style="text-align:right;"><div style="font-size:16px;font-weight:bold;">50 XP</div><div style="font-size:11px;opacity:0.9;">当日 XP</div></div>' +
+        '</div>' +
+        '<button onclick="buyMassage();this.closest(\'.shop-modal\').remove()" style="margin-top:12px;width:100%;background:rgba(255,255,255,0.2);color:white;border:none;padding:8px;border-radius:6px;font-size:14px;font-weight:bold;cursor:pointer;">购买</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+      overlay.className = 'shop-modal';
+      document.body.appendChild(overlay);
+    }
+    
+    // 渲染道具快捷栏
+    function renderInventory() {
+      const invEl = document.getElementById('inventory-bar');
+      if (!invEl) return;
+      
+      const hasItems = state.inventory.timePause > 0 || state.inventory.massage > 0;
+      
+      if (!hasItems) {
+        invEl.innerHTML = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:8px;">🎒 道具包空空的，去商店看看吧～</p>';
+        return;
+      }
+      
+      let html = '<div style="display:flex;gap:12px;flex-wrap:wrap;">';
+      
+      if (state.inventory.timePause > 0) {
+        const usedToday = state.usedTimePauseToday;
+        html += '<div style="flex:1;min-width:140px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;padding:12px;border-radius:10px;position:relative;">' +
+          '<div style="font-size:20px;margin-bottom:4px;">⏱️</div>' +
+          '<div style="font-size:13px;font-weight:bold;">时间暂停器 ×' + state.inventory.timePause + '</div>' +
+          '<div style="font-size:11px;opacity:0.9;margin-top:4px;">延长 15 分钟</div>' +
+          (usedToday ? '<div style="font-size:11px;color:#fcd34d;margin-top:4px;">⚠️ 今日已用</div>' : '') +
+          (!usedToday ? '<button onclick="useTimePause()" style="margin-top:8px;width:100%;background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 8px;border-radius:4px;font-size:12px;cursor:pointer;">使用</button>' : '') +
+          '</div>';
+      }
+      
+      if (state.inventory.massage > 0) {
+        // 清理过期券
+        const now = Date.now();
+        if (state.massageExpiry) {
+          state.massageExpiry = state.massageExpiry.filter(exp => exp > now);
+        }
+        const validCount = state.massageExpiry ? state.massageExpiry.length : 0;
+        
+        html += '<div style="flex:1;min-width:140px;background:linear-gradient(135deg,#f472b6,#ec4899);color:white;padding:12px;border-radius:10px;">' +
+          '<div style="font-size:20px;margin-bottom:4px;">💆</div>' +
+          '<div style="font-size:13px;font-weight:bold;">按摩券 ×' + validCount + '</div>' +
+          '<div style="font-size:11px;opacity:0.9;margin-top:4px;">10-15 分钟</div>' +
+          '<button onclick="useMassage()" style="margin-top:8px;width:100%;background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 8px;border-radius:4px;font-size:12px;cursor:pointer;">预约</button>' +
+          '</div>';
+      }
+      
+      html += '</div>';
+      invEl.innerHTML = html;
+    }
+    
     // 21 点倒计时更新
-    function updateCountdown() {
+    function updateCountdown(usePause = false) {
       const now = new Date();
-      const deadline = new Date();
+      let deadline = new Date();
       deadline.setHours(21, 0, 0, 0);
+      
+      // 如果使用了时间暂停器，延长至 21:15
+      if (usePause || state.usedTimePauseToday) {
+        deadline.setHours(21, 15, 0, 0);
+      }
       
       const countdownEl = document.getElementById('deadline-countdown');
       if (!countdownEl) return;
@@ -955,7 +1168,9 @@
       
       if (hours > 0) {
         countdownEl.innerHTML = `⏰ 剩余：${hours}小时${minutes}分`;
-      } else if (minutes > 30) {
+        countdownEl.style.background = '#fef3c7';
+        countdownEl.style.color = '#92400e';
+      } else if (minutes > 15) {
         countdownEl.innerHTML = `⚠️ 剩余：${minutes}分`;
         countdownEl.style.background = '#fef3c7';
         countdownEl.style.color = '#92400e';
