@@ -356,6 +356,11 @@
         <div id="verify-list"></div>
         <button class="verify-btn" onclick="confirmAllTasks()" style="margin-top: 16px;">✅ 全部确认</button>
       </div>
+      
+      <!-- 核销申请列表 -->
+      <div class="card" style="margin-top: 12px;">
+        <div id="redeem-list"></div>
+      </div>
     </div>
   </div>
   
@@ -390,7 +395,7 @@
         </div>
         <div class="setting-item">
           <span>版本</span>
-          <span style="color: #64748b;">v2.1.3</span>
+          <span style="color: #64748b;">v2.1.4</span>
         </div>
         <div class="setting-item">
           <span>清除数据</span>
@@ -658,7 +663,7 @@
       showToast('⏱️ 时间暂停器已使用！截止至 21:15');
     }
     
-    // 使用睡前按摩券
+    // 使用睡前按摩券（生成核销申请）
     function useMassage() {
       if (state.inventory.massage < 1) { showToast('❌ 没有按摩券'); return; }
       
@@ -678,13 +683,25 @@
       const expiryDate = new Date(state.massageExpiry[0]);
       const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
       
-      alert(`🎫 睡前按摩券\n\n有效期：剩余 ${daysLeft} 天\n\n请提前联系 Redpapa 预约时间（21:00-22:00）\n使用后券消失`);
+      // 生成核销申请
+      const redeemRequest = {
+        id: Date.now(),
+        time: new Date().toISOString(),
+        type: 'massage',
+        status: 'pending' // pending, verified, expired
+      };
       
+      if (!state.redeemRequests) state.redeemRequests = [];
+      state.redeemRequests.push(redeemRequest);
+      
+      // 减少按摩券数量（等待核销）
       state.inventory.massage -= 1;
       state.massageExpiry.shift();
       saveState(state);
       render();
-      showToast('✅ 按摩券已使用！请预约时间');
+      
+      alert(`🎫 睡前按摩券 - 已提交核销申请\n\n有效期：剩余 ${daysLeft} 天\n\n请等待校对员（Redpapa）核销\n核销后提供 10-15 分钟按摩服务`);
+      showToast('✅ 核销申请已提交，等待校对员确认');
     }
     
     // 获取本周已使用按摩次数
@@ -807,34 +824,120 @@
     }
     
     function renderVerify() {
+      // 渲染待校对任务
       const count = state.pendingVerify.length;
       document.getElementById('verify-count').textContent = '待校对任务：' + count + '个';
       document.getElementById('verify-badge').textContent = count;
       
+      let verifyHtml = '';
       if (count === 0) {
-        document.getElementById('verify-list').innerHTML = '<p style="text-align:center;color:#64748b;padding:20px;">暂无待确认任务</p>';
-        return;
-      }
-      
-      const html = state.pendingVerify.map(task => {
+        verifyHtml = '<p style="text-align:center;color:#64748b;padding:20px;">暂无待确认任务</p>';
+      } else {
         const taskNames = {
           chinese: '📖 语文作业', math: '📐 数学作业', english: '🔤 英语作业',
           preview: '📚 提前预习', review: '🔄 今日复习', basketball: '🏀 今日篮球',
           cleanDesk: '🧹 整理书桌', water: '💧 喝水', packBag: '🎒 收拾书包',
           breakfast: '🌅 早餐', lunch: '☀️ 午餐', dinner: '🌙 晚餐', focus: '⚡ 专注充能',
         };
-        return '<div class="task-item pending-verify">' +
+        verifyHtml = state.pendingVerify.map(task => {
+          return '<div class="task-item pending-verify">' +
+            '<div class="task-name">' +
+            '<div class="task-check pending-verify">⏳</div>' +
+            '<span>' + (taskNames[task.id] || task.id) + '</span>' +
+            '</div>' +
+            '<div>' +
+            '<span class="task-xp">+' + task.xp + ' XP</span>' +
+            '<button class="btn btn-verify" onclick="confirmTask({id:\'' + task.id + '\',xp:' + task.xp + '})">确认</button>' +
+            '</div>' +
+            '</div>';
+        }).join('');
+      }
+      document.getElementById('verify-list').innerHTML = verifyHtml;
+      
+      // 渲染核销申请
+      renderRedeemRequests();
+    }
+    
+    // 渲染核销申请列表
+    function renderRedeemRequests() {
+      const redeemEl = document.getElementById('redeem-list');
+      if (!redeemEl) return;
+      
+      // 清理过期的核销申请
+      const now = Date.now();
+      if (state.redeemRequests) {
+        state.redeemRequests = state.redeemRequests.filter(req => {
+          if (req.status === 'expired') return false;
+          const reqTime = new Date(req.time).getTime();
+          return (now - reqTime) < 7 * 24 * 60 * 60 * 1000; // 7 天有效期
+        });
+      }
+      
+      const pendingRequests = state.redeemRequests ? state.redeemRequests.filter(r => r.status === 'pending') : [];
+      
+      if (pendingRequests.length === 0) {
+        redeemEl.innerHTML = '<div style="margin-top:16px;"><p style="text-align:center;color:#64748b;padding:20px;">暂无待核销申请</p></div>';
+        return;
+      }
+      
+      let html = '<div style="margin-top:16px;"><div class="card-title">🎫 待核销申请</div>';
+      html += pendingRequests.map(req => {
+        const reqTime = new Date(req.time);
+        const timeStr = reqTime.toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        
+        let typeName = '';
+        if (req.type === 'massage') typeName = '💆 睡前按摩券';
+        else if (req.type === 'timePause') typeName = '⏱️ 时间暂停器';
+        
+        return '<div class="task-item" style="background:#fef3c7;border:2px solid #f59e0b;">' +
           '<div class="task-name">' +
-          '<div class="task-check pending-verify">⏳</div>' +
-          '<span>' + (taskNames[task.id] || task.id) + '</span>' +
+          '<div style="font-size:20px;">🎫</div>' +
+          '<span>' + typeName + '</span>' +
+          '<span style="font-size:12px;color:#64748b;margin-left:8px;">' + timeStr + '</span>' +
           '</div>' +
           '<div>' +
-          '<span class="task-xp">+' + task.xp + ' XP</span>' +
-          '<button class="btn btn-verify" onclick="confirmTask({id:\'' + task.id + '\',xp:' + task.xp + '})">确认</button>' +
+          '<button class="btn btn-verify" onclick="verifyRedeem(' + req.id + ')">✅ 核销</button>' +
           '</div>' +
           '</div>';
       }).join('');
-      document.getElementById('verify-list').innerHTML = html;
+      html += '</div>';
+      
+      redeemEl.innerHTML = html;
+    }
+    
+    // 核销申请
+    function verifyRedeem(requestId) {
+      if (!state.redeemRequests) return;
+      
+      const request = state.redeemRequests.find(r => r.id === requestId);
+      if (!request) {
+        showToast('❌ 核销申请不存在');
+        return;
+      }
+      
+      let typeName = '';
+      if (request.type === 'massage') typeName = '睡前按摩券';
+      else if (request.type === 'timePause') typeName = '时间暂停器';
+      
+      if (!confirm(`确认核销 ${typeName}？\n\n核销后请提供相应服务`)) return;
+      
+      request.status = 'verified';
+      request.verifiedTime = new Date().toISOString();
+      
+      // 记录核销历史
+      if (!state.redeemHistory) state.redeemHistory = [];
+      state.redeemHistory.push(request);
+      
+      saveState(state);
+      renderVerify();
+      showToast('✅ 核销成功！请提供相应服务');
+      
+      // 如果是按摩券，记录到按摩历史
+      if (request.type === 'massage') {
+        if (!state.massageHistory) state.massageHistory = [];
+        state.massageHistory.push(new Date().toISOString());
+      }
+    }
     }
     
     function renderAchievements() {
