@@ -1,0 +1,26 @@
+{
+  "name": "小塔的努力记录 · Siatar",
+  "short_name": "Siatar",
+  "description": "小塔在 Siatar 公司的成长记录系统",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230f172a'/><stop offset='1' stop-color='%231e3a5f'/></linearGradient></defs><rect width='192' height='192' rx='40' fill='url(%23g)'/><text x='96' y='110' font-size='44' text-anchor='middle' font-family='SF Mono,Consolas,Liberation Mono,Menlo,monospace' font-weight='700' fill='%2338bdf8' letter-spacing='2'>Siatar</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230f172a'/><stop offset='1' stop-color='%231e3a5f'/></linearGradient></defs><rect width='512' height='512' rx='100' fill='url(%23g)'/><text x='256' y='295' font-size='118' text-anchor='middle' font-family='SF Mono,Consolas,Liberation Mono,Menlo,monospace' font-weight='700' fill='%2338bdf8' letter-spacing='4'>Siatar</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

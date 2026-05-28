@@ -1,0 +1,2933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.json">
+  <title>Siatar 工业 · 任务面板</title>
+  <style>
+    :root {
+      --c-primary: #0ea5e9;
+      --c-primary-dark: #0284c7;
+      --c-primary-light: #38bdf8;
+      --c-secondary: #1e3a5f;
+      --c-header-from: #0f172a;
+      --c-header-to: #1e3a5f;
+      --c-success: #22c55e;
+      --c-warning: #f59e0b;
+      --c-danger: #ef4444;
+      --c-gold: #fcd34d;
+      --c-gold-dark: #f59e0b;
+      --c-bg: #f0f4f8;
+      --c-card: #ffffff;
+      --c-text: #1e293b;
+      --c-text-light: #64748b;
+      --c-text-faint: #94a3b8;
+      --c-border: #e2e8f0;
+      --c-bg-soft: #f1f5f9;
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-lift: 0 4px 12px rgba(14,165,233,0.2);
+      --shadow-card-hover: 0 4px 16px rgba(0,0,0,0.1);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { overscroll-behavior: none; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Roboto, sans-serif;
+      background: var(--c-bg);
+      color: var(--c-text);
+      padding-bottom: calc(80px + env(safe-area-inset-bottom));
+      padding-top: env(safe-area-inset-top);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========== Splash ========== */
+    #splash {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, var(--c-header-from), var(--c-header-to));
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.4s;
+    }
+    #splash.hide { opacity: 0; pointer-events: none; }
+    #splash .logo {
+      width: 96px; height: 96px; border-radius: 24px;
+      background: white; display: flex; align-items: center; justify-content: center;
+      font-size: 56px; color: var(--c-primary-dark); font-weight: bold;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      animation: splash-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes splash-pop {
+      0% { transform: scale(0.3); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ========== Header ========== */
+    .header {
+      background: linear-gradient(135deg, var(--c-header-from), var(--c-header-to));
+      color: white;
+      padding: 20px 16px 24px;
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute; top: -50%; right: -20%;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(56,189,248,0.15), transparent 70%);
+      pointer-events: none;
+    }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; position: relative; z-index: 1; }
+    .greeting h1 { font-size: 22px; font-weight: 700; }
+    .greeting p { color: rgba(255,255,255,0.85); font-size: 13px; margin-top: 2px; }
+    .rank-chip {
+      background: rgba(56,189,248,0.18);
+      backdrop-filter: blur(10px);
+      padding: 8px 14px;
+      border-radius: 100px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+      border: 1px solid rgba(56,189,248,0.25);
+    }
+    .rank-chip:active { transform: scale(0.95); }
+    .rank-chip .title { font-size: 14px; font-weight: 600; }
+    .rank-chip .label { font-size: 10px; opacity: 0.85; margin-top: 1px; }
+    .quick-stats {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      position: relative; z-index: 1;
+    }
+    .stat-card {
+      background: rgba(56,189,248,0.12);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-md);
+      padding: 10px 8px;
+      text-align: center;
+      border: 1px solid rgba(56,189,248,0.15);
+    }
+    .stat-card .value { font-size: 18px; font-weight: 700; line-height: 1.2; }
+    .stat-card .label { font-size: 10px; opacity: 0.85; margin-top: 2px; }
+    .sc-coin {
+      display: inline-block; width: 16px; height: 16px;
+      background: linear-gradient(135deg, var(--c-gold), var(--c-gold-dark));
+      border-radius: 50%; position: relative;
+      margin-right: 3px; vertical-align: text-bottom;
+      box-shadow: 0 0 6px rgba(252,211,77,0.6);
+    }
+    .sc-coin::before {
+      content: '$'; position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: #78350f; font-size: 10px; font-weight: bold;
+    }
+    .streak-flame { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+
+    /* ========== Sections ========== */
+    .section { padding: 14px 16px 6px; }
+    .section-title {
+      font-size: 13px; font-weight: 600;
+      color: var(--c-text-light); margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center;
+      letter-spacing: 0.3px;
+    }
+    .card {
+      background: var(--c-card);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+    .card + .card { margin-top: 10px; }
+
+    /* ========== Verify badge banner ========== */
+    .verify-banner {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border: 1.5px solid var(--c-warning);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(245,158,11,0.15);
+      transition: transform 0.15s;
+    }
+    .verify-banner:active { transform: scale(0.98); }
+    .verify-banner .text { font-weight: 600; color: #78350f; font-size: 14px; }
+    .verify-banner .sub { font-size: 11px; color: #92400e; margin-top: 2px; }
+    .verify-banner .count {
+      background: var(--c-danger); color: white;
+      min-width: 24px; height: 24px;
+      border-radius: 12px; padding: 0 8px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 13px;
+      animation: pulse-badge 1.6s infinite;
+    }
+    .verify-banner .count.zero { background: var(--c-text-faint); animation: none; }
+    @keyframes pulse-badge {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+      50% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+    }
+
+    /* ========== Time/Deadline display ========== */
+    .time-card {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      color: white;
+      padding: 14px;
+      border-radius: var(--radius-lg);
+    }
+    .time-card .current { font-size: 28px; font-weight: 700; letter-spacing: 1px; }
+    .time-card .label { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+    .time-card .remaining { font-size: 13px; margin-top: 10px; display: flex; justify-content: space-between; }
+    .time-card .remaining strong { color: var(--c-gold); font-variant-numeric: tabular-nums; }
+    .deadline-bar {
+      width: 100%; height: 8px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px; overflow: hidden;
+      margin-top: 6px;
+    }
+    .deadline-bar > div {
+      height: 100%;
+      background: linear-gradient(90deg, var(--c-success), var(--c-gold), var(--c-danger));
+      transition: width 1s linear;
+    }
+
+    /* ========== Progress (today XP, level XP) ========== */
+    .progress-block { margin-bottom: 12px; }
+    .progress-block:last-child { margin-bottom: 0; }
+    .progress-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; color: var(--c-text-light); margin-bottom: 5px;
+    }
+    .progress-head .right { font-weight: 600; color: var(--c-text); }
+    .progress-bar {
+      width: 100%; height: 10px;
+      background: var(--c-bg-soft);
+      border-radius: 5px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: var(--c-primary);
+    }
+    .progress-fill.gold { background: linear-gradient(90deg, var(--c-gold), var(--c-gold-dark)); }
+    .progress-fill.green { background: linear-gradient(90deg, #86efac, var(--c-success)); }
+    .progress-fill.blue { background: linear-gradient(90deg, var(--c-primary-light), var(--c-primary)); }
+
+    .exchange-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 12px; margin-top: 10px;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-radius: var(--radius-md);
+    }
+    .exchange-row .info { font-size: 13px; color: #78350f; }
+    .exchange-row .info strong { font-size: 16px; color: var(--c-gold-dark); }
+    .exchange-row button {
+      background: linear-gradient(135deg, var(--c-warning), var(--c-gold-dark));
+      color: white; border: none;
+      padding: 6px 14px; border-radius: 100px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(245,158,11,0.4);
+    }
+    .exchange-row button:active { transform: scale(0.96); }
+
+    .hint { font-size: 11px; color: var(--c-text-light); margin-top: 8px; }
+    .hint.warn { color: var(--c-danger); font-weight: 500; }
+
+    /* ========== Task Tabs ========== */
+    .tabs {
+      display: flex;
+      background: var(--c-card);
+      border-radius: var(--radius-lg);
+      padding: 4px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-card);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex: 1; padding: 8px 10px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      font-size: 13px;
+      color: var(--c-text-light);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      position: relative;
+      min-width: 0;
+    }
+    .tab.active {
+      background: var(--c-primary);
+      color: white;
+      font-weight: 600;
+      box-shadow: var(--shadow-lift);
+    }
+    .tab .dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--c-danger);
+      border-radius: 50%;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    /* ========== Task items (工单 style) ========== */
+    .task-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--c-card);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      border: 1px solid var(--c-border);
+      position: relative;
+      transition: all 0.2s;
+    }
+    .task-item:active { transform: scale(0.98); }
+    .task-item.completed {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      opacity: 0.92;
+    }
+    .task-item.pending-verify {
+      background: #fef9e7;
+      border-color: var(--c-warning);
+      box-shadow: 0 2px 8px rgba(245,158,11,0.15);
+    }
+    .task-item.locked { opacity: 0.5; background: var(--c-bg-soft); }
+    .task-name { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .task-check {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0;
+      border: 2px solid var(--c-border);
+      background: white;
+      transition: all 0.2s;
+    }
+    .task-check.done { background: var(--c-success); color: white; border-color: var(--c-success); }
+    .task-check.pending-verify { background: var(--c-warning); color: white; border-color: var(--c-warning); }
+    .task-label { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .task-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .task-xp { color: var(--c-success); font-weight: 700; font-size: 13px; }
+    .task-stamp {
+      position: absolute; top: 6px; right: 6px;
+      font-size: 9px; font-weight: 700;
+      padding: 2px 6px; border-radius: 3px;
+      letter-spacing: 0.5px;
+      transform: rotate(8deg);
+      opacity: 0.85;
+    }
+    .task-stamp.approved {
+      color: var(--c-success); border: 1.5px solid var(--c-success);
+      background: rgba(34,197,94,0.05);
+    }
+    .task-stamp.pending {
+      color: var(--c-warning); border: 1.5px dashed var(--c-warning);
+      background: rgba(245,158,11,0.05);
+    }
+    .btn {
+      background: var(--c-primary); color: white; border: none;
+      padding: 7px 14px; border-radius: 100px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn:disabled { background: var(--c-text-faint); cursor: not-allowed; }
+    .btn-verify { background: linear-gradient(135deg, var(--c-warning), var(--c-gold-dark)); }
+    .btn-danger { background: var(--c-danger); }
+    .btn-success { background: var(--c-success); }
+    .btn-ghost { background: transparent; color: var(--c-text-light); border: 1px solid var(--c-border); }
+
+    /* ========== Meal punch ========== */
+    .meal-row { display: flex; gap: 8px; margin-top: 10px; }
+    .meal-btn {
+      flex: 1; padding: 10px 4px; border: 1.5px solid var(--c-border);
+      background: white; border-radius: var(--radius-md);
+      font-size: 13px; cursor: pointer; font-weight: 500;
+      transition: all 0.2s;
+    }
+    .meal-btn:active { transform: scale(0.96); }
+    .meal-btn.done {
+      background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border-color: #16a34a;
+    }
+
+    /* ========== Inventory drawer ========== */
+    .inv-drawer {
+      display: flex; gap: 8px;
+      overflow-x: auto; padding: 4px 0;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
+    .inv-drawer::-webkit-scrollbar { display: none; }
+    .inv-item {
+      flex-shrink: 0; padding: 8px 12px;
+      border-radius: var(--radius-md);
+      color: white; font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.2s;
+    }
+    .inv-item:active { transform: scale(0.96); }
+    .inv-empty { color: var(--c-text-faint); font-size: 13px; padding: 8px 0; }
+
+    /* ========== Bottom nav ========== */
+    .nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--c-border);
+      display: flex; justify-content: space-around;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+    .nav-item {
+      flex: 1; text-align: center;
+      color: var(--c-text-faint); font-size: 11px;
+      cursor: pointer; padding: 4px;
+      position: relative;
+      transition: color 0.2s;
+    }
+    .nav-item.active { color: var(--c-primary); }
+    .nav-icon { font-size: 22px; margin-bottom: 2px; line-height: 1; }
+    .nav-item .badge {
+      position: absolute; top: 0; right: 50%; margin-right: -22px;
+      background: var(--c-danger); color: white;
+      min-width: 18px; height: 18px; border-radius: 9px;
+      padding: 0 5px; font-size: 11px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: bold;
+    }
+
+    /* ========== Pages ========== */
+    .page { display: none; }
+    .page.active { display: block; animation: page-in 0.25s ease-out; }
+    @keyframes page-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========== Achievements / Ranks ========== */
+    .rank-card-big {
+      background: linear-gradient(135deg, var(--c-header-from), var(--c-header-to));
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: 24px 16px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(14,165,233,0.25);
+    }
+    .rank-card-big .icon { font-size: 56px; margin-bottom: 6px; }
+    .rank-card-big .title { font-size: 22px; font-weight: 700; }
+    .rank-card-big .meta { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+    .rank-card-big .progress {
+      height: 8px; background: rgba(255,255,255,0.2);
+      border-radius: 4px; margin-top: 14px; overflow: hidden;
+    }
+    .rank-card-big .progress > div {
+      height: 100%; background: var(--c-gold);
+      transition: width 0.6s;
+    }
+    .rank-list-item {
+      display: flex; align-items: center;
+      padding: 10px 12px; margin-bottom: 6px;
+      background: var(--c-bg-soft); border-radius: var(--radius-md);
+      gap: 10px;
+    }
+    .rank-list-item.achieved {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border-left: 4px solid var(--c-success);
+    }
+    .rank-list-item.current {
+      background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+      border-left: 4px solid var(--c-primary);
+      box-shadow: var(--shadow-lift);
+    }
+    .rank-list-item .ic { font-size: 22px; }
+    .rank-list-item .name { flex: 1; font-weight: 500; }
+    .rank-list-item .xp { color: var(--c-text-light); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+    /* ========== Growth (history) Tab ========== */
+    .heatmap {
+      display: grid;
+      grid-template-columns: repeat(15, 1fr);
+      gap: 3px;
+      padding: 4px 0;
+    }
+    .heat-cell {
+      aspect-ratio: 1;
+      background: var(--c-bg-soft);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .heat-cell:active { transform: scale(0.85); }
+    .heat-cell.l1 { background: #e0f2fe; }
+    .heat-cell.l2 { background: #7dd3fc; }
+    .heat-cell.l3 { background: #38bdf8; }
+    .heat-cell.l4 { background: #0ea5e9; }
+    .heat-cell.l5 { background: #0284c7; }
+    .heat-cell.today { outline: 2px solid var(--c-primary); outline-offset: 1px; }
+    .heat-legend {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px; color: var(--c-text-light);
+      justify-content: flex-end; margin-top: 8px;
+    }
+    .heat-legend .s {
+      width: 10px; height: 10px; border-radius: 2px;
+    }
+    .stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-top: 12px;
+    }
+    .stat-mini {
+      background: var(--c-bg-soft);
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+    .stat-mini .v { font-size: 22px; font-weight: 700; color: var(--c-primary); }
+    .stat-mini .l { font-size: 12px; color: var(--c-text-light); margin-top: 2px; }
+    .milestone-card {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 8px;
+      border-left: 4px solid var(--c-gold-dark);
+    }
+    .milestone-card .when { font-size: 11px; color: #92400e; }
+    .milestone-card .what { font-weight: 600; color: #78350f; margin-top: 2px; }
+
+    /* ========== Settings ========== */
+    .setting-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 16px;
+      background: var(--c-card);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      box-shadow: var(--shadow-card);
+    }
+    .setting-item .label { font-size: 14px; font-weight: 500; }
+    .setting-item .desc { font-size: 11px; color: var(--c-text-light); margin-top: 2px; }
+    .setting-group { margin-bottom: 16px; }
+    .setting-group .group-title {
+      font-size: 12px; font-weight: 600; color: var(--c-text-light);
+      padding: 0 16px 6px; letter-spacing: 0.5px;
+    }
+
+    /* ========== Modal ========== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      animation: fade-in 0.2s;
+    }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      max-width: 420px; width: 100%;
+      max-height: 85vh; overflow-y: auto;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      animation: modal-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes modal-in {
+      from { transform: scale(0.85) translateY(20px); opacity: 0; }
+      to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .modal-title { font-size: 19px; font-weight: 700; margin-bottom: 12px; }
+    .modal-body { font-size: 14px; color: var(--c-text-light); line-height: 1.55; margin-bottom: 18px; }
+    .modal-body p { margin: 8px 0; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ========== Password modal (custom replacement for prompt) ========== */
+    .pwd-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 18px;
+      border: 2px solid var(--c-border);
+      border-radius: var(--radius-md);
+      outline: none;
+      letter-spacing: 4px;
+      text-align: center;
+      transition: border-color 0.2s;
+      -webkit-text-security: disc;
+    }
+    .pwd-input:focus { border-color: var(--c-primary); }
+    .pwd-input.error {
+      border-color: var(--c-danger);
+      animation: shake 0.4s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    /* ========== Toast ========== */
+    .toast {
+      position: fixed; top: calc(20px + env(safe-area-inset-top));
+      left: 50%; transform: translateX(-50%);
+      background: rgba(30,41,59,0.95);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 100px;
+      z-index: 2000;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      animation: toast-in 0.3s;
+      max-width: 90%;
+    }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translate(-50%, -10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+    .toast.out { animation: toast-out 0.3s forwards; }
+    @keyframes toast-out {
+      to { opacity: 0; transform: translate(-50%, -10px); }
+    }
+
+    /* ========== Level-up celebration ========== */
+    .celebration-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9000;
+      animation: fade-in 0.3s;
+    }
+    .celebration-content {
+      text-align: center; color: white;
+      padding: 20px;
+      animation: celebrate-zoom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes celebrate-zoom {
+      0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+    .celebration-content .icon { font-size: 96px; margin-bottom: 16px; animation: float 2.5s ease-in-out infinite; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .celebration-content .label { font-size: 14px; opacity: 0.85; }
+    .celebration-content .title { font-size: 36px; font-weight: 800; margin: 8px 0; background: linear-gradient(135deg, var(--c-gold), #fff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .celebration-content .quote { font-size: 14px; opacity: 0.85; margin-top: 12px; max-width: 280px; line-height: 1.5; }
+    .celebration-content .ok-btn {
+      margin-top: 24px;
+      background: linear-gradient(135deg, var(--c-gold), var(--c-gold-dark));
+      color: #78350f;
+      border: none;
+      padding: 12px 36px;
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(252,211,77,0.4);
+    }
+    .confetti {
+      position: absolute; width: 8px; height: 16px;
+      background: var(--c-gold);
+      animation: confetti-fall 3s linear forwards;
+    }
+    @keyframes confetti-fall {
+      0% { transform: translateY(-100vh) rotate(0); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ========== Trend Chart ========== */
+    .trend-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+    .trend-tab {
+      flex: 1; text-align: center; padding: 6px; border-radius: 6px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      background: var(--c-bg-soft); color: var(--c-text-light);
+      border: none; transition: all 0.2s;
+    }
+    .trend-tab.active { background: var(--c-primary); color: white; }
+    .trend-chart {
+      width: 100%; height: 160px; position: relative;
+      border-left: 1px solid var(--c-border);
+      border-bottom: 1px solid var(--c-border);
+    }
+    .trend-chart svg { width: 100%; height: 100%; }
+    .trend-chart .axis-label {
+      position: absolute; font-size: 9px; color: var(--c-text-faint);
+    }
+    .trend-summary {
+      display: flex; gap: 8px; margin-top: 10px;
+    }
+    .trend-stat {
+      flex: 1; text-align: center; background: var(--c-bg-soft);
+      border-radius: 8px; padding: 8px;
+    }
+    .trend-stat .v { font-size: 16px; font-weight: 700; color: var(--c-primary); }
+    .trend-stat .l { font-size: 10px; color: var(--c-text-light); margin-top: 2px; }
+
+    /* ========== Company Card ========== */
+    .company-card {
+      background: var(--c-card); border-radius: var(--radius-lg); padding: 14px;
+      box-shadow: var(--shadow-card);
+      border-left: 4px solid var(--c-primary);
+    }
+    .company-card-header {
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+    }
+    .company-card-logo {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--c-header-from), var(--c-header-to));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: white; flex-shrink: 0;
+    }
+    .company-card-info { flex: 1; }
+    .company-card-info .name { font-size: 15px; font-weight: 700; }
+    .company-card-info .slogan { font-size: 11px; color: var(--c-text-light); margin-top: 2px; }
+    .company-card-info .rank-tag {
+      display: inline-block; font-size: 11px; background: var(--c-bg-soft);
+      padding: 2px 8px; border-radius: 100px; margin-top: 4px;
+      color: var(--c-primary-dark); font-weight: 600;
+    }
+    .company-card-toggle {
+      font-size: 12px; color: var(--c-text-faint); transition: transform 0.3s;
+    }
+    .company-card.open .company-card-toggle { transform: rotate(180deg); }
+    .company-card-body {
+      max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
+    }
+    .company-card.open .company-card-body { max-height: 400px; }
+    .company-card-body-inner {
+      padding-top: 12px; margin-top: 12px; border-top: 1px solid var(--c-border);
+    }
+    .dept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .dept-item {
+      background: var(--c-bg-soft); border-radius: 8px; padding: 8px 10px;
+    }
+    .dept-item .dept-name { font-size: 12px; font-weight: 600; }
+    .dept-item .dept-person { color: var(--c-text-light); font-size: 11px; margin-top: 2px; }
+    .dept-item .dept-motto { color: var(--c-text-faint); font-size: 10px; margin-top: 1px; font-style: italic; }
+
+    /* ========== Shop / Goal categories ========== */
+    .shop-item {
+      border: 1.5px solid var(--c-border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 10px;
+      background: white;
+    }
+    .shop-item-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .shop-item-head .name { font-weight: 600; font-size: 14px; }
+    .shop-item-head .desc { font-size: 12px; color: var(--c-text-light); margin-top: 3px; line-height: 1.4; }
+    .shop-item-head .price { text-align: right; flex-shrink: 0; margin-left: 8px; }
+    .shop-item-head .price .cost { color: var(--c-gold-dark); font-weight: 700; font-size: 13px; white-space: nowrap; }
+    .shop-item-head .price .limit { font-size: 11px; color: var(--c-text-light); margin-top: 2px; }
+
+    /* ========== XP increment floating animation ========== */
+    .xp-float {
+      position: fixed;
+      color: var(--c-success);
+      font-weight: 700;
+      font-size: 18px;
+      pointer-events: none;
+      z-index: 5000;
+      animation: xp-rise 1.2s ease-out forwards;
+      text-shadow: 0 2px 8px rgba(34,197,94,0.5);
+    }
+    @keyframes xp-rise {
+      0% { opacity: 0; transform: translateY(0) scale(0.5); }
+      30% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+      100% { opacity: 0; transform: translateY(-80px) scale(1); }
+    }
+
+    /* ========== Tip pills / chips ========== */
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 600;
+    }
+    .chip-success { background: #dcfce7; color: #166534; }
+    .chip-warn { background: #fef3c7; color: #92400e; }
+    .chip-info { background: #dbeafe; color: #1e40af; }
+
+    /* ========== Empty state ========== */
+    .empty-state {
+      padding: 30px 20px;
+      text-align: center;
+      color: var(--c-text-faint);
+    }
+    .empty-state .ic { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+    .empty-state .msg { font-size: 13px; }
+
+    /* ========== Network status ========== */
+    .network-indicator {
+      position: fixed;
+      top: calc(env(safe-area-inset-top) + 8px);
+      right: 12px;
+      background: var(--c-danger); color: white;
+      padding: 4px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 600;
+      z-index: 1500;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .network-indicator.show { display: block; animation: fade-in 0.3s; }
+
+    /* ========== Reduce motion ========== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash"><div class="logo">塔</div></div>
+
+<!-- Network status -->
+<div class="network-indicator" id="net-indicator">📡 离线模式</div>
+
+<!-- ========== HOME PAGE ========== -->
+<div id="home-page" class="page active">
+  <div class="header">
+    <div class="header-top">
+      <div class="greeting">
+        <h1>👋 小塔</h1>
+        <p id="greeting-text">加油，今天也要努力！</p>
+      </div>
+      <div class="rank-chip" onclick="switchPage('achievements')">
+        <div class="title" id="header-rank">🔰 见习成员</div>
+        <div class="label">当前职级</div>
+      </div>
+    </div>
+    <div class="quick-stats">
+      <div class="stat-card">
+        <div class="value" id="level">Lv.1</div>
+        <div class="label">等级</div>
+      </div>
+      <div class="stat-card">
+        <div class="value"><span class="sc-coin"></span><span id="sc">0</span></div>
+        <div class="label">SC 币</div>
+      </div>
+      <div class="stat-card">
+        <div class="value"><span class="streak-flame">🔥<span id="streak">0</span></span></div>
+        <div class="label">连续天数</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Company card -->
+  <div class="section">
+    <div class="company-card" id="company-card" onclick="this.classList.toggle('open')">
+      <div class="company-card-header">
+        <div class="company-card-logo">✦</div>
+        <div class="company-card-info">
+          <div class="name">Siatar工业 <span style="font-size:12px;font-weight:400;color:var(--c-text);">— 部门架构</span></div>
+          <div class="slogan">真正伟大的科技，是帮助人类更好地成长</div>
+          <div class="rank-tag" id="company-rank-tag">🔰 见习成员 · 0 XP</div>
+        </div>
+        <div class="company-card-toggle">▼</div>
+      </div>
+      <div class="company-card-body">
+        <div class="company-card-body-inner">
+          <div class="dept-grid">
+            <div class="dept-item"><div class="dept-name">📚 学习部</div><div class="dept-person">CTO Siatar</div><div class="dept-motto">把知识变成能力</div></div>
+            <div class="dept-item"><div class="dept-name">💪 健康部</div><div class="dept-person">Sam 教练</div><div class="dept-motto">身体是第一装备</div></div>
+            <div class="dept-item"><div class="dept-name">🎒 行政部</div><div class="dept-person">小杨</div><div class="dept-motto">秩序让行动更高效</div></div>
+            <div class="dept-item"><div class="dept-name">🛠️ 研发部</div><div class="dept-person">老张</div><div class="dept-motto">装备随后抵达</div></div>
+            <div class="dept-item"><div class="dept-name">👤 人事部</div><div class="dept-person">曾主任</div><div class="dept-motto">成长值得被记录</div></div>
+            <div class="dept-item"><div class="dept-name">💰 财务部</div><div class="dept-person">Data</div><div class="dept-motto">努力有清楚记录</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verify banner -->
+  <div class="section">
+    <div class="verify-banner" onclick="switchPage('verify')">
+      <div>
+        <div class="text">✅ 待 CEO 审批</div>
+        <div class="sub" id="verify-sub">暂无待审批任务</div>
+      </div>
+      <div class="count zero" id="verify-count">0</div>
+    </div>
+  </div>
+
+  <!-- Time card (always shown to provide deadline awareness) -->
+  <div class="section">
+    <div class="time-card">
+      <div class="current" id="current-time">--:--</div>
+      <div class="label" id="deadline-label">⏰ 兑换 SC 截止：24:00</div>
+      <div class="remaining">
+        <span>🕐 剩余时间</span>
+        <strong id="remaining-time">--:--:--</strong>
+      </div>
+      <div class="deadline-bar"><div id="deadline-fill" style="width:100%"></div></div>
+    </div>
+  </div>
+
+  <!-- Progress card -->
+  <div class="section">
+    <div class="card">
+      <div class="progress-block">
+        <div class="progress-head">
+          <span>💰 当日 XP（财务部结算）</span>
+          <span class="right"><span id="today-xp">0</span> / 100</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill gold" id="today-fill" style="width:0%"></div></div>
+        <div class="exchange-row">
+          <div class="info"><span class="sc-coin"></span>可兑换：<strong id="can-exchange">0</strong> SC</div>
+          <button onclick="showExchangeModal()">💰 兑换</button>
+        </div>
+      </div>
+      <div class="progress-block">
+        <div class="progress-head">
+          <span>📈 累积 XP（永久）</span>
+          <span class="right" id="level-xp-display">0 XP</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill green" id="level-fill" style="width:0%"></div></div>
+      </div>
+      <p class="hint warn">⚠️ 当日 XP 凌晨清零，记得当天兑换</p>
+    </div>
+  </div>
+
+  <!-- Inventory drawer -->
+  <div class="section">
+    <div class="section-title">
+      <span>🧰 装备库</span>
+      <a onclick="showShopModal()" style="color:var(--c-primary);font-weight:600;cursor:pointer;">✦ 研发部</a>
+    </div>
+    <div class="inv-drawer" id="inventory-bar"></div>
+  </div>
+
+  <!-- Task tabs -->
+  <div class="section">
+    <div class="tabs" id="task-tabs">
+      <div class="tab active" data-tab="all" onclick="switchTab('all')">全部</div>
+      <div class="tab" data-tab="learning" onclick="switchTab('learning')">📚 学习部</div>
+      <div class="tab" data-tab="sports" onclick="switchTab('sports')">💪 健康部</div>
+      <div class="tab" data-tab="life" onclick="switchTab('life')">🎒 行政部</div>
+      <div class="tab" data-tab="meal" onclick="switchTab('meal')">⚡ 补给</div>
+    </div>
+    <div id="task-container"></div>
+  </div>
+</div>
+
+<!-- ========== VERIFY PAGE ========== -->
+<div id="verify-page" class="page">
+  <div class="header" style="border-radius:0;padding-bottom:18px;">
+    <div class="header-top">
+      <div class="greeting">
+        <h1>✅ CEO 审批中心</h1>
+        <p>审批任务完成情况，签发 XP</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="card">
+      <div class="section-title" style="margin-bottom:10px;">
+        <span>待确认任务</span>
+        <button class="btn btn-success" onclick="confirmAllTasks()">✅ 全部确认</button>
+      </div>
+      <div id="verify-list"></div>
+    </div>
+    <div class="card" id="redeem-card" style="display:none;">
+      <div class="section-title" style="margin-bottom:10px;"><span>📦 道具核销申请</span></div>
+      <div id="redeem-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== GROWTH PAGE ========== -->
+<div id="growth-page" class="page">
+  <div class="header" style="border-radius:0;padding-bottom:18px;">
+    <div class="header-top">
+      <div class="greeting">
+        <h1>📈 财务部 · 执行记录</h1>
+        <p>Data 为你整理的成长数据</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="card">
+      <div class="section-title" style="margin-bottom:10px;"><span>📅 最近 90 天打卡</span></div>
+      <div class="heatmap" id="heatmap"></div>
+      <div class="heat-legend">
+        <span>少</span>
+        <div class="s" style="background:var(--c-bg-soft)"></div>
+        <div class="s l1"></div>
+        <div class="s l2"></div>
+        <div class="s l3"></div>
+        <div class="s l4"></div>
+        <div class="s l5"></div>
+        <span>多</span>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-mini">
+          <div class="v" id="growth-total-days">0</div>
+          <div class="l">累计打卡天数</div>
+        </div>
+        <div class="stat-mini">
+          <div class="v" id="growth-max-streak">0</div>
+          <div class="l">最长连击</div>
+        </div>
+        <div class="stat-mini">
+          <div class="v" id="growth-total-xp">0</div>
+          <div class="l">累计获得 XP</div>
+        </div>
+        <div class="stat-mini">
+          <div class="v" id="growth-total-sc">0</div>
+          <div class="l">累计兑换 SC</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-bottom:10px;"><span>📈 XP 趋势</span></div>
+      <div class="trend-tabs">
+        <button class="trend-tab active" onclick="switchTrend('week')">周</button>
+        <button class="trend-tab" onclick="switchTrend('month')">月</button>
+      </div>
+      <div class="trend-chart" id="trend-chart"></div>
+      <div class="trend-summary" id="trend-summary"></div>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-bottom:10px;"><span>🏆 里程碑</span></div>
+      <div id="milestone-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ACHIEVEMENTS PAGE ========== -->
+<div id="achievements-page" class="page">
+  <div class="header" style="border-radius:0;padding-bottom:18px;">
+    <div class="header-top">
+      <div class="greeting">
+        <h1>🏆 人事部 · 职级档案</h1>
+        <p>每一次成长，都值得被记录</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="rank-card-big">
+      <div class="icon" id="big-rank-icon">🔰</div>
+      <div class="title" id="big-rank-title">见习成员</div>
+      <div class="meta">累计 XP <span id="big-rank-xp">0</span> / 距下一职级还差 <span id="big-rank-next">0</span> XP</div>
+      <div class="progress"><div id="big-rank-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="card">
+      <div class="section-title" style="margin-bottom:10px;"><span>🪜 晋升通道 · 曾主任审核</span></div>
+      <div id="ranks-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SETTINGS PAGE ========== -->
+<div id="settings-page" class="page">
+  <div class="header" style="border-radius:0;padding-bottom:18px;">
+    <div class="header-top">
+      <div class="greeting">
+        <h1>⚙️ 系统管理</h1>
+        <p>Siatar 工业 · 系统配置</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="setting-group">
+      <div class="group-title">外观</div>
+      <div class="setting-item">
+        <div>
+          <div class="label">字体大小</div>
+          <div class="desc">影响整个页面的文字</div>
+        </div>
+        <select class="btn btn-ghost" id="font-size-select" onchange="changeFontSize(this.value)">
+          <option value="14">小</option>
+          <option value="16" selected>标准</option>
+          <option value="18">大</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="group-title">CEO 权限</div>
+      <div class="setting-item">
+        <div>
+          <div class="label">CEO 审批密码</div>
+          <div class="desc">审批任务和核销道具时输入</div>
+        </div>
+        <button class="btn btn-success" onclick="changePassword()">修改</button>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="group-title">数据管理</div>
+      <div class="setting-item">
+        <div>
+          <div class="label">导出数据</div>
+          <div class="desc">下载 JSON 备份文件</div>
+        </div>
+        <button class="btn" onclick="exportData()">📥 导出</button>
+      </div>
+      <div class="setting-item">
+        <div>
+          <div class="label">导入数据</div>
+          <div class="desc">从 JSON 文件恢复</div>
+        </div>
+        <button class="btn" onclick="document.getElementById('import-file').click()">📤 导入</button>
+        <input type="file" id="import-file" accept="application/json" style="display:none" onchange="importDataFromFile(event)">
+      </div>
+      <div class="setting-item">
+        <div>
+          <div class="label">上次自动备份</div>
+          <div class="desc" id="last-backup-desc">尚未备份</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="group-title">关于</div>
+      <div class="setting-item">
+        <div>
+          <div class="label">版本</div>
+          <div class="desc">Siatar 工业 · 系统版本</div>
+        </div>
+        <span style="color:var(--c-text-light);font-variant-numeric:tabular-nums;" id="version-text">v2.3.1</span>
+      </div>
+      <div class="setting-item">
+        <div>
+          <div class="label">查看升级公告</div>
+          <div class="desc">重新阅读本次更新内容</div>
+        </div>
+        <button class="btn btn-ghost" onclick="showUpgradeNotice(true)">查看</button>
+      </div>
+      <div class="setting-item">
+        <div>
+          <div class="label">关于 Siatar 工业</div>
+          <div class="desc">公司简介、组织架构与部门介绍</div>
+        </div>
+        <button class="btn btn-ghost" onclick="showCompanyInfo()">查看</button>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="group-title" style="color:var(--c-danger);">危险操作</div>
+      <div class="setting-item">
+        <div>
+          <div class="label">清除所有数据</div>
+          <div class="desc">不可恢复，请先导出备份</div>
+        </div>
+        <button class="btn btn-danger" onclick="clearData()">清除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Bottom Nav ========== -->
+<nav class="nav">
+  <div class="nav-item active" data-page="home" onclick="switchPage('home')">
+    <div class="nav-icon">📋</div>
+    <div>任务</div>
+  </div>
+  <div class="nav-item" data-page="verify" onclick="switchPage('verify')">
+    <div class="nav-icon">✅</div>
+    <div>审批</div>
+    <span class="badge" id="nav-verify-badge" style="display:none">0</span>
+  </div>
+  <div class="nav-item" data-page="growth" onclick="switchPage('growth')">
+    <div class="nav-icon">📈</div>
+    <div>记录</div>
+  </div>
+  <div class="nav-item" data-page="achievements" onclick="switchPage('achievements')">
+    <div class="nav-icon">🏆</div>
+    <div>职级</div>
+  </div>
+  <div class="nav-item" data-page="settings" onclick="switchPage('settings')">
+    <div class="nav-icon">⚙️</div>
+    <div>设置</div>
+  </div>
+</nav>
+
+<script>
+/* ===========================================================
+   Siatar 工业 · 任务面板 v2.5.0
+   架构说明：
+   - localStorage 作为主存储（key: 'xta-game-data'）
+   - 历史记录单独存储（key: 'xta-game-history'）
+   - CEO 密码使用 SHA-256 + salt 哈希
+   - 兼容旧数据自动迁移
+   =========================================================== */
+
+const VERSION = 'v2.6.0';
+
+// 本地日期字符串 YYYY-MM-DD（避免 toISOString() 在非 UTC 时区造成的偏移）
+function localDateStr(d) {
+  const date = d || new Date();
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+// v2.5：周期键（cycle）
+// - 周一~周四：每天独立周期，9:00 切换
+// - 周五~周日：三天合为一个 weekend 周期，统一在下周一 9:00 切换
+// - 凌晨 9:00 之前归属前一个"工作日"
+function getActiveCycleKey(now) {
+  const ref = new Date(now || Date.now());
+  if (ref.getHours() < 9) ref.setDate(ref.getDate() - 1);
+  const dow = ref.getDay(); // 0=Sun,1=Mon,...,5=Fri,6=Sat
+  if (dow === 5 || dow === 6 || dow === 0) {
+    // 找到对应的周五日期
+    const friday = new Date(ref);
+    if (dow === 6) friday.setDate(friday.getDate() - 1);
+    else if (dow === 0) friday.setDate(friday.getDate() - 2);
+    return 'weekend-' + localDateStr(friday);
+  }
+  return 'weekday-' + localDateStr(ref);
+}
+
+function isWeekendCycle(cycleKey) {
+  return typeof cycleKey === 'string' && cycleKey.startsWith('weekend-');
+}
+
+// SC 兑换截止时间（按当前周期）
+function getSCDeadline(now) {
+  const ref = new Date(now || Date.now());
+  const dow = ref.getDay();
+  const d = new Date(ref);
+  if (dow === 5 || dow === 6 || dow === 0) {
+    // 周末周期：周六 21:00
+    // 找本周期的周六
+    const saturday = new Date(ref);
+    if (dow === 5) saturday.setDate(saturday.getDate() + 1);
+    else if (dow === 0) saturday.setDate(saturday.getDate() - 1);
+    saturday.setHours(LEARNING_DEADLINE.weekend.h, LEARNING_DEADLINE.weekend.m, 0, 0);
+    return saturday;
+  }
+  d.setHours(LEARNING_DEADLINE.weekday.h, LEARNING_DEADLINE.weekday.m, 0, 0);
+  return d;
+}
+
+// 早鸟窗口判断（当前时刻是否仍在早鸟窗口内）
+function isInEarlyBirdWindow(now) {
+  const ref = new Date(now || Date.now());
+  const dow = ref.getDay();
+  if (dow >= 1 && dow <= 4) {
+    const eb = new Date(ref);
+    eb.setHours(EARLY_BIRD.weekday.h, EARLY_BIRD.weekday.m, 0, 0);
+    return ref <= eb;
+  }
+  if (dow === 5 || dow === 6 || dow === 0) {
+    // 找本周期的周六 18:00
+    const sat = new Date(ref);
+    if (dow === 5) sat.setDate(sat.getDate() + 1);
+    else if (dow === 0) sat.setDate(sat.getDate() - 1);
+    sat.setHours(EARLY_BIRD.weekendSat.h, EARLY_BIRD.weekendSat.m, 0, 0);
+    return ref <= sat;
+  }
+  return false;
+}
+
+// 必做学习（chinese/math/english）是否都已在 SC 截止时间前提交
+function isLearningOnTime() {
+  const deadline = getSCDeadline();
+  for (const id of EXCHANGE_RULES.required) {
+    if (!state.todayTasks[id]) return false;
+    const ts = state.taskTime && state.taskTime[id];
+    if (!ts || ts > deadline.getTime()) return false;
+  }
+  return true;
+}
+
+// Plan Y 辅助：sports / life / nutrition 三个模块中达成 ≥2 个（每个模块 ≥1 个任务）
+function countAuxiliaryGroupsDone() {
+  let count = 0;
+  if (TASK_GROUPS.sports.some(t => state.todayTasks[t.id])) count++;
+  if (TASK_GROUPS.life.some(t => state.todayTasks[t.id])) count++;
+  // nutrition：meals 任意一餐打卡
+  if (state.meals && (state.meals.breakfast || state.meals.lunch || state.meals.dinner)) count++;
+  return count;
+}
+
+const STORAGE_KEY = 'xta-game-data';
+const HISTORY_KEY = 'xta-game-history';
+const PWD_KEY = 'xta-verify-password-hash';
+const PWD_LEGACY_KEY = 'xta-verify-password';  // 旧明文密码键，迁移用
+const BACKUP_PREFIX = 'xta-game-backup-';
+const UPGRADE_SEEN_KEY = 'xta-upgrade-seen-' + VERSION;
+const PWD_SALT = 'xta-siatar-2026';
+
+const initialState = {
+  levelXP: 0, dailyXP: 0, sc: 0, level: 1, streak: 0,
+  lastActiveDate: null, lastCycleKey: null, completedTasks: 0,
+  pendingVerify: [], pendingRedeem: [],
+  inventory: { timePause: 0, massage: 0, scienceExperiment: 0 },
+  massageExpiry: [], scienceExperimentExpiry: [],
+  todayTasks: {
+    bringHome: false, chinese: false, math: false, english: false,
+    basketball: false, earlyFinish: false, organize: false, notDetained: false,
+  },
+  meals: { breakfast: false, lunch: false, dinner: false },
+  taskTime: {},
+  usedTimePauseToday: false,
+  weeklyGameUsed: 0,
+  lastWeekReset: null,
+  lastBackupTime: null,
+  maxStreak: 0,
+  totalScEarned: 0,
+  protectedRankIndex: 0,
+  totalEarnedXP: 0,
+  scClaimedCycles: [],
+  earlyBirdAwardedCycles: [],
+};
+
+// v2.5：精简为 6 档，节奏缩短到 ~1 年
+const ranks = [
+  { xp: 0,     title: '见习成员',       icon: '🔰', color: '#94a3b8', desc: '欢迎加入 Siatar 工业未来行动计划' },
+  { xp: 500,   title: '初级执行员',     icon: '⚡', color: '#22c55e', desc: '已通过试用考核，正式参与任务执行' },
+  { xp: 1500,  title: '任务专员',       icon: '🎯', color: '#3b82f6', desc: '独立完成多部门委派任务的可靠成员' },
+  { xp: 3500,  title: '项目协作员',     icon: '🔗', color: '#8b5cf6', desc: '跨部门协作的中坚力量' },
+  { xp: 7000,  title: '高级执行官',     icon: '⭐', color: '#f59e0b', desc: '战略执行层核心成员' },
+  { xp: 12000, title: '核心成员',       icon: '💎', color: '#ef4444', desc: 'Siatar 工业年度表彰候选人' },
+  { xp: 20000, title: 'Siatar 工程师',  icon: '🛠️', color: '#06b6d4', desc: '掌握核心技术的高级工程师' },
+  { xp: 35000, title: '首席学习官 CLO', icon: '👑', color: '#fcd34d', desc: '与 CEO 并肩的公司最高学习决策者' },
+];
+
+const XP_REWARDS = {
+  bringHome: 10, chinese: 20, math: 20, english: 20,
+  basketball: 10, organize: 10, notDetained: 10,
+  meal: 5, earlyFinish: 0, earlyBird: 10,
+};
+
+// v2.5：SC 兑换新规则
+// - 必做：语文/数学/英语 三科
+// - 辅助：sports / life / nutrition 三个模块，需达成 ≥2 个（每个模块至少 1 个任务）
+// - 学习按时：必做三科都需在 LEARNING_DEADLINE 之前提交
+// - scCost 改为 60（更易达成正常一天的目标）
+const EXCHANGE_RULES = {
+  scCost: 60,
+  required: ['chinese', 'math', 'english'],
+  auxiliaryGroups: ['sports', 'life', 'nutrition'],
+  minAuxiliary: 2,
+};
+
+// 学习按时截止：周一~周四 20:40，周末整个周期 周六 21:00
+const LEARNING_DEADLINE = { weekday: { h: 20, m: 40 }, weekend: { h: 21, m: 0 } };
+// 早鸟窗口：周一~周四 20:00 前，周末（Fri-Sun 周期内）周六 18:00 前
+const EARLY_BIRD = { weekday: { h: 20, m: 0 }, weekendSat: { h: 18, m: 0 }, bonusXP: 10 };
+
+const TIME_PAUSE_ITEM = { name: '⏸️ 时间暂停器', cost: 50, description: '延长 20 分钟截止时间' };
+const MASSAGE_ITEM = { name: '💆 睡前按摩券', cost: 50, validity: '7 天', description: '睡前 10-15 分钟按摩，需预约' };
+// v2.5：科学实验已下线，保留常量定义以兼容历史数据
+const SCIENCE_EXPERIMENT_ITEM = { name: '🔬 科学实验', cost: 50, validity: '7 天', description: '（已下线）' };
+// v2.5：看电视取代游戏时间
+const TV_LIMITS = { maxPerWeek: 3, scCost: 1 };
+
+const TASK_NAMES = {
+  bringHome: '📁 资料回收任务（作业带回家）',
+  chinese: '📖 语文解码训练（语文作业）',
+  math: '📐 数学引擎校准（数学作业）',
+  english: '🔤 英语模块强化（英语作业）',
+  basketball: '💪 身体核心激活（篮球/足弓训练）',
+  organize: '🎒 基地秩序恢复（收拾书包+整理书桌）',
+  notDetained: '🚀 及时返航确认（没被留校）',
+};
+
+// NPC 签发人
+const TASK_ISSUER = {
+  bringHome: 'CTO Siatar',
+  chinese: 'CTO Siatar',
+  math: 'CTO Siatar',
+  english: 'CTO Siatar',
+  basketball: '健康部 Sam 教练',
+  organize: '行政部 小杨',
+  notDetained: '人事部 曾主任',
+};
+
+// 部门归属
+const TASK_DEPT = {
+  bringHome: '学习部',
+  chinese: '学习部',
+  math: '学习部',
+  english: '学习部',
+  basketball: '健康部',
+  organize: '行政部',
+  notDetained: '人事部',
+};
+
+const TASK_GROUPS = {
+  learning: [
+    { id: 'bringHome', xp: 10 },
+    { id: 'chinese', xp: 20 },
+    { id: 'math', xp: 20 },
+    { id: 'english', xp: 20 },
+  ],
+  sports: [{ id: 'basketball', xp: 10 }],
+  life: [
+    { id: 'organize', xp: 10 },
+    { id: 'notDetained', xp: 10 },
+  ],
+  // v2.5：营养独立为一个辅助模块（实际任务沿用 meals 打卡）
+  nutrition: [
+    { id: 'meal_breakfast', xp: 5 },
+    { id: 'meal_lunch', xp: 5 },
+    { id: 'meal_dinner', xp: 5 },
+  ],
+};
+
+const MEALS = [
+  { id: 'breakfast', name: '🌅 早间补给', xp: 5 },
+  { id: 'lunch', name: '☀️ 午间补给', xp: 5 },
+  { id: 'dinner', name: '🌙 晚间补给', xp: 5 },
+];
+
+const GREETINGS = [
+  '今日任务面板已启动，请开始执行',
+  'Siatar 工业期待你的今日表现',
+  '新一轮任务已签发，准备就绪',
+  '保持节奏，每一步都在积累 XP',
+  '各部门任务已就位，等你来挑战',
+  '系统已上线，开始你的执行计划',
+  'CTO Siatar 已签发今日学习任务',
+  'Sam 教练提醒：别忘了体能激活训练',
+];
+
+/* ===========================================================
+   State & Storage
+   =========================================================== */
+let state;
+let history;
+let currentTab = 'all';
+let timeReminderInterval = null;
+let lastLevelXP = 0;
+let lastRankIndex = -1;
+
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function hashPassword(pwd) {
+  return await sha256(pwd + PWD_SALT);
+}
+
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  let s = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(initialState));
+
+  // Data migration
+  if (typeof s.xp === 'number') { s.levelXP = s.xp; delete s.xp; }
+  if (!s.inventory) s.inventory = { timePause: 0, massage: 0, scienceExperiment: 0 };
+  if (typeof s.inventory.massage !== 'number') s.inventory.massage = 0;
+  if (typeof s.inventory.scienceExperiment !== 'number') s.inventory.scienceExperiment = 0;
+  if (!s.meals) s.meals = { breakfast: false, lunch: false, dinner: false };
+  if (!s.massageExpiry) s.massageExpiry = [];
+  if (!s.scienceExperimentExpiry) s.scienceExperimentExpiry = [];
+  if (!s.pendingRedeem) s.pendingRedeem = [];
+  if (!s.pendingVerify) s.pendingVerify = [];
+  if (!s.todayTasks) s.todayTasks = { ...initialState.todayTasks };
+  if (typeof s.maxStreak !== 'number') s.maxStreak = s.streak || 0;
+  if (typeof s.totalScEarned !== 'number') s.totalScEarned = s.sc || 0;
+  if (!s.lastBackupTime) s.lastBackupTime = null;
+  if (!Array.isArray(s.scClaimedCycles)) s.scClaimedCycles = [];
+  if (!Array.isArray(s.earlyBirdAwardedCycles)) s.earlyBirdAwardedCycles = [];
+  if (!s.taskTime || typeof s.taskTime !== 'object') s.taskTime = {};
+
+  // v2.5：totalEarnedXP = 历史累计 XP（只增不减），用于头衔判定
+  // levelXP = 可花余额（买道具扣这里，不影响头衔）
+  if (typeof s.totalEarnedXP !== 'number' || s.totalEarnedXP === 0) {
+    // 迁移：首次加载 v2.5，用当前 levelXP 作为历史累计起点
+    s.totalEarnedXP = s.levelXP || 0;
+  }
+
+  // v2.5：头衔保护。首次升级到 v2.5 时锁定当前头衔档位，规则收紧后不会被降级
+  if (typeof s.protectedRankIndex !== 'number') {
+    let idx = 0;
+    ranks.forEach((r, i) => { if ((s.totalEarnedXP || 0) >= r.xp) idx = i; });
+    s.protectedRankIndex = idx;
+  }
+
+  // v2.5：按"周期"重置（替代 v2.3 之前的按日历日重置）
+  const today = new Date().toDateString();
+  const currentCycle = getActiveCycleKey();
+  if (s.lastCycleKey !== currentCycle) {
+    // streak：按"上次活跃日"距今天数判断
+    if (s.lastActiveDate) {
+      const last = new Date(s.lastActiveDate);
+      const now = new Date();
+      const diff = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+      if (diff > 1) s.streak = 0;
+    }
+    s.dailyXP = 0;
+    s.todayTasks = { ...initialState.todayTasks };
+    s.meals = { breakfast: false, lunch: false, dinner: false };
+    s.taskTime = {};
+    s.usedTimePauseToday = false;
+    s.lastCycleKey = currentCycle;
+    s.lastActiveDate = today;
+
+    // Weekly reset (Monday)
+    if (new Date().getDay() === 1) {
+      s.weeklyGameUsed = 0;
+      s.lastWeekReset = today;
+    }
+
+    // 旧周期记录裁剪（只保留最近 30 条，避免无限增长）
+    if (s.scClaimedCycles.length > 30) s.scClaimedCycles = s.scClaimedCycles.slice(-30);
+    if (s.earlyBirdAwardedCycles.length > 30) s.earlyBirdAwardedCycles = s.earlyBirdAwardedCycles.slice(-30);
+  }
+  if (s.streak > s.maxStreak) s.maxStreak = s.streak;
+  return s;
+}
+
+function saveState() {
+  if (typeof state === 'undefined') return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  scheduleAutoBackup();
+}
+
+function loadHistory() {
+  const saved = localStorage.getItem(HISTORY_KEY);
+  return saved ? JSON.parse(saved) : [];
+}
+
+function saveHistory() {
+  // Cap at 1000 entries to prevent unbounded growth
+  if (history.length > 1000) history = history.slice(-1000);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+function recordHistory(entry) {
+  history.push({
+    timestamp: Date.now(),
+    date: localDateStr(),
+    ...entry
+  });
+  saveHistory();
+}
+
+/* ===========================================================
+   Auto backup (rolling 7 days)
+   =========================================================== */
+let backupTimer = null;
+function scheduleAutoBackup() {
+  if (backupTimer) return;
+  backupTimer = setTimeout(() => {
+    backupTimer = null;
+    const today = new Date().toISOString().slice(0, 10);
+    const key = BACKUP_PREFIX + today;
+    localStorage.setItem(key, JSON.stringify({
+      timestamp: Date.now(),
+      data: localStorage.getItem(STORAGE_KEY),
+      history: localStorage.getItem(HISTORY_KEY),
+    }));
+    state.lastBackupTime = Date.now();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+    // Clean backups older than 7 days
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    Object.keys(localStorage).filter(k => k.startsWith(BACKUP_PREFIX)).forEach(k => {
+      try {
+        const b = JSON.parse(localStorage.getItem(k));
+        if (b.timestamp < cutoff) localStorage.removeItem(k);
+      } catch (e) {}
+    });
+  }, 3000);
+}
+
+/* ===========================================================
+   Password (SHA-256 + salt)
+   =========================================================== */
+async function migrateLegacyPassword() {
+  const legacy = localStorage.getItem(PWD_LEGACY_KEY);
+  const hashed = localStorage.getItem(PWD_KEY);
+  if (legacy && !hashed) {
+    const h = await hashPassword(legacy);
+    localStorage.setItem(PWD_KEY, h);
+    localStorage.removeItem(PWD_LEGACY_KEY);
+  }
+}
+
+async function getStoredPasswordHash() {
+  return localStorage.getItem(PWD_KEY);
+}
+
+async function verifyPassword(pwd) {
+  const stored = await getStoredPasswordHash();
+  if (!stored) return true;  // 没设过密码，默认通过
+  const inputHash = await hashPassword(pwd);
+  return inputHash === stored;
+}
+
+async function setPassword(pwd) {
+  const h = await hashPassword(pwd);
+  localStorage.setItem(PWD_KEY, h);
+}
+
+/* ===========================================================
+   Custom Password Modal (replaces prompt)
+   =========================================================== */
+function askPassword(title, message) {
+  return new Promise((resolve) => {
+    const html = `
+      <div class="modal-overlay" id="pwd-modal-overlay">
+        <div class="modal">
+          <div class="modal-title">${title}</div>
+          <div class="modal-body">${message || '请输入 CEO 审批密码'}</div>
+          <input type="password" inputmode="numeric" class="pwd-input" id="pwd-input-field" autofocus>
+          <div style="font-size:11px;color:var(--c-text-light);margin-top:8px;text-align:center;">输入完成后按回车确认</div>
+          <div class="modal-actions" style="margin-top:18px;">
+            <button class="btn btn-ghost" onclick="resolvePwd(null)">取消</button>
+            <button class="btn" onclick="submitPwd()">确认</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+    const field = document.getElementById('pwd-input-field');
+    field.focus();
+    field.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitPwd();
+      else if (e.key === 'Escape') resolvePwd(null);
+    });
+    window.resolvePwd = (val) => {
+      const m = document.getElementById('pwd-modal-overlay');
+      if (m) m.remove();
+      resolve(val);
+    };
+    window.submitPwd = () => {
+      const v = field.value;
+      if (!v) {
+        field.classList.add('error');
+        setTimeout(() => field.classList.remove('error'), 500);
+        return;
+      }
+      resolvePwd(v);
+    };
+  });
+}
+
+async function askPasswordAndVerify(title, msg) {
+  const pwd = await askPassword(title, msg);
+  if (pwd === null) return false;
+  const ok = await verifyPassword(pwd);
+  if (!ok) {
+    showToast('❌ 密码错误', 'error');
+    return false;
+  }
+  return true;
+}
+
+/* ===========================================================
+   UI Rendering
+   =========================================================== */
+function getCurrentRank() {
+  return [...ranks].reverse().find(r => state.levelXP >= r.xp) || ranks[0];
+}
+
+function getNextRank() {
+  const xp = state.totalEarnedXP || state.levelXP || 0;
+  return ranks.find(r => r.xp > xp);
+}
+
+function getRankIndex() {
+  let idx = 0;
+  const xp = state.totalEarnedXP || state.levelXP || 0;
+  ranks.forEach((r, i) => { if (xp >= r.xp) idx = i; });
+  // v2.5：头衔保护，规则收紧后不会被降级
+  const floor = state.protectedRankIndex || 0;
+  return Math.max(idx, floor);
+}
+
+function animateNumber(el, from, to, duration = 600) {
+  if (!el) return;
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const v = Math.round(from + (to - from) * eased);
+    el.textContent = v;
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function updateUI(animateXP = false) {
+  const rank = getCurrentRank();
+  document.getElementById('header-rank').textContent = rank.icon + ' ' + rank.title;
+  document.getElementById('level').textContent = 'Lv.' + state.level;
+
+  // Animate or set XP/SC directly
+  const scEl = document.getElementById('sc');
+  if (animateXP) {
+    const prev = parseInt(scEl.textContent) || 0;
+    animateNumber(scEl, prev, state.sc);
+  } else {
+    scEl.textContent = state.sc;
+  }
+
+  document.getElementById('streak').textContent = state.streak;
+
+  // Greeting
+  const gIdx = (new Date().getDate()) % GREETINGS.length;
+  document.getElementById('greeting-text').textContent = GREETINGS[gIdx];
+
+  // Today XP progress
+  document.getElementById('today-xp').textContent = state.dailyXP;
+  document.getElementById('today-fill').style.width = Math.min(state.dailyXP, 100) + '%';
+  // v2.5：可兑换数 = 真实 eligibility 结果，避免"XP 够但辅助没完成"的误导
+  const elig = checkExchangeEligibility();
+  document.getElementById('can-exchange').textContent = elig.eligible ? 1 : 0;
+
+  // Level progress（用 totalEarnedXP 显示头衔进度，levelXP 是可花余额）
+  const rankXP = state.totalEarnedXP || state.levelXP || 0;
+  const prevRankXP = [...ranks].reverse().find(r => r.xp <= rankXP)?.xp || 0;
+  const nextRank = getNextRank();
+  const nextRankXP = nextRank ? nextRank.xp : rankXP + 1000;
+  const progress = ((rankXP - prevRankXP) / (nextRankXP - prevRankXP)) * 100;
+  document.getElementById('level-fill').style.width = Math.min(100, progress) + '%';
+  document.getElementById('level-xp-display').textContent = rankXP + ' XP';
+
+  // Verify badge
+  const count = state.pendingVerify.length;
+  const banner = document.getElementById('verify-count');
+  banner.textContent = count;
+  banner.classList.toggle('zero', count === 0);
+  document.getElementById('verify-sub').textContent = count > 0 ? `有 ${count} 项任务待 CEO 审批` : '暂无待审批任务';
+  const navBadge = document.getElementById('nav-verify-badge');
+  if (count > 0) { navBadge.textContent = count; navBadge.style.display = ''; }
+  else { navBadge.style.display = 'none'; }
+
+  renderTasks();
+  renderInventory();
+  updateAchievementsPage();
+  updateCompanyCard();
+  checkTimeDisplay();
+}
+
+function updateCompanyCard() {
+  const rank = getCurrentRank();
+  const xp = state.totalEarnedXP || state.levelXP || 0;
+  const tag = document.getElementById('company-rank-tag');
+  if (tag) tag.textContent = `${rank.icon} ${rank.title} · ${xp} XP`;
+  // 首次打开自动展开，之后记住折叠状态
+  const card = document.getElementById('company-card');
+  if (!card) return;
+  const seenKey = 'xta-company-card-seen';
+  if (!localStorage.getItem(seenKey)) {
+    card.classList.add('open');
+    localStorage.setItem(seenKey, '1');
+  }
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('#task-tabs .tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  renderTasks();
+}
+
+function renderTaskItem(taskId, xp) {
+  const completed = state.todayTasks[taskId];
+  const pending = state.pendingVerify.find(t => t.id === taskId);
+  const statusClass = pending ? 'pending-verify' : (completed ? 'completed' : '');
+  const checkClass = pending ? 'pending-verify' : (completed ? 'done' : '');
+  const checkText = pending ? '⏳' : (completed ? '✓' : '');
+  const stamp = pending
+    ? '<div class="task-stamp pending">待审批</div>'
+    : (completed ? '<div class="task-stamp approved">已审批</div>' : '');
+  return `
+    <div class="task-item ${statusClass}" data-tid="${taskId}">
+      ${stamp}
+      <div class="task-name">
+        <div class="task-check ${checkClass}">${checkText}</div>
+        <span class="task-label">${TASK_NAMES[taskId]}</span>
+      </div>
+      <div class="task-right">
+        <span class="task-xp">+${xp} XP</span>
+        ${!completed && !pending ? `<button class="btn" onclick="event.stopPropagation();completeTask('${taskId}')">完成</button>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderMealItem(meal) {
+  const done = state.meals[meal.id];
+  return `
+    <button class="meal-btn ${done ? 'done' : ''}" ${done ? 'disabled' : ''} onclick="toggleMeal('${meal.id}')">
+      ${done ? '✓ ' : ''}${meal.name}
+    </button>`;
+}
+
+function renderTasks() {
+  const c = document.getElementById('task-container');
+  let html = '';
+  const showGroup = (title, items, showCard = true) => {
+    if (!items) return '';
+    return `<div class="section-title" style="padding:8px 0 6px;">${title}</div>${items}`;
+  };
+
+  const learningHtml = TASK_GROUPS.learning.map(t => renderTaskItem(t.id, t.xp)).join('');
+  const sportsHtml = TASK_GROUPS.sports.map(t => renderTaskItem(t.id, t.xp)).join('');
+  const lifeHtml = TASK_GROUPS.life.map(t => renderTaskItem(t.id, t.xp)).join('');
+  const mealHtml = `
+    <div class="card">
+      <div class="section-title" style="margin-bottom:6px;">
+        <span>⚡ 能量补给任务</span>
+        <span class="chip chip-success">+5 XP / 餐</span>
+      </div>
+      <p class="hint" style="margin-bottom:8px;">健康部要求：碳水 + 蛋白质 + 膳食纤维（任一餐补给即算辅助达标）</p>
+      <div class="meal-row">${MEALS.map(renderMealItem).join('')}</div>
+    </div>`;
+
+  if (currentTab === 'all') {
+    html += showGroup('📚 学习部 · 必做任务（CTO Siatar 签发）', learningHtml);
+    html += showGroup('💪 健康部 · 辅助（Sam 教练签发）', sportsHtml);
+    html += showGroup('🎒 行政部 · 辅助（小杨签发）', lifeHtml);
+    html += showGroup('⚡ 健康部 · 能量补给（辅助）', mealHtml);
+  } else if (currentTab === 'learning') {
+    html += learningHtml || '<div class="empty-state"><div class="ic">🎉</div><div class="msg">全部完成了！</div></div>';
+  } else if (currentTab === 'sports') {
+    html += sportsHtml;
+  } else if (currentTab === 'life') {
+    html += lifeHtml;
+  } else if (currentTab === 'meal') {
+    html += mealHtml;
+  }
+  c.innerHTML = html;
+}
+
+function renderInventory() {
+  const items = [];
+  if (state.inventory.timePause >= 1) {
+    const n = state.inventory.timePause > 1 ? ` x${state.inventory.timePause}` : '';
+    items.push(`<div class="inv-item" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);">⏸️ 时间暂停器${n}</div>`);
+  }
+  if (state.inventory.massage >= 1) {
+    const n = state.inventory.massage > 1 ? ` x${state.inventory.massage}` : '';
+    items.push(`<div class="inv-item" style="background:linear-gradient(135deg,#f59e0b,#d97706);" onclick="redeemMassage()">💆 按摩券${n}</div>`);
+  }
+  if (state.inventory.scienceExperiment >= 1) {
+    const n = state.inventory.scienceExperiment > 1 ? ` x${state.inventory.scienceExperiment}` : '';
+    items.push(`<div class="inv-item" style="background:linear-gradient(135deg,#9333ea,#7e22ce);" onclick="redeemScienceExperiment()">🔬 科学实验${n}</div>`);
+  }
+  if (state.weeklyGameUsed >= 1) {
+    items.push(`<div class="inv-item" style="background:linear-gradient(135deg,#22c55e,#16a34a);">🎬 本周看电视 ${state.weeklyGameUsed} 次</div>`);
+  }
+  if (items.length === 0) {
+    items.push('<span class="inv-empty">暂无装备，前往研发部领取 →</span>');
+  }
+  document.getElementById('inventory-bar').innerHTML = items.join('');
+}
+
+/* ===========================================================
+   Task Actions
+   =========================================================== */
+function completeTask(taskId) {
+  state.todayTasks[taskId] = true;
+  const ts = Date.now();
+  state.taskTime[taskId] = ts; // v2.5：记录提交时间，用于"学习按时"判定
+  state.pendingVerify.push({
+    id: taskId,
+    name: TASK_NAMES[taskId],
+    xp: XP_REWARDS[taskId],
+    time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+    timestamp: ts,
+  });
+  state.completedTasks++;
+  saveState();
+  recordHistory({ type: 'task_submitted', taskId, name: TASK_NAMES[taskId], xp: XP_REWARDS[taskId] });
+
+  // XP float animation from task to header
+  const taskEl = document.querySelector(`[data-tid="${taskId}"]`);
+  if (taskEl) {
+    const rect = taskEl.getBoundingClientRect();
+    spawnXpFloat('提交 +' + XP_REWARDS[taskId] + ' XP', rect.left + rect.width / 2, rect.top);
+  }
+
+  updateUI();
+  showToast(`✅ ${TASK_DEPT[taskId] || ''}已确认提交，等待 CEO 审批`);
+}
+
+function toggleMeal(mealId) {
+  if (state.meals[mealId]) { showToast('⚠️ 今日已打卡'); return; }
+  const meal = MEALS.find(m => m.id === mealId);
+  state.meals[mealId] = true;
+  const ts = Date.now();
+  state.taskTime['meal_' + mealId] = ts;
+  state.pendingVerify.push({
+    id: 'meal_' + mealId,
+    name: meal.name,
+    xp: meal.xp,
+    time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+    timestamp: ts,
+  });
+  state.completedTasks++;
+  saveState();
+  recordHistory({ type: 'meal_submitted', mealId, name: meal.name, xp: meal.xp });
+  updateUI();
+  showToast('✅ 健康部已记录能量补给');
+}
+
+async function confirmTask(index) {
+  const ok = await askPasswordAndVerify('CEO 审批', '确认签发该任务的 XP？');
+  if (!ok) return;
+  applyConfirmTask(index);
+}
+
+function applyConfirmTask(index) {
+  const task = state.pendingVerify[index];
+  const beforeRank = getRankIndex();
+  state.levelXP += task.xp;
+  state.totalEarnedXP = (state.totalEarnedXP || 0) + task.xp;
+  state.dailyXP += task.xp;
+  state.pendingVerify.splice(index, 1);
+  state.level = Math.floor(state.levelXP / 100) + 1;
+  state.streak = Math.max(state.streak, 1);  // 至少 1 天
+  if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+  saveState();
+  recordHistory({ type: 'task_confirmed', taskId: task.id, name: task.name, xp: task.xp });
+
+  const afterRank = getRankIndex();
+  updateUI(true);
+  renderVerifyPage();
+
+  if (afterRank > beforeRank) {
+    celebrateRankUp(ranks[afterRank]);
+  } else {
+    showToast(`🎉 财务部 Data 已结算：+${task.xp} XP`);
+  }
+}
+
+async function confirmAllTasks() {
+  if (state.pendingVerify.length === 0) { showToast('暂无待审批任务'); return; }
+  const ok = await askPasswordAndVerify('CEO 批量审批', `一次签发全部 ${state.pendingVerify.length} 项任务的 XP？`);
+  if (!ok) return;
+  const beforeRank = getRankIndex();
+  let totalXp = 0;
+  state.pendingVerify.forEach(task => {
+    state.levelXP += task.xp;
+    state.totalEarnedXP = (state.totalEarnedXP || 0) + task.xp;
+    state.dailyXP += task.xp;
+    totalXp += task.xp;
+    recordHistory({ type: 'task_confirmed', taskId: task.id, name: task.name, xp: task.xp });
+  });
+  state.pendingVerify = [];
+  state.level = Math.floor(state.levelXP / 100) + 1;
+  state.streak = Math.max(state.streak, 1);
+  if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+  saveState();
+  const afterRank = getRankIndex();
+  updateUI(true);
+  renderVerifyPage();
+  if (afterRank > beforeRank) {
+    celebrateRankUp(ranks[afterRank]);
+  } else {
+    showToast(`🎉 财务部 Data 已结算：+${totalXp} XP`);
+  }
+}
+
+async function confirmRedeem(index) {
+  const ok = await askPasswordAndVerify('CEO 核销', '确认签发该道具的使用权？');
+  if (!ok) return;
+  const item = state.pendingRedeem[index];
+  state.pendingRedeem.splice(index, 1);
+  saveState();
+  recordHistory({ type: 'redeem_confirmed', name: item.name });
+  renderInventory();
+  renderVerifyPage();
+  showToast('✅ 行政部已核销，道具已生效');
+}
+
+/* ===========================================================
+   Verify Page
+   =========================================================== */
+function renderVerifyPage() {
+  const list = document.getElementById('verify-list');
+  if (state.pendingVerify.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="ic">📭</div><div class="msg">暂无待审批任务</div></div>';
+  } else {
+    list.innerHTML = state.pendingVerify.map((task, idx) => `
+      <div class="task-item pending-verify">
+        <div class="task-name">
+          <div class="task-check pending-verify">⏳</div>
+          <div>
+            <div style="font-weight:600;font-size:14px;">${task.name}</div>
+            <div style="font-size:11px;color:var(--c-text-light);margin-top:2px;">${task.time} 提交</div>
+          </div>
+        </div>
+        <div class="task-right">
+          <span class="task-xp">+${task.xp}</span>
+          <button class="btn btn-verify" onclick="confirmTask(${idx})">确认</button>
+        </div>
+      </div>`).join('');
+  }
+
+  const redeemCard = document.getElementById('redeem-card');
+  const redeemList = document.getElementById('redeem-list');
+  if (state.pendingRedeem.length > 0) {
+    redeemCard.style.display = '';
+    redeemList.innerHTML = state.pendingRedeem.map((item, idx) => `
+      <div class="task-item pending-verify">
+        <div class="task-name">
+          <div class="task-check pending-verify">⏳</div>
+          <div>
+            <div style="font-weight:600;font-size:14px;">${item.name}</div>
+            <div style="font-size:11px;color:var(--c-text-light);margin-top:2px;">${item.time} 申请 · ${item.note || ''}</div>
+          </div>
+        </div>
+        <div class="task-right">
+          <button class="btn btn-verify" onclick="confirmRedeem(${idx})">核销</button>
+        </div>
+      </div>`).join('');
+  } else {
+    redeemCard.style.display = 'none';
+  }
+}
+
+/* ===========================================================
+   Achievements Page
+   =========================================================== */
+function updateAchievementsPage() {
+  const rank = getCurrentRank();
+  const next = getNextRank();
+  document.getElementById('big-rank-icon').textContent = rank.icon;
+  document.getElementById('big-rank-title').textContent = rank.title;
+  const rXP = state.totalEarnedXP || state.levelXP || 0;
+  document.getElementById('big-rank-xp').textContent = rXP;
+  document.getElementById('big-rank-next').textContent = next ? (next.xp - rXP) : 0;
+  const prevXP = [...ranks].reverse().find(r => r.xp <= rXP)?.xp || 0;
+  const nextXP = next ? next.xp : rXP + 1000;
+  const bigProgress = ((rXP - prevXP) / (nextXP - prevXP)) * 100;
+  document.getElementById('big-rank-bar').style.width = Math.min(100, bigProgress) + '%';
+
+  const currentIdx = getRankIndex();
+  document.getElementById('ranks-list').innerHTML = ranks.map((r, i) => {
+    const cls = i < currentIdx ? 'achieved' : (i === currentIdx ? 'current' : '');
+    const status = i < currentIdx ? '✅' : (i === currentIdx ? '⭐' : '⬜');
+    return `<div class="rank-list-item ${cls}">
+      <span class="ic">${r.icon}</span>
+      <div class="name">${status} ${r.title}<div style="font-size:11px;color:var(--c-text-light);font-weight:400;margin-top:2px;">${r.desc}</div></div>
+      <span class="xp">${r.xp} XP</span>
+    </div>`;
+  }).join('');
+}
+
+/* ===========================================================
+   Growth Page (history)
+   =========================================================== */
+function renderGrowthPage() {
+  // Heatmap of last 90 days
+  const days = 90;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayStr = localDateStr(today);
+
+  // Aggregate XP per date from history
+  const xpByDate = {};
+  history.forEach(h => {
+    if (h.type === 'task_confirmed' || h.type === 'meal_confirmed') {
+      xpByDate[h.date] = (xpByDate[h.date] || 0) + (h.xp || 0);
+    }
+  });
+
+  const cells = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const ds = localDateStr(d);
+    const xp = xpByDate[ds] || 0;
+    let level = 0;
+    if (xp > 0) level = 1;
+    if (xp >= 20) level = 2;
+    if (xp >= 50) level = 3;
+    if (xp >= 80) level = 4;
+    if (xp >= 100) level = 5;
+    cells.push(`<div class="heat-cell ${level ? 'l' + level : ''} ${ds === todayStr ? 'today' : ''}"
+      title="${ds}: ${xp} XP" onclick="showDayDetail('${ds}', ${xp})"></div>`);
+  }
+  document.getElementById('heatmap').innerHTML = cells.join('');
+
+  // Stats
+  const totalDays = Object.keys(xpByDate).filter(d => xpByDate[d] > 0).length;
+  const totalXp = Object.values(xpByDate).reduce((a, b) => a + b, 0);
+  document.getElementById('growth-total-days').textContent = totalDays;
+  document.getElementById('growth-max-streak').textContent = state.maxStreak;
+  document.getElementById('growth-total-xp').textContent = state.totalEarnedXP || state.levelXP;
+  document.getElementById('growth-total-sc').textContent = state.totalScEarned;
+
+  // Trend chart
+  renderTrendChart('week');
+
+  // Milestones
+  const milestones = generateMilestones();
+  const ms = document.getElementById('milestone-list');
+  if (milestones.length === 0) {
+    ms.innerHTML = '<div class="empty-state"><div class="ic">🌱</div><div class="msg">继续执行任务，人事部将记录你的里程碑</div></div>';
+  } else {
+    ms.innerHTML = milestones.map(m => `
+      <div class="milestone-card">
+        <div class="when">${m.when}</div>
+        <div class="what">${m.what}</div>
+      </div>`).join('');
+  }
+}
+
+function generateMilestones() {
+  const out = [];
+  // Streak milestones
+  [7, 14, 30, 60, 100].forEach(n => {
+    if (state.maxStreak >= n) out.push({ when: '行政部表彰', what: `🔥 连续执行任务 ${n} 天！` });
+  });
+  // Rank milestones
+  const currentIdx = getRankIndex();
+  for (let i = 1; i <= currentIdx; i++) {
+    out.push({ when: '人事部任命', what: `${ranks[i].icon} 晋升为「${ranks[i].title}」` });
+  }
+  // SC milestones
+  [10, 50, 100].forEach(n => {
+    if (state.totalScEarned >= n) out.push({ when: '财务部记录', what: `💰 累计获得 ${n} SC` });
+  });
+  return out.slice(-10).reverse();
+}
+
+function showDayDetail(date, xp) {
+  const entries = history.filter(h => h.date === date && (h.type === 'task_confirmed' || h.type === 'meal_confirmed'));
+  let body = `<p><strong>当天获得 XP：${xp}</strong></p>`;
+  if (entries.length === 0) {
+    body += '<p style="color:var(--c-text-faint);">这一天没有完成任务记录</p>';
+  } else {
+    body += '<p style="margin-top:12px;">完成的任务：</p>';
+    body += entries.map(e => `<p>· ${e.name} (+${e.xp} XP)</p>`).join('');
+  }
+  showInfoModal('📅 ' + date, body);
+}
+
+/* ===========================================================
+   Trend Chart
+   =========================================================== */
+let currentTrendMode = 'week';
+
+function switchTrend(mode) {
+  currentTrendMode = mode;
+  document.querySelectorAll('.trend-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  renderTrendChart(mode);
+}
+
+function renderTrendChart(mode) {
+  const container = document.getElementById('trend-chart');
+  const summaryEl = document.getElementById('trend-summary');
+  if (!container) return;
+
+  // Aggregate XP per date from history
+  const xpByDate = {};
+  history.forEach(h => {
+    if (h.type === 'task_confirmed' || h.type === 'meal_confirmed') {
+      xpByDate[h.date] = (xpByDate[h.date] || 0) + (h.xp || 0);
+    }
+  });
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let buckets = []; // { label, xp }
+
+  if (mode === 'week') {
+    // Last 8 weeks
+    for (let w = 7; w >= 0; w--) {
+      let weekXp = 0;
+      const weekStart = new Date(today);
+      weekStart.setDate(weekStart.getDate() - w * 7);
+      for (let d = 0; d < 7; d++) {
+        const day = new Date(weekStart);
+        day.setDate(day.getDate() + d);
+        const ds = localDateStr(day);
+        weekXp += xpByDate[ds] || 0;
+      }
+      const ws = new Date(weekStart);
+      const label = `${ws.getMonth() + 1}/${ws.getDate()}`;
+      buckets.push({ label, xp: weekXp });
+    }
+  } else {
+    // Last 6 months
+    for (let m = 5; m >= 0; m--) {
+      const monthDate = new Date(today.getFullYear(), today.getMonth() - m, 1);
+      const monthEnd = new Date(today.getFullYear(), today.getMonth() - m + 1, 0);
+      let monthXp = 0;
+      for (let d = new Date(monthDate); d <= monthEnd; d.setDate(d.getDate() + 1)) {
+        monthXp += xpByDate[localDateStr(d)] || 0;
+      }
+      const label = `${monthDate.getMonth() + 1}月`;
+      buckets.push({ label, xp: monthXp });
+    }
+  }
+
+  const maxXp = Math.max(...buckets.map(b => b.xp), 1);
+  const W = 320, H = 140, PAD_L = 5, PAD_R = 5, PAD_T = 15, PAD_B = 25;
+  const chartW = W - PAD_L - PAD_R;
+  const chartH = H - PAD_T - PAD_B;
+
+  const points = buckets.map((b, i) => {
+    const x = PAD_L + (i / (buckets.length - 1 || 1)) * chartW;
+    const y = PAD_T + chartH - (b.xp / maxXp) * chartH;
+    return { x, y, ...b };
+  });
+
+  // Build gradient fill
+  const polylinePoints = points.map(p => `${p.x},${p.y}`).join(' ');
+  const areaPoints = `${points[0].x},${PAD_T + chartH} ${polylinePoints} ${points[points.length - 1].x},${PAD_T + chartH}`;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  // Defs for gradient
+  svg += `<defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="var(--c-primary)" stop-opacity="0.25"/>
+    <stop offset="100%" stop-color="var(--c-primary)" stop-opacity="0.02"/>
+  </linearGradient></defs>`;
+  // Grid lines
+  for (let i = 0; i <= 4; i++) {
+    const gy = PAD_T + (chartH / 4) * i;
+    svg += `<line x1="${PAD_L}" y1="${gy}" x2="${W - PAD_R}" y2="${gy}" stroke="var(--c-border)" stroke-width="0.5" stroke-dasharray="3,3"/>`;
+  }
+  // Area fill
+  svg += `<polygon points="${areaPoints}" fill="url(#tg)"/>`;
+  // Line
+  svg += `<polyline points="${polylinePoints}" fill="none" stroke="var(--c-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  // Dots and labels
+  points.forEach(p => {
+    svg += `<circle cx="${p.x}" cy="${p.y}" r="3" fill="var(--c-primary)" stroke="white" stroke-width="1.5"/>`;
+    if (p.xp > 0) {
+      svg += `<text x="${p.x}" y="${p.y - 7}" text-anchor="middle" fill="var(--c-primary)" font-size="9" font-weight="600">${p.xp}</text>`;
+    }
+    svg += `<text x="${p.x}" y="${H - 5}" text-anchor="middle" fill="var(--c-text-faint)" font-size="9">${p.label}</text>`;
+  });
+  svg += '</svg>';
+
+  container.innerHTML = svg;
+
+  // Summary stats
+  const totalPeriod = buckets.reduce((s, b) => s + b.xp, 0);
+  const avgPeriod = Math.round(totalPeriod / buckets.length);
+  const trend = buckets.length >= 2 ? buckets[buckets.length - 1].xp - buckets[buckets.length - 2].xp : 0;
+  const trendIcon = trend > 0 ? '📈' : trend < 0 ? '📉' : '➡️';
+
+  summaryEl.innerHTML = `
+    <div class="trend-stat"><div class="v">${totalPeriod}</div><div class="l">${mode === 'week' ? '近8周' : '近6月'}累计 XP</div></div>
+    <div class="trend-stat"><div class="v">${avgPeriod}</div><div class="l">平均每${mode === 'week' ? '周' : '月'}</div></div>
+    <div class="trend-stat"><div class="v">${trendIcon} ${trend >= 0 ? '+' : ''}${trend}</div><div class="l">较上${mode === 'week' ? '周' : '月'}</div></div>
+  `;
+}
+
+/* ===========================================================
+   Time display & deadline
+   =========================================================== */
+function checkTimeDisplay() {
+  updateTimeDisplay();
+  if (!timeReminderInterval) timeReminderInterval = setInterval(updateTimeDisplay, 1000);
+}
+
+function getDeadline() {
+  // v2.5：SC 兑换截止 = 周一~周四当天 20:40；周末（Fri-Sun）周期为 周六 21:00
+  const deadline = getSCDeadline();
+  if (state.usedTimePauseToday) {
+    deadline.setMinutes(deadline.getMinutes() + 20);
+  }
+  return deadline;
+}
+
+function updateTimeDisplay() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('current-time').textContent = timeStr;
+
+  const dayOfWeek = now.getDay();
+  const deadline = getDeadline();
+  const isWeekend = (dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6);
+  const deadlineLabel = isWeekend
+    ? `⏰ 兑换 SC 截止：周六 21:00${state.usedTimePauseToday ? '+20' : ''}`
+    : `⏰ 兑换 SC 截止：20:40${state.usedTimePauseToday ? '+20' : ''}`;
+  document.getElementById('deadline-label').textContent = deadlineLabel;
+
+  const remainingMs = Math.max(0, deadline - now);
+  const remainingSec = Math.floor(remainingMs / 1000);
+  const h = Math.floor(remainingSec / 3600);
+  const m = Math.floor((remainingSec % 3600) / 60);
+  const s = remainingSec % 60;
+  const txt = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  const rEl = document.getElementById('remaining-time');
+  if (rEl) {
+    rEl.textContent = txt;
+    if (remainingSec <= 300) rEl.style.color = 'var(--c-danger)';
+    else if (remainingSec <= 1800) rEl.style.color = 'var(--c-gold)';
+    else rEl.style.color = 'var(--c-gold)';
+  }
+
+  // Progress bar (0% when deadline reached, 100% at start of day)
+  const startOfDay = new Date(now);
+  startOfDay.setHours(0, 0, 0, 0);
+  const totalSec = Math.max(1, Math.floor((deadline - startOfDay) / 1000));
+  const pct = Math.max(0, Math.min(100, (remainingSec / totalSec) * 100));
+  const fEl = document.getElementById('deadline-fill');
+  if (fEl) fEl.style.width = pct + '%';
+}
+
+/* ===========================================================
+   Exchange / Shop
+   =========================================================== */
+function checkExchangeEligibility() {
+  const result = { eligible: true, messages: [], suggestions: '', earlyBird: false };
+  const now = new Date();
+  const cycle = getActiveCycleKey();
+  const weekend = isWeekendCycle(cycle);
+
+  // 1) 当前周期是否已兑换过
+  if (state.scClaimedCycles && state.scClaimedCycles.includes(cycle)) {
+    result.eligible = false;
+    result.messages.push(weekend ? '❌ 本周末已兑换过 1 枚 SC' : '❌ 今日已兑换过 1 枚 SC');
+  }
+
+  // 2) 必做三科
+  const homeworkOk = EXCHANGE_RULES.required.every(id => state.todayTasks[id]);
+  if (!homeworkOk) {
+    result.eligible = false;
+    result.messages.push('❌ 语文/数学/英语 未全部完成');
+  }
+
+  // 3) 学习按时（必做三科都需在截止前提交）
+  if (homeworkOk && !isLearningOnTime()) {
+    result.eligible = false;
+    const deadlineLabel = weekend ? '周六 21:00' : '20:40';
+    result.messages.push(`❌ 必做三科未在 ${deadlineLabel} 前提交`);
+    result.suggestions = '今天的 SC 机会已失去，但 XP 继续累积（对头衔/兑换道具仍有帮助）';
+  }
+
+  // 4) 辅助 Plan Y：sports / life / nutrition 三个模块中达成 ≥2
+  const auxDone = countAuxiliaryGroupsDone();
+  if (auxDone < EXCHANGE_RULES.minAuxiliary) {
+    result.eligible = false;
+    result.messages.push(`❌ 辅助模块只达成 ${auxDone}/${EXCHANGE_RULES.minAuxiliary}（运动/生活/营养任选其二）`);
+  }
+
+  // 5) 截止时间（兜底）
+  const deadline = getDeadline();
+  if (now > deadline) {
+    result.eligible = false;
+    if (!result.messages.some(m => m.includes('截止'))) {
+      result.messages.push('❌ 已超过兑换截止时间');
+      result.suggestions = result.suggestions || '明天请更早开始，或使用时间暂停器';
+    }
+  }
+
+  // 6) 当日 XP 阈值
+  if (state.dailyXP < EXCHANGE_RULES.scCost) {
+    result.eligible = false;
+    result.messages.push(`❌ 当日 XP 不足（${state.dailyXP}/${EXCHANGE_RULES.scCost}）`);
+  }
+
+  // 早鸟提示（不影响 eligible，仅展示）
+  if (isInEarlyBirdWindow(now) && !(state.earlyBirdAwardedCycles || []).includes(cycle)) {
+    result.earlyBird = true;
+  }
+
+  return result;
+}
+
+function showExchangeModal() {
+  const check = checkExchangeEligibility();
+  if (!check.eligible) {
+    const body = '<p><strong>检查结果：</strong></p>'
+      + check.messages.map(m => `<p>${m}</p>`).join('')
+      + (check.suggestions ? `<p style="margin-top:14px;padding:10px;background:#fef3c7;border-radius:8px;">💡 ${check.suggestions}</p>` : '');
+    showInfoModal('❌ 暂不能兑换 SC', body);
+    return;
+  }
+  const remaining = state.dailyXP - EXCHANGE_RULES.scCost;
+  const cycle = getActiveCycleKey();
+  const weekend = isWeekendCycle(cycle);
+  const ebLabel = weekend ? '周六 18:00 前' : '20:00 前';
+  const body = `
+    <p>当日 XP：<strong>${state.dailyXP}</strong></p>
+    ${check.earlyBird ? `<p style="color:var(--c-success);">🌅 ${ebLabel}完成，可额外获得 +${EARLY_BIRD.bonusXP} XP 早鸟奖励！</p>` : ''}
+    <p>兑换：-${EXCHANGE_RULES.scCost} XP → +1 SC</p>
+    <p>剩余 ${Math.max(0, remaining)} XP 累积（计入累积 XP，对头衔/道具有帮助）</p>
+    <p style="margin-top:12px;padding:10px;background:var(--c-bg-soft);border-radius:8px;">
+      当前 SC：<strong>${state.sc}</strong> · XP 余额：${state.levelXP}
+    </p>`;
+  showConfirmModal('🎉 可以兑换', body, '兑换 1 SC', exchangeSC);
+}
+
+function exchangeSC() {
+  const cycle = getActiveCycleKey();
+  // 再次校验：本周期只能 1 枚
+  if ((state.scClaimedCycles || []).includes(cycle)) {
+    closeAllModals();
+    showToast('⚠️ 本周期已兑换过');
+    return;
+  }
+  state.sc += 1;
+  state.totalScEarned = (state.totalScEarned || 0) + 1;
+  state.dailyXP -= EXCHANGE_RULES.scCost;
+  if (!Array.isArray(state.scClaimedCycles)) state.scClaimedCycles = [];
+  state.scClaimedCycles.push(cycle);
+
+  // v2.5：早鸟奖励 +10 XP（累积），每个周期最多 1 次
+  let earlyBirdBonus = 0;
+  if (isInEarlyBirdWindow() && !(state.earlyBirdAwardedCycles || []).includes(cycle)) {
+    earlyBirdBonus = EARLY_BIRD.bonusXP;
+    state.levelXP += earlyBirdBonus;
+    state.totalEarnedXP = (state.totalEarnedXP || 0) + earlyBirdBonus;
+    if (!Array.isArray(state.earlyBirdAwardedCycles)) state.earlyBirdAwardedCycles = [];
+    state.earlyBirdAwardedCycles.push(cycle);
+    recordHistory({ type: 'early_bird_bonus', xp: earlyBirdBonus, cycle });
+  }
+
+  saveState();
+  recordHistory({ type: 'sc_exchanged', amount: 1, cycle });
+  updateUI(true);
+  closeAllModals();
+  showToast(earlyBirdBonus > 0 ? `🎉 财务部已结算：+1 SC，早鸟奖励 +${earlyBirdBonus} XP！` : '🎉 财务部已结算：+1 SC');
+}
+
+function showShopModal() {
+  const body = `
+    <div style="background:var(--c-bg-soft);padding:10px;border-radius:8px;margin-bottom:14px;">
+      <p style="font-size:12px;color:var(--c-text-light);">研发部 老张 · 装备发放中心</p>
+      <p style="margin-top:4px;">SC：<strong>${state.sc}</strong> · XP 余额：<strong>${state.levelXP}</strong></p>
+      <p style="font-size:11px;color:var(--c-text-light);margin-top:2px;">头衔总 XP：${state.totalEarnedXP || 0}（兑换装备不影响职级）</p>
+    </div>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">⏸️ 时间暂停器</div><div class="desc">研发部出品 · 延长 20 分钟截止</div></div>
+        <div class="price"><div class="cost">50 XP</div><div class="limit">每日限 1 次</div></div>
+      </div>
+      <button class="btn" style="width:100%;" onclick="buyTimePause()">兑换</button>
+    </div>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">💆 睡前按摩券</div><div class="desc">行政部小杨签发 · 10-15 分钟，有效 7 天</div></div>
+        <div class="price"><div class="cost">50 XP</div><div class="limit">无限制</div></div>
+      </div>
+      <button class="btn btn-verify" style="width:100%;" onclick="buyMassage()">兑换</button>
+    </div>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">🎬 看电视 20 分钟</div><div class="desc">行政部福利 · 周末使用，需 CEO 批准</div></div>
+        <div class="price"><div class="cost">1 SC</div><div class="limit">每周限 3 次</div></div>
+      </div>
+      <button class="btn btn-verify" style="width:100%;" ${state.weeklyGameUsed >= TV_LIMITS.maxPerWeek ? 'disabled' : ''} onclick="buyTVTime()">
+        ${state.weeklyGameUsed >= TV_LIMITS.maxPerWeek ? '本周已达上限' : '兑换'}
+      </button>
+    </div>`;
+  showInfoModal('✦ 研发部 · 装备与福利', body);
+}
+
+function buyTimePause() {
+  if (state.usedTimePauseToday) { showToast('⚠️ 今日已使用'); return; }
+  if (state.levelXP < TIME_PAUSE_ITEM.cost) { showToast(`❌ XP 余额不足（需 ${TIME_PAUSE_ITEM.cost}，当前 ${state.levelXP}）`); return; }
+  state.levelXP -= TIME_PAUSE_ITEM.cost;
+  state.inventory.timePause += 1;
+  state.usedTimePauseToday = true;
+  saveState();
+  recordHistory({ type: 'item_bought', name: TIME_PAUSE_ITEM.name, cost: TIME_PAUSE_ITEM.cost });
+  closeAllModals();
+  updateUI();
+  showToast('✅ 研发部已发货：时间暂停器 ×1');
+}
+
+function buyMassage() {
+  if (state.levelXP < MASSAGE_ITEM.cost) { showToast(`❌ XP 余额不足（需 ${MASSAGE_ITEM.cost}，当前 ${state.levelXP}）`); return; }
+  state.levelXP -= MASSAGE_ITEM.cost;
+  state.inventory.massage += 1;
+  state.massageExpiry.push(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  saveState();
+  recordHistory({ type: 'item_bought', name: MASSAGE_ITEM.name, cost: MASSAGE_ITEM.cost });
+  closeAllModals();
+  updateUI();
+  showToast('✅ 行政部已签发：按摩券 ×1');
+}
+
+// v2.5：看电视 20 分钟（取代旧版游戏 15 分钟），复用 weeklyGameUsed 字段
+function buyTVTime() {
+  if (state.sc < TV_LIMITS.scCost) { showToast('❌ SC 不足'); return; }
+  if (state.weeklyGameUsed >= TV_LIMITS.maxPerWeek) { showToast('⚠️ 本周已达上限'); return; }
+  state.sc -= TV_LIMITS.scCost;
+  state.weeklyGameUsed += 1;
+  saveState();
+  recordHistory({ type: 'tv_redeemed' });
+  closeAllModals();
+  updateUI();
+  showToast('✅ 行政部已签发：电视福利 20 分钟');
+}
+
+function redeemMassage() {
+  if (state.inventory.massage < 1) { showToast('❌ 没有按摩券'); return; }
+  const now = Date.now();
+  state.massageExpiry = state.massageExpiry.filter(e => e > now);
+  if (state.massageExpiry.length === 0) {
+    state.inventory.massage = 0; saveState(); updateUI();
+    showToast('❌ 按摩券已过期'); return;
+  }
+  state.pendingRedeem.push({ type: 'massage', name: '💆 睡前按摩券', time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }), note: '请 CEO 安排时间' });
+  state.inventory.massage -= 1;
+  state.massageExpiry.shift();
+  saveState();
+  updateUI();
+  showToast('✅ 已提交核销申请，等待 CEO 审批');
+}
+
+function redeemScienceExperiment() {
+  if (state.inventory.scienceExperiment < 1) { showToast('❌ 没有科学实验券'); return; }
+  const now = Date.now();
+  state.scienceExperimentExpiry = state.scienceExperimentExpiry.filter(e => e > now);
+  if (state.scienceExperimentExpiry.length === 0) {
+    state.inventory.scienceExperiment = 0; saveState(); updateUI();
+    showToast('❌ 已过期'); return;
+  }
+  state.pendingRedeem.push({ type: 'scienceExperiment', name: '🔬 科学实验', time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }), note: '请 CEO 安排实验时间' });
+  state.inventory.scienceExperiment -= 1;
+  state.scienceExperimentExpiry.shift();
+  saveState();
+  updateUI();
+  showToast('✅ 已提交核销申请，等待 CEO 审批');
+}
+
+/* ===========================================================
+   Navigation
+   =========================================================== */
+function switchPage(pageName) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageName + '-page').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === pageName);
+  });
+  if (pageName === 'verify') renderVerifyPage();
+  if (pageName === 'growth') renderGrowthPage();
+  if (pageName === 'achievements') updateAchievementsPage();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ===========================================================
+   Modals
+   =========================================================== */
+function closeAllModals() {
+  document.querySelectorAll('.modal-overlay, .celebration-overlay').forEach(m => m.remove());
+}
+
+function showInfoModal(title, body) {
+  const html = `
+    <div class="modal-overlay" onclick="if(event.target===this) this.remove()">
+      <div class="modal">
+        <div class="modal-title">${title}</div>
+        <div class="modal-body">${body}</div>
+        <div class="modal-actions">
+          <button class="btn" onclick="closeAllModals()">知道了</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function showConfirmModal(title, body, okText, onOk) {
+  const id = 'cm-' + Date.now();
+  window.__confirmCb = onOk;
+  const html = `
+    <div class="modal-overlay" onclick="if(event.target===this) this.remove()">
+      <div class="modal">
+        <div class="modal-title">${title}</div>
+        <div class="modal-body">${body}</div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeAllModals()">取消</button>
+          <button class="btn btn-verify" onclick="window.__confirmCb && window.__confirmCb()">${okText}</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+/* ===========================================================
+   Toast & Effects
+   =========================================================== */
+function showToast(msg, type = 'info') {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }, 2200);
+}
+
+function spawnXpFloat(text, x, y) {
+  const el = document.createElement('div');
+  el.className = 'xp-float';
+  el.textContent = text;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.style.transform = 'translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+function celebrateRankUp(rank) {
+  const html = `
+    <div class="celebration-overlay">
+      <div class="celebration-content">
+        <div class="icon">${rank.icon}</div>
+        <div class="label">— 人事部 曾主任 · 任命通知 —</div>
+        <div class="title">${rank.title}</div>
+        <div class="quote">${rank.desc}<br><br>人事部已备案，新职级已解锁。<br>继续执行任务，前路无限。</div>
+        <button class="ok-btn" onclick="closeAllModals()">谢谢！</button>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+  spawnConfetti();
+}
+
+function spawnConfetti() {
+  const colors = ['#fcd34d', '#f59e0b', '#22c55e', '#0ea5e9', '#ec4899', '#38bdf8'];
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.top = -20 + 'px';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDelay = (Math.random() * 0.8) + 's';
+    c.style.animationDuration = (2 + Math.random() * 2) + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4000);
+  }
+}
+
+/* ===========================================================
+   Settings actions
+   =========================================================== */
+async function changePassword() {
+  const newPwd = await askPassword('修改 CEO 审批密码', '请输入新的审批密码');
+  if (!newPwd) return;
+  const confirm = await askPassword('再次确认', '请再输入一次');
+  if (confirm !== newPwd) { showToast('❌ 两次输入不一致'); return; }
+  await setPassword(newPwd);
+  showToast('✅ 密码已修改');
+}
+
+function changeFontSize(size) {
+  document.body.style.fontSize = size + 'px';
+  localStorage.setItem('xta-font-size', size);
+  showToast('✅ 字体已调整');
+}
+
+async function clearData() {
+  const ok = await askPasswordAndVerify('⚠️ 危险操作', '清除所有数据不可恢复，请先导出备份。确认继续？');
+  if (!ok) return;
+  if (!window.confirm('最后确认：真的要清除所有数据吗？')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(HISTORY_KEY);
+  Object.keys(localStorage).filter(k => k.startsWith(BACKUP_PREFIX)).forEach(k => localStorage.removeItem(k));
+  location.reload();
+}
+
+function exportData() {
+  const payload = {
+    version: VERSION,
+    exportedAt: new Date().toISOString(),
+    data: localStorage.getItem(STORAGE_KEY),
+    history: localStorage.getItem(HISTORY_KEY),
+    passwordHash: localStorage.getItem(PWD_KEY),
+    fontSize: localStorage.getItem('xta-font-size'),
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `xta-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('✅ 已下载备份文件');
+}
+
+function importDataFromFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const payload = JSON.parse(e.target.result);
+      if (!window.confirm(`确认从 ${payload.exportedAt || '未知时间'} 的备份恢复？\n当前所有数据将被覆盖！`)) return;
+      if (payload.data) localStorage.setItem(STORAGE_KEY, payload.data);
+      if (payload.history) localStorage.setItem(HISTORY_KEY, payload.history);
+      if (payload.passwordHash) localStorage.setItem(PWD_KEY, payload.passwordHash);
+      if (payload.fontSize) localStorage.setItem('xta-font-size', payload.fontSize);
+      showToast('✅ 导入成功，正在刷新...');
+      setTimeout(() => location.reload(), 1000);
+    } catch (err) {
+      showToast('❌ 文件格式错误');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function updateLastBackupDisplay() {
+  const el = document.getElementById('last-backup-desc');
+  if (!el) return;
+  if (state.lastBackupTime) {
+    const d = new Date(state.lastBackupTime);
+    el.textContent = d.toLocaleString('zh-CN');
+  } else {
+    el.textContent = '尚未备份';
+  }
+}
+
+/* ===========================================================
+   Company Info
+   =========================================================== */
+function showCompanyInfo() {
+  const rank = getCurrentRank();
+  const body = `
+    <div style="text-align:center;padding:10px 0 16px;">
+      <div style="font-size:36px;color:var(--c-primary);">✦</div>
+      <div style="font-size:18px;font-weight:700;margin-top:6px;">Siatar 工业</div>
+      <div style="font-size:12px;color:var(--c-text-light);margin-top:4px;">Siatar Industries</div>
+      <div style="font-size:11px;color:var(--c-text-faint);margin-top:6px;line-height:1.5;">
+        真正伟大的科技，是帮助人类更好地成长
+      </div>
+    </div>
+
+    <div style="background:var(--c-bg-soft);padding:10px 12px;border-radius:8px;margin-bottom:12px;">
+      <p style="font-size:13px;font-weight:600;">📋 你的档案</p>
+      <p style="font-size:12px;margin-top:4px;">职级：${rank.icon} ${rank.title}</p>
+      <p style="font-size:12px;">身份：Siatar 工业未来行动计划成员</p>
+      <p style="font-size:12px;">累计 XP：${state.totalEarnedXP || 0}</p>
+    </div>
+
+    <p style="font-size:13px;font-weight:600;margin-bottom:8px;">🏢 高层</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;">
+      <div style="background:var(--c-bg-soft);padding:8px;border-radius:6px;text-align:center;">
+        <div style="font-size:20px;">👨‍💼</div>
+        <div style="font-size:11px;font-weight:600;">CEO</div>
+        <div style="font-size:10px;color:var(--c-text-light);">Redpapa</div>
+      </div>
+      <div style="background:var(--c-bg-soft);padding:8px;border-radius:6px;text-align:center;">
+        <div style="font-size:20px;">🤖</div>
+        <div style="font-size:11px;font-weight:600;">CTO</div>
+        <div style="font-size:10px;color:var(--c-text-light);">Siatar</div>
+      </div>
+      <div style="background:var(--c-bg-soft);padding:8px;border-radius:6px;text-align:center;">
+        <div style="font-size:20px;">${rank.icon}</div>
+        <div style="font-size:11px;font-weight:600;">${rank.title}</div>
+        <div style="font-size:10px;color:var(--c-text-light);">小塔</div>
+      </div>
+    </div>
+
+    <p style="font-size:13px;font-weight:600;margin-bottom:8px;">✦ 部门</p>
+    <div style="font-size:12px;line-height:2;">
+      <div>📚 <strong>学习部</strong>（CTO Siatar）— 把知识变成能力</div>
+      <div>💪 <strong>健康部</strong>（Sam 教练）— 身体是执行任务的第一装备</div>
+      <div>🎒 <strong>行政部</strong>（小杨）— 秩序让行动更高效</div>
+      <div>🛠️ <strong>研发部</strong>（老张）— 想象力先到达，装备随后抵达</div>
+      <div>👤 <strong>人事部</strong>（曾主任）— 每一次成长，都值得被记录</div>
+      <div>💰 <strong>财务部</strong>（Data）— 每一分努力，都有清楚记录</div>
+    </div>
+
+    <div style="margin-top:14px;padding:10px;background:var(--c-bg-soft);border-radius:8px;font-size:11px;color:var(--c-text-light);text-align:center;">
+      Siatar 工业相信，真正伟大的科技不是替代人类，<br>而是帮助人类更好地学习、成长与生活。
+    </div>`;
+  showInfoModal('✦ 关于 Siatar 工业', body);
+}
+
+/* ===========================================================
+   Upgrade Notice
+   =========================================================== */
+function showUpgradeNotice(force = false) {
+  if (!force && localStorage.getItem(UPGRADE_SEEN_KEY)) return;
+  const body = `
+    <p><strong>📢 Siatar 工业 · 年度体系调整通告（${VERSION}）</strong></p>
+    <p style="margin-top:10px;">经 CEO Redpapa 批准，人事部曾主任签发，自即日起公司绩效与晋升体系做出以下优化：</p>
+
+    <p style="margin-top:12px;"><strong>📅 工作节奏调整</strong></p>
+    <p>· 工作日（周一~周四）：每日独立结算，<strong>20:40 前</strong>完成学习部必做任务可参与 SC 兑换</p>
+    <p>· 周末周期（周五~周日）：统一结算，最晚 <strong>周六 21:00</strong> 前兑换 1 枚 SC</p>
+    <p>· 任务清零：工作日次日 9:00，周末周期次周一 9:00</p>
+
+    <p style="margin-top:12px;"><strong>🎯 SC 兑换新规则（财务部 Data 执行）</strong></p>
+    <p>· 必做：学习部三项任务（语文 + 数学 + 英语）按时提交</p>
+    <p>· 辅助：健康部 / 行政部 / 能量补给 三个模块，<strong>任选 2 个</strong>达成</p>
+    <p>· 当日 XP 达 60 → 兑换 1 SC</p>
+
+    <p style="margin-top:12px;"><strong>🌅 早鸟奖励</strong></p>
+    <p>· 工作日 20:00 前 / 周末 周六 18:00 前完成兑换，额外 <strong>+10 累积 XP</strong></p>
+
+    <p style="margin-top:12px;"><strong>🏆 职级体系重构（人事部曾主任签发）</strong></p>
+    <p>· 全新 8 档晋升通道：见习成员 → 初级执行员 → 任务专员 → 项目协作员 → 高级执行官 → 核心成员 → Siatar 工程师 → 首席学习官</p>
+    <p>· <strong>职级保护</strong>：本次调整不会让你的现有职级降级</p>
+
+    <p style="margin-top:12px;"><strong>✦ 组织架构更新</strong></p>
+    <p>· 学习部（CTO Siatar）· 健康部（Sam 教练）· 行政部（小杨）· 研发部（老张）· 人事部（曾主任）· 财务部（Data）</p>
+    <p>· 各部门任务独立签发，装备由研发部发放，福利由行政部签发</p>
+
+    <p style="margin-top:14px;padding:10px;background:var(--c-bg-soft);border-radius:8px;font-size:12px;color:var(--c-text-light);">
+      ✨ Siatar 工业相信，真正伟大的科技不是替代人类，而是帮助人类更好地学习、成长与生活。<br><span style="display:block;text-align:right;margin-top:4px;">—— Redpapa</span>
+    </p>`;
+  showInfoModal('🎊 Siatar 升级了！', body);
+  localStorage.setItem(UPGRADE_SEEN_KEY, '1');
+}
+
+/* ===========================================================
+   Admin URL endpoint (with password)
+   =========================================================== */
+async function handleAdminURL() {
+  const params = new URLSearchParams(window.location.search);
+  let cmd = params.get('siatar');
+  const pwd = params.get('pwd');
+  if (!cmd) return;
+  if (!pwd) { alert('❌ 操作未授权'); return; }
+  const ok = await verifyPassword(pwd);
+  if (!ok) { alert('❌ 密码错误'); return; }
+
+  // URL 解析时 '+' 会被解码成空格，把空格还原为 '+' 以便后续正则匹配
+  cmd = cmd.replace(/\s+/g, '+');
+
+  const scMatch = cmd.match(/^SC([+-]\d+)$/);
+  const xpMatch = cmd.match(/^XP([+-]\d+)$/);
+  const lxpMatch = cmd.match(/^LXP([+-]\d+)$/);
+  // v2.5：RANK+N 直接锁定头衔保护档位（0~5），用于修复升级时锁错档位的情况
+  const rankMatch = cmd.match(/^RANK\+(\d+)$/);
+  let msg = null;
+
+  // 记录变更前的头衔，用于检测晋升
+  const beforeRank = getRankIndex();
+
+  if (scMatch) {
+    const delta = parseInt(scMatch[1]);
+    state.sc = Math.max(0, state.sc + delta);
+    if (delta > 0) state.totalScEarned = (state.totalScEarned || 0) + delta;
+    msg = `SC 已调整：${delta > 0 ? '+' : ''}${delta}，当前 ${state.sc}`;
+    recordHistory({ type: 'admin_adjust', target: 'sc', delta });
+  } else if (xpMatch) {
+    const delta = parseInt(xpMatch[1]);
+    state.dailyXP = Math.max(0, state.dailyXP + delta);
+    msg = `当日 XP 已调整：${delta > 0 ? '+' : ''}${delta}，当前 ${state.dailyXP}`;
+    recordHistory({ type: 'admin_adjust', target: 'dailyXP', delta });
+  } else if (lxpMatch) {
+    const delta = parseInt(lxpMatch[1]);
+    state.levelXP = Math.max(0, state.levelXP + delta);
+    if (delta > 0) state.totalEarnedXP = (state.totalEarnedXP || 0) + delta;
+    state.level = Math.floor(state.levelXP / 100) + 1;
+    msg = `累积 XP 已调整：${delta > 0 ? '+' : ''}${delta}，当前余额 ${state.levelXP}，历史总计 ${state.totalEarnedXP}`;
+    recordHistory({ type: 'admin_adjust', target: 'levelXP', delta });
+  } else if (rankMatch) {
+    const n = Math.max(0, Math.min(ranks.length - 1, parseInt(rankMatch[1])));
+    state.protectedRankIndex = n;
+    msg = `头衔保护已锁定到：${ranks[n].icon} ${ranks[n].title}（第 ${n + 1} 档）`;
+    recordHistory({ type: 'admin_adjust', target: 'protectedRankIndex', value: n });
+  } else {
+    alert('❌ 操作未识别');
+    return;
+  }
+  saveState();
+
+  // Clean URL（在 alert 之前清掉，避免 alert 期间用户复制 URL 泄露密码）
+  params.delete('siatar'); params.delete('pwd');
+  window.history.replaceState({}, '', window.location.pathname + (params.toString() ? '?' + params.toString() : ''));
+
+  alert('✅ ' + msg);
+
+  // 实时刷新 UI（不刷新页面，否则会错过升头衔动画）
+  updateUI(true);
+
+  // 检测头衔晋升 → 触发庆祝
+  const afterRank = getRankIndex();
+  if (afterRank > beforeRank) {
+    celebrateRankUp(ranks[afterRank]);
+  }
+}
+
+/* ===========================================================
+   Network status
+   =========================================================== */
+function setupNetworkIndicator() {
+  const ind = document.getElementById('net-indicator');
+  const update = () => {
+    ind.classList.toggle('show', !navigator.onLine);
+  };
+  window.addEventListener('online', update);
+  window.addEventListener('offline', update);
+  update();
+}
+
+/* ===========================================================
+   Service Worker registration
+   =========================================================== */
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => {
+        console.warn('SW registration failed:', err);
+      });
+    });
+  }
+}
+
+/* ===========================================================
+   Init
+   =========================================================== */
+async function init() {
+  await migrateLegacyPassword();
+  state = loadState();
+  history = loadHistory();
+  saveState();
+
+  const savedFont = localStorage.getItem('xta-font-size');
+  if (savedFont) {
+    document.body.style.fontSize = savedFont + 'px';
+    const sel = document.getElementById('font-size-select');
+    if (sel) sel.value = savedFont;
+  }
+
+  document.getElementById('version-text').textContent = VERSION;
+  updateUI();
+  updateLastBackupDisplay();
+  setupNetworkIndicator();
+  registerServiceWorker();
+
+  // Hide splash
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hide');
+    setTimeout(() => document.getElementById('splash').remove(), 400);
+  }, 600);
+
+  // Show upgrade notice (first time only)
+  setTimeout(() => showUpgradeNotice(false), 1200);
+
+  // Handle admin URL
+  await handleAdminURL();
+}
+
+// Run init when DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
