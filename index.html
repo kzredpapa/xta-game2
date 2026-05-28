@@ -1496,21 +1496,23 @@ const initialState = {
   earlyBirdCount: 0,
   totalScEarned: 0,
   // 机器人工厂
-  robotSelected: null,    // 'sx-01' | 'sp-9' | null
-  robotParts: 0,          // 已购买零件数 (0-8)
-  robotCompleted: false,
+  robotSelected: null,    // 当前正在查看/组装的机器人 ID
+  robotActive: null,      // 当前装备的主机器人（显示浮标）
+  robotsOwned: {},        // { 'sp-9': { parts: 8, completed: true }, ... }
+  robotParts: 0,          // 兼容旧数据，迁移后不再使用
+  robotCompleted: false,  // 兼容旧数据
 };
 
 // v2.5：精简为 6 档，节奏缩短到 ~1 年
 const ranks = [
   { xp: 0,     title: '见习成员',       icon: '🔰', color: '#94a3b8', desc: '欢迎加入 Siatar 工业未来行动计划' },
   { xp: 500,   title: '初级执行员',     icon: '⚡', color: '#22c55e', desc: '已通过试用考核，正式参与任务执行' },
-  { xp: 1500,  title: '任务专员',       icon: '🎯', color: '#3b82f6', desc: '独立完成多部门委派任务的可靠成员' },
-  { xp: 3500,  title: '项目协作员',     icon: '🔗', color: '#8b5cf6', desc: '跨部门协作的中坚力量' },
-  { xp: 7000,  title: '高级执行官',     icon: '⭐', color: '#f59e0b', desc: '战略执行层核心成员' },
-  { xp: 12000, title: '核心成员',       icon: '💎', color: '#ef4444', desc: 'Siatar 工业年度表彰候选人' },
-  { xp: 20000, title: 'Siatar 工程师',  icon: '🛠️', color: '#06b6d4', desc: '掌握核心技术的高级工程师' },
-  { xp: 35000, title: '首席学习官 CLO', icon: '👑', color: '#fcd34d', desc: '与 CEO 并肩的公司最高学习决策者' },
+  { xp: 2500,  title: '任务专员',       icon: '🎯', color: '#3b82f6', desc: '独立完成多部门委派任务的可靠成员' },
+  { xp: 5000,  title: '项目协作员',     icon: '🔗', color: '#8b5cf6', desc: '跨部门协作的中坚力量' },
+  { xp: 9000,  title: '高级执行官',     icon: '⭐', color: '#f59e0b', desc: '战略执行层核心成员' },
+  { xp: 15000, title: '核心成员',       icon: '💎', color: '#ef4444', desc: 'Siatar 工业年度表彰候选人' },
+  { xp: 25000, title: 'Siatar 工程师',  icon: '🛠️', color: '#06b6d4', desc: '掌握核心技术的高级工程师' },
+  { xp: 40000, title: '首席学习官 CLO', icon: '👑', color: '#fcd34d', desc: '与 CEO 并肩的公司最高学习决策者' },
 ];
 
 const XP_REWARDS = {
@@ -1594,14 +1596,14 @@ const ROBOTS = {
     id: 'sx-01', name: '铁卫', model: 'SX-01', type: '战术机甲',
     desc: 'Siatar 研发部的第一代战术机甲。全身钛合金骨架搭配纳米装甲，搭载 HUD 战术系统和 360° 传感阵列。性格沉稳可靠，是你最忠诚的战术搭档。',
     parts: [
-      { name: '核心框架', icon: '⚙️', cost: 20, desc: '每台机甲的起点。钛合金骨架从研发部的 3D 打印机里一根根成型，这是铁卫的"脊椎"。' },
-      { name: '动力模组', icon: '💚', cost: 25, desc: '心脏上线。微型聚变反应堆开始输出能量，胸口的绿光意味着——铁卫活了。' },
-      { name: '装甲外壳', icon: '🛡️', cost: 40, desc: '深蓝色纳米装甲一片片贴合骨架，就像给铁卫穿上了防弹外套。研发部说这能抗住陨石碎片。' },
-      { name: '战术面罩', icon: '😎', cost: 50, desc: '一条冰蓝色的光带亮起——铁卫睁开了"眼睛"。它能扫描 360° 范围内的所有目标。' },
-      { name: '双臂组件', icon: '💪', cost: 60, desc: '液压关节嵌入肩膀，两条机械臂完成对接。现在铁卫可以搬运、操作、甚至挥手了。' },
-      { name: '行走系统', icon: '🦿', cost: 70, desc: '双腿驱动器启动，铁卫第一次站了起来。地板微微震动——它比你想象的要重。' },
-      { name: 'HUD 系统', icon: '📡', cost: 80, desc: '战术数据浮层加载完毕。铁卫的视野里出现了温度、距离、任务状态……一切尽在掌握。' },
-      { name: '传感阵列', icon: '🔴', cost: 100, desc: '最后的传感器阵列接入主板。铁卫全系统激活，发出第一声语音："系统就绪，等待指令。"' },
+      { name: '核心框架', icon: '⚙️', cost: 60, desc: '每台机甲的起点。钛合金骨架从研发部的 3D 打印机里一根根成型，这是铁卫的"脊椎"。' },
+      { name: '动力模组', icon: '💚', cost: 80, desc: '心脏上线。微型聚变反应堆开始输出能量，胸口的绿光意味着——铁卫活了。' },
+      { name: '装甲外壳', icon: '🛡️', cost: 100, desc: '深蓝色纳米装甲一片片贴合骨架，就像给铁卫穿上了防弹外套。研发部说这能抗住陨石碎片。' },
+      { name: '战术面罩', icon: '😎', cost: 130, desc: '一条冰蓝色的光带亮起——铁卫睁开了"眼睛"。它能扫描 360° 范围内的所有目标。' },
+      { name: '双臂组件', icon: '💪', cost: 150, desc: '液压关节嵌入肩膀，两条机械臂完成对接。现在铁卫可以搬运、操作、甚至挥手了。' },
+      { name: '行走系统', icon: '🦿', cost: 180, desc: '双腿驱动器启动，铁卫第一次站了起来。地板微微震动——它比你想象的要重。' },
+      { name: 'HUD 系统', icon: '📡', cost: 220, desc: '战术数据浮层加载完毕。铁卫的视野里出现了温度、距离、任务状态……一切尽在掌握。' },
+      { name: '传感阵列', icon: '🔴', cost: 280, desc: '最后的传感器阵列接入主板。铁卫全系统激活，发出第一声语音："系统就绪，等待指令。"' },
     ],
     lines: {
       submit: ['收到，已录入系统。', '执行确认。继续保持。', '数据同步中……完毕。', '不错的效率，士兵。', '任务入库，等待上级签批。', '铁卫确认。你今天状态不错。'],
@@ -1784,6 +1786,19 @@ function loadState() {
   if (!s.robotSelected) s.robotSelected = null;
   if (typeof s.robotParts !== 'number') s.robotParts = 0;
   if (typeof s.robotCompleted !== 'boolean') s.robotCompleted = false;
+  // v2.7.1 多机器人迁移
+  if (!s.robotsOwned || typeof s.robotsOwned !== 'object' || Array.isArray(s.robotsOwned)) {
+    s.robotsOwned = {};
+    // 迁移旧数据
+    if (s.robotSelected && s.robotParts > 0) {
+      s.robotsOwned[s.robotSelected] = { parts: s.robotParts, completed: s.robotCompleted || false };
+    }
+  }
+  if (!s.robotActive) {
+    // 自动装备第一个已完成的机器人
+    const completed = Object.entries(s.robotsOwned).find(([_, v]) => v.completed);
+    s.robotActive = completed ? completed[0] : null;
+  }
   if (!Array.isArray(s.unlockedBadges)) s.unlockedBadges = [];
   if (typeof s.earlyBirdCount !== 'number') s.earlyBirdCount = 0;
   if (typeof s.totalScEarned !== 'number') s.totalScEarned = 0;
@@ -2831,7 +2846,7 @@ function showShopModal() {
 
     <div class="shop-item" style="border-color:var(--c-primary);background:rgba(14,165,233,0.08);cursor:pointer;" onclick="closeAllModals();switchPage('robot')">
       <div class="shop-item-head" style="margin-bottom:0;">
-        <div><div class="name">🤖 机器人工厂</div><div class="desc">用 XP 组装专属机器人 · 已装配 ${state.robotParts || 0}/8 零件</div></div>
+        <div><div class="name">🤖 机器人工厂</div><div class="desc">用 XP 组装专属机器人 · 已拥有 ${Object.values(state.robotsOwned).filter(r=>r.completed).length}/2 机器人</div></div>
         <div class="price"><span style="color:var(--c-primary);font-size:18px;">→</span></div>
       </div>
     </div>
@@ -3129,13 +3144,28 @@ function getRobotSVG(id) {
 }
 
 function renderRobotSelectContent(container) {
-  const totalCosts = { 'sx-01': 445, 'sp-9': 445 };
-  const body = Object.values(ROBOTS).map(r => `
+  const totalCosts = { 'sx-01': 1200, 'sp-9': 445 };
+  const body = Object.values(ROBOTS).map(r => {
+    const rd = state.robotsOwned[r.id];
+    const isComplete = rd && rd.completed;
+    const isActive = state.robotActive === r.id;
+    const inProgress = rd && rd.parts > 0 && !rd.completed;
+    let btnHtml;
+    if (isComplete && isActive) {
+      btnHtml = `<button class="btn" style="width:100%;margin-top:12px;background:#22c55e;" onclick="selectRobot('${r.id}')">✅ 主机器人 · 查看</button>`;
+    } else if (isComplete) {
+      btnHtml = `<button class="btn" style="width:100%;margin-top:12px;" onclick="setActiveRobot('${r.id}')">装备为主机器人</button>`;
+    } else if (inProgress) {
+      btnHtml = `<button class="btn" style="width:100%;margin-top:12px;" onclick="selectRobot('${r.id}')">继续组装 · ${rd.parts}/8</button>`;
+    } else {
+      btnHtml = `<button class="btn" style="width:100%;margin-top:12px;" onclick="selectRobot('${r.id}')">开始组装 ${r.name}</button>`;
+    }
+    return `
     <div class="robot-select-card" onclick="selectRobot('${r.id}')">
       <div class="robot-select-top">
         <div class="robot-select-avatar">${getRobotSVG(r.id)}</div>
         <div class="robot-select-header">
-          <div class="robot-select-model">${r.model}</div>
+          <div class="robot-select-model">${r.model}${isActive ? ' <span style="color:#22c55e;font-size:10px;">● 装备中</span>' : ''}</div>
           <div class="robot-select-name">${r.name}</div>
           <div class="robot-select-type">${r.type} · ${r.id === 'sx-01' ? 'Tactical Mech' : 'Floating Core'}</div>
         </div>
@@ -3146,9 +3176,9 @@ function renderRobotSelectContent(container) {
         <span><span class="spec-val">${totalCosts[r.id]}</span><span class="spec-label">总 XP</span></span>
         <span><span class="spec-val">${r.type.substring(0, 2)}</span><span class="spec-label">类型</span></span>
       </div>
-      <button class="btn" style="width:100%;margin-top:12px;">开始组装 ${r.name}</button>
-    </div>
-  `).join('<div style="text-align:center;color:var(--c-text-faint);font-size:12px;margin:12px 0;">— 或者 —</div>');
+      ${btnHtml}
+    </div>`;
+  }).join('<div style="text-align:center;color:var(--c-text-faint);font-size:12px;margin:12px 0;">— 或者 —</div>');
   container.innerHTML = `
     <div class="card">
       <div style="font-size:12px;color:var(--c-text-faint);text-align:center;margin-bottom:16px;">选择你要组装的机器人型号<br>研发部将为你启动生产线</div>
@@ -3156,13 +3186,28 @@ function renderRobotSelectContent(container) {
     </div>`;
 }
 
+function setActiveRobot(robotId) {
+  state.robotActive = robotId;
+  saveState();
+  showToast(`🤖 已装备：${ROBOTS[robotId].model}「${ROBOTS[robotId].name}」`);
+  renderRobotWidget();
+  renderRobotPage();
+}
+
 function selectRobot(robotId) {
   state.robotSelected = robotId;
-  state.robotParts = 0;
-  state.robotCompleted = false;
+  // 初始化该机器人数据（不覆盖已有进度）
+  if (!state.robotsOwned[robotId]) {
+    state.robotsOwned[robotId] = { parts: 0, completed: false };
+  }
   saveState();
   recordHistory({ type: 'robot_selected', robotId });
-  showToast(`🏭 生产线启动：${ROBOTS[robotId].model}「${ROBOTS[robotId].name}」`);
+  const r = state.robotsOwned[robotId];
+  if (r.completed) {
+    showToast(`🤖 切换查看：${ROBOTS[robotId].model}「${ROBOTS[robotId].name}」`);
+  } else {
+    showToast(`🏭 生产线启动：${ROBOTS[robotId].model}「${ROBOTS[robotId].name}」`);
+  }
   renderRobotPage();
 }
 
@@ -3213,9 +3258,10 @@ function getRobotAssemblySVG(robotId, partsOwned) {
 function renderRobotAssemblyContent(container) {
   const robot = ROBOTS[state.robotSelected];
   if (!robot) return;
-  const partsOwned = state.robotParts;
+  const rd = state.robotsOwned[state.robotSelected] || { parts: 0, completed: false };
+  const partsOwned = rd.parts;
   const totalParts = robot.parts.length;
-  const isComplete = partsOwned >= totalParts;
+  const isComplete = rd.completed || partsOwned >= totalParts;
   const progressPct = Math.round((partsOwned / totalParts) * 100);
 
   let partsHtml = robot.parts.map((p, i) => {
@@ -3251,25 +3297,33 @@ function renderRobotAssemblyContent(container) {
     </div>
     <div class="card">
       <div>${partsHtml}</div>
+    </div>
+    <div style="text-align:center;margin-top:16px;">
+      ${isComplete && state.robotActive !== state.robotSelected ? `<button class="btn" style="margin-bottom:8px;background:#22c55e;" onclick="setActiveRobot('${state.robotSelected}')">装备为主机器人</button><br>` : ''}
+      <button class="btn" style="background:transparent;border:1px solid var(--c-border);color:var(--c-text-light);" onclick="state.robotSelected=null;renderRobotPage();">← 返回机器人列表</button>
     </div>`;
 }
 
 function buyRobotPart() {
   const robot = ROBOTS[state.robotSelected];
   if (!robot) return;
-  const partIndex = state.robotParts;
+  const rd = state.robotsOwned[state.robotSelected];
+  if (!rd) return;
+  const partIndex = rd.parts;
   if (partIndex >= robot.parts.length) return;
   const part = robot.parts[partIndex];
   if (state.levelXP < part.cost) { showToast(`❌ XP 余额不足（需 ${part.cost}，当前 ${state.levelXP}）`); return; }
   state.levelXP -= part.cost;
-  state.robotParts += 1;
+  rd.parts += 1;
   state.shopPurchaseCount = (state.shopPurchaseCount || 0) + 1;
-  if (state.robotParts >= robot.parts.length) {
-    state.robotCompleted = true;
+  if (rd.parts >= robot.parts.length) {
+    rd.completed = true;
+    // 自动装备为主机器人（如果还没装备）
+    if (!state.robotActive) state.robotActive = state.robotSelected;
   }
   saveState();
   recordHistory({ type: 'robot_part_bought', robotId: state.robotSelected, partIndex, partName: part.name, cost: part.cost });
-  if (state.robotCompleted) {
+  if (rd.completed) {
     showRobotCompleteAnimation(robot);
   } else {
     showToast(`🔧 ${part.icon} ${part.name} 装配完成！`);
@@ -3297,17 +3351,23 @@ function showRobotCompleteAnimation(robot) {
 function renderRobotWidget() {
   const existing = document.getElementById('robot-widget');
   if (existing) existing.remove();
-  if (!state.robotCompleted || !state.robotSelected) return;
-  const robot = ROBOTS[state.robotSelected];
+  // 显示当前装备的主机器人
+  const activeId = state.robotActive;
+  if (!activeId) return;
+  const rd = state.robotsOwned[activeId];
+  if (!rd || !rd.completed) return;
+  const robot = ROBOTS[activeId];
+  if (!robot) return;
+  const miniSvg = getRobotSVG(activeId).replace(/width="56"/g, 'width="32"').replace(/height="56"/g, 'height="32"');
   const html = `
     <div id="robot-widget" class="robot-widget" onclick="showRobotIdleLine()">
-      <div class="robot-widget-icon">${state.robotSelected === 'sx-01' ? '🤖' : '🔮'}</div>
+      <div class="robot-widget-icon">${miniSvg}</div>
     </div>`;
   document.body.insertAdjacentHTML('beforeend', html);
 }
 
 function showRobotIdleLine() {
-  const robot = ROBOTS[state.robotSelected];
+  const robot = ROBOTS[state.robotActive];
   if (!robot) return;
   const lines = robot.lines.idle;
   const line = lines[Math.floor(Math.random() * lines.length)];
@@ -3325,8 +3385,11 @@ function showRobotIdleLine() {
 
 // 任务提交时机器人反应
 function robotReactToSubmit() {
-  if (!state.robotCompleted || !state.robotSelected) return;
-  const robot = ROBOTS[state.robotSelected];
+  const activeId = state.robotActive;
+  if (!activeId) return;
+  const rd = state.robotsOwned[activeId];
+  if (!rd || !rd.completed) return;
+  const robot = ROBOTS[activeId];
   const lines = robot.lines.submit;
   const line = lines[Math.floor(Math.random() * lines.length)];
   const existing = document.getElementById('robot-speech');
