@@ -3827,34 +3827,35 @@ function showCompanyInfo() {
 function showUpgradeNotice(force = false) {
   if (!force && localStorage.getItem(UPGRADE_SEEN_KEY)) return;
   const body = `
-    <p><strong>📢 Siatar 工业 · 年度体系调整通告（${VERSION}）</strong></p>
-    <p style="margin-top:10px;">经 CEO Redpapa 批准，人事部曾主任签发，自即日起公司绩效与晋升体系做出以下优化：</p>
+    <p><strong>📢 Siatar 工业 · 研发部重大更新通告（${VERSION}）</strong></p>
+    <p style="margin-top:10px;">经 CEO Redpapa 批准，研发部老张签发，Siatar 工业迎来史上最大规模系统升级：</p>
 
-    <p style="margin-top:12px;"><strong>📅 工作节奏调整</strong></p>
-    <p>· 工作日（周一~周四）：每日独立结算，<strong>20:40 前</strong>完成学习部必做任务可参与 SC 兑换</p>
-    <p>· 周末周期（周五~周日）：统一结算，最晚 <strong>周六 21:00</strong> 前兑换 1 枚 SC</p>
-    <p>· 任务清零：工作日次日 9:00，周末周期次周一 9:00</p>
+    <p style="margin-top:12px;"><strong>🤖 机器人工厂上线</strong></p>
+    <p>· 研发部全新打造「机器人工厂」，用 XP 逐步组装你的专属战斗机器人</p>
+    <p>· 两款型号可选：<strong>SX-01「铁卫」</strong>（重甲近战）和 <strong>SP-9「游星」</strong>（侦察浮球）</p>
+    <p>· 共 8 个零件，每装一个就能看到机器人"长出"新部位</p>
 
-    <p style="margin-top:12px;"><strong>🎯 SC 兑换新规则（财务部 Data 执行）</strong></p>
-    <p>· 必做：学习部三项任务（语文 + 数学 + 英语）按时提交</p>
-    <p>· 辅助：健康部 / 行政部 / 能量补给 三个模块，<strong>任选 2 个</strong>达成</p>
-    <p>· 当日 XP 达 60 → 兑换 1 SC</p>
+    <p style="margin-top:12px;"><strong>🎲 随机事件系统</strong></p>
+    <p>· 完成任务后有概率触发 NPC 随机事件</p>
+    <p>· 可能是奖励、挑战、或有趣的部门剧情</p>
 
-    <p style="margin-top:12px;"><strong>🌅 早鸟奖励</strong></p>
-    <p>· 工作日 20:00 前 / 周末 周六 18:00 前完成兑换，额外 <strong>+10 累积 XP</strong></p>
+    <p style="margin-top:12px;"><strong>🏅 荣誉徽章墙</strong></p>
+    <p>· 完成特定成就自动解锁专属徽章</p>
+    <p>· 在「记录」页面查看你的荣誉墙</p>
 
-    <p style="margin-top:12px;"><strong>🏆 职级体系重构（人事部曾主任签发）</strong></p>
-    <p>· 全新 8 档晋升通道：见习成员 → 初级执行员 → 任务专员 → 项目协作员 → 高级执行官 → 核心成员 → Siatar 工程师 → 首席学习官</p>
-    <p>· <strong>职级保护</strong>：本次调整不会让你的现有职级降级</p>
+    <p style="margin-top:12px;"><strong>🛒 研发部商店大扩充</strong></p>
+    <p>· 新增：选晚餐权、晚睡券、PS 游戏时间、自选书/漫画、周末活动选择权</p>
+    <p>· 新增 XP→SC 大额兑换通道</p>
+    <p>· 新增主题皮肤和自定义称号</p>
 
-    <p style="margin-top:12px;"><strong>✦ 组织架构更新</strong></p>
-    <p>· 学习部（CTO Siatar）· 健康部（Sam 教练）· 行政部（小杨）· 研发部（老张）· 人事部（曾主任）· 财务部（Data）</p>
-    <p>· 各部门任务独立签发，装备由研发部发放，福利由行政部签发</p>
+    <p style="margin-top:12px;"><strong>🎨 界面全面升级</strong></p>
+    <p>· 全新深空蓝主题，更炫酷的暗色风格</p>
+    <p>· 平板适配优化，间距更舒适</p>
 
-    <p style="margin-top:14px;padding:10px;background:var(--c-bg-soft);border-radius:8px;font-size:12px;color:var(--c-text-light);">
-      ✨ Siatar 工业相信，真正伟大的科技不是替代人类，而是帮助人类更好地学习、成长与生活。<br><span style="display:block;text-align:right;margin-top:4px;">—— Redpapa</span>
+    <p style="margin-top:14px;padding:12px 14px;background:var(--c-bg-soft);border-radius:8px;font-size:12px;color:var(--c-text-light);">
+      🚀 研发部老张：这次的更新我们准备了很久，希望小塔喜欢。组装机器人的过程就像学习——一步步积累，最终看到完整的成果。<br><span style="display:block;text-align:right;margin-top:4px;">—— Siatar 工业研发部</span>
     </p>`;
-  showInfoModal('🎊 Siatar 升级了！', body);
+  showInfoModal('🎊 Siatar v2.7 重大更新！', body);
   localStorage.setItem(UPGRADE_SEEN_KEY, '1');
 }
 
