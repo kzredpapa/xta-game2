@@ -22,16 +22,16 @@
       --c-danger: #ef4444;
       --c-gold: #fcd34d;
       --c-gold-dark: #f59e0b;
-      --c-bg: #f0f4f8;
-      --c-card: #ffffff;
-      --c-text: #1e293b;
-      --c-text-light: #64748b;
-      --c-text-faint: #94a3b8;
-      --c-border: #e2e8f0;
-      --c-bg-soft: #f1f5f9;
-      --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-lift: 0 4px 12px rgba(14,165,233,0.2);
-      --shadow-card-hover: 0 4px 16px rgba(0,0,0,0.1);
+      --c-bg: #0b1929;
+      --c-card: #112240;
+      --c-text: #e2e8f0;
+      --c-text-light: #94a3b8;
+      --c-text-faint: #64748b;
+      --c-border: #1e3a5f;
+      --c-bg-soft: #162d50;
+      --shadow-card: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-lift: 0 4px 16px rgba(14,165,233,0.25);
+      --shadow-card-hover: 0 4px 20px rgba(0,0,0,0.4);
       --radius-sm: 6px;
       --radius-md: 10px;
       --radius-lg: 14px;
@@ -60,7 +60,7 @@
     #splash.hide { opacity: 0; pointer-events: none; }
     #splash .logo {
       width: 96px; height: 96px; border-radius: 24px;
-      background: white; display: flex; align-items: center; justify-content: center;
+      background: var(--c-card); display: flex; align-items: center; justify-content: center;
       font-size: 56px; color: var(--c-primary-dark); font-weight: bold;
       box-shadow: 0 20px 40px rgba(0,0,0,0.2);
       animation: splash-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -74,7 +74,7 @@
     .header {
       background: linear-gradient(135deg, var(--c-header-from), var(--c-header-to));
       color: white;
-      padding: 20px 16px 24px;
+      padding: 20px 28px 24px;
       border-radius: 0 0 var(--radius-xl) var(--radius-xl);
       position: relative;
       overflow: hidden;
@@ -111,7 +111,7 @@
       background: rgba(56,189,248,0.12);
       backdrop-filter: blur(10px);
       border-radius: var(--radius-md);
-      padding: 10px 8px;
+      padding: 12px 12px;
       text-align: center;
       border: 1px solid rgba(56,189,248,0.15);
     }
@@ -127,41 +127,42 @@
     .sc-coin::before {
       content: '$'; position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      color: #78350f; font-size: 10px; font-weight: bold;
+      color: var(--c-warning); font-size: 10px; font-weight: bold;
     }
     .streak-flame { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
 
     /* ========== Sections ========== */
-    .section { padding: 14px 16px 6px; }
+    .section { padding: 16px 28px 8px; }
     .section-title {
       font-size: 13px; font-weight: 600;
-      color: var(--c-text-light); margin-bottom: 8px;
+      color: var(--c-text-light); margin-bottom: 12px;
+      padding: 0 16px;
       display: flex; justify-content: space-between; align-items: center;
       letter-spacing: 0.3px;
     }
     .card {
       background: var(--c-card);
       border-radius: var(--radius-lg);
-      padding: 14px;
+      padding: 16px 20px;
       box-shadow: var(--shadow-card);
-      border: 1px solid rgba(0,0,0,0.03);
+      border: 1px solid var(--c-border);
     }
     .card + .card { margin-top: 10px; }
 
     /* ========== Verify badge banner ========== */
     .verify-banner {
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      background: rgba(245,158,11,0.15);
       border: 1.5px solid var(--c-warning);
       border-radius: var(--radius-lg);
-      padding: 12px 14px;
+      padding: 14px 20px;
       display: flex; justify-content: space-between; align-items: center;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(245,158,11,0.15);
       transition: transform 0.15s;
     }
     .verify-banner:active { transform: scale(0.98); }
-    .verify-banner .text { font-weight: 600; color: #78350f; font-size: 14px; }
-    .verify-banner .sub { font-size: 11px; color: #92400e; margin-top: 2px; }
+    .verify-banner .text { font-weight: 600; color: var(--c-warning); font-size: 14px; }
+    .verify-banner .sub { font-size: 11px; color: var(--c-text-light); margin-top: 2px; }
     .verify-banner .count {
       background: var(--c-danger); color: white;
       min-width: 24px; height: 24px;
@@ -200,11 +201,11 @@
     }
 
     /* ========== Progress (today XP, level XP) ========== */
-    .progress-block { margin-bottom: 12px; }
+    .progress-block { margin-bottom: 14px; }
     .progress-block:last-child { margin-bottom: 0; }
     .progress-head {
       display: flex; justify-content: space-between; align-items: baseline;
-      font-size: 13px; color: var(--c-text-light); margin-bottom: 5px;
+      font-size: 13px; color: var(--c-text-light); margin-bottom: 6px;
     }
     .progress-head .right { font-weight: 600; color: var(--c-text); }
     .progress-bar {
@@ -223,16 +224,16 @@
 
     .exchange-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 12px; margin-top: 10px;
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      padding: 14px 16px; margin-top: 10px;
+      background: rgba(245,158,11,0.15);
       border-radius: var(--radius-md);
     }
-    .exchange-row .info { font-size: 13px; color: #78350f; }
+    .exchange-row .info { font-size: 13px; color: var(--c-warning); }
     .exchange-row .info strong { font-size: 16px; color: var(--c-gold-dark); }
     .exchange-row button {
       background: linear-gradient(135deg, var(--c-warning), var(--c-gold-dark));
       color: white; border: none;
-      padding: 6px 14px; border-radius: 100px;
+      padding: 10px 18px; border-radius: 100px;
       font-size: 13px; font-weight: 600; cursor: pointer;
       box-shadow: 0 2px 8px rgba(245,158,11,0.4);
     }
@@ -246,16 +247,17 @@
       display: flex;
       background: var(--c-card);
       border-radius: var(--radius-lg);
-      padding: 4px;
-      margin-bottom: 10px;
+      padding: 6px;
+      margin-bottom: 14px;
       box-shadow: var(--shadow-card);
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
+      border: 1px solid var(--c-border);
     }
     .tabs::-webkit-scrollbar { display: none; }
     .tab {
-      flex: 1; padding: 8px 10px;
+      flex: 1; padding: 10px 14px;
       border-radius: var(--radius-md);
       text-align: center;
       font-size: 13px;
@@ -284,22 +286,22 @@
     /* ========== Task items (工单 style) ========== */
     .task-item {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 14px;
+      padding: 14px 18px;
       background: var(--c-card);
       border-radius: var(--radius-md);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       border: 1px solid var(--c-border);
       position: relative;
       transition: all 0.2s;
     }
     .task-item:active { transform: scale(0.98); }
     .task-item.completed {
-      background: #f0fdf4;
-      border-color: #bbf7d0;
+      background: rgba(34,197,94,0.1);
+      border-color: rgba(34,197,94,0.3);
       opacity: 0.92;
     }
     .task-item.pending-verify {
-      background: #fef9e7;
+      background: rgba(245,158,11,0.1);
       border-color: var(--c-warning);
       box-shadow: 0 2px 8px rgba(245,158,11,0.15);
     }
@@ -310,7 +312,7 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 13px; flex-shrink: 0;
       border: 2px solid var(--c-border);
-      background: white;
+      background: var(--c-bg-soft);
       transition: all 0.2s;
     }
     .task-check.done { background: var(--c-success); color: white; border-color: var(--c-success); }
@@ -336,8 +338,8 @@
     }
     .btn {
       background: var(--c-primary); color: white; border: none;
-      padding: 7px 14px; border-radius: 100px;
-      font-size: 12px; font-weight: 600; cursor: pointer;
+      padding: 12px 24px; border-radius: 100px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
       transition: transform 0.15s;
     }
     .btn:active { transform: scale(0.95); }
@@ -350,9 +352,9 @@
     /* ========== Meal punch ========== */
     .meal-row { display: flex; gap: 8px; margin-top: 10px; }
     .meal-btn {
-      flex: 1; padding: 10px 4px; border: 1.5px solid var(--c-border);
-      background: white; border-radius: var(--radius-md);
-      font-size: 13px; cursor: pointer; font-weight: 500;
+      flex: 1; padding: 12px 14px; border: 1.5px solid var(--c-border);
+      background: var(--c-bg-soft); border-radius: var(--radius-md);
+      font-size: 13px; cursor: pointer; font-weight: 500; color: var(--c-text);
       transition: all 0.2s;
     }
     .meal-btn:active { transform: scale(0.96); }
@@ -360,29 +362,40 @@
       background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border-color: #16a34a;
     }
 
-    /* ========== Inventory drawer ========== */
-    .inv-drawer {
-      display: flex; gap: 8px;
-      overflow-x: auto; padding: 4px 0;
-      -webkit-overflow-scrolling: touch; scrollbar-width: none;
-    }
-    .inv-drawer::-webkit-scrollbar { display: none; }
-    .inv-item {
-      flex-shrink: 0; padding: 8px 12px;
+    /* ========== Inventory / Backpack ========== */
+    .inv-list { display: flex; flex-direction: column; gap: 8px; }
+    .inv-card {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px;
+      background: var(--c-card);
       border-radius: var(--radius-md);
-      color: white; font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: var(--shadow-card);
-      transition: transform 0.2s;
+      border: 1px solid var(--c-border);
+      transition: all 0.2s;
+      margin-bottom: 8px;
     }
-    .inv-item:active { transform: scale(0.96); }
-    .inv-empty { color: var(--c-text-faint); font-size: 13px; padding: 8px 0; }
+    .inv-card:active { transform: scale(0.98); }
+    .inv-card .inv-left { display: flex; align-items: center; gap: 12px; }
+    .inv-card .inv-icon { font-size: 24px; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--c-bg-soft); }
+    .inv-card .inv-info .inv-name { font-size: 14px; font-weight: 600; }
+    .inv-card .inv-info .inv-desc { font-size: 11px; color: var(--c-text-light); margin-top: 3px; }
+    .inv-card .inv-qty { font-size: 12px; color: var(--c-text-faint); margin-right: 10px; }
+    .inv-card .inv-use-btn {
+      background: var(--c-primary); color: white; border: none;
+      padding: 8px 16px; border-radius: 100px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .inv-card .inv-use-btn:active { transform: scale(0.95); }
+    .inv-card .inv-use-btn.equipped { background: var(--c-success); }
+    .inv-card .inv-use-btn:disabled { background: var(--c-text-faint); cursor: not-allowed; }
+    .inv-empty { color: var(--c-text-faint); font-size: 13px; padding: 12px 0; text-align: center; }
+    .inv-summary { display: flex; gap: 12px; margin-bottom: 10px; font-size: 12px; color: var(--c-text-light); }
+    .inv-summary span { background: var(--c-bg-soft); padding: 4px 10px; border-radius: 100px; }
 
     /* ========== Bottom nav ========== */
     .nav {
       position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(255,255,255,0.95);
+      background: rgba(11,25,41,0.95);
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--c-border);
       display: flex; justify-content: space-around;
@@ -437,16 +450,16 @@
     }
     .rank-list-item {
       display: flex; align-items: center;
-      padding: 10px 12px; margin-bottom: 6px;
+      padding: 12px 16px; margin-bottom: 8px;
       background: var(--c-bg-soft); border-radius: var(--radius-md);
-      gap: 10px;
+      gap: 12px;
     }
     .rank-list-item.achieved {
-      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      background: rgba(34,197,94,0.1);
       border-left: 4px solid var(--c-success);
     }
     .rank-list-item.current {
-      background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+      background: rgba(14,165,233,0.15);
       border-left: 4px solid var(--c-primary);
       box-shadow: var(--shadow-lift);
     }
@@ -469,11 +482,11 @@
       transition: transform 0.15s;
     }
     .heat-cell:active { transform: scale(0.85); }
-    .heat-cell.l1 { background: #e0f2fe; }
-    .heat-cell.l2 { background: #7dd3fc; }
-    .heat-cell.l3 { background: #38bdf8; }
-    .heat-cell.l4 { background: #0ea5e9; }
-    .heat-cell.l5 { background: #0284c7; }
+    .heat-cell.l1 { background: rgba(14,165,233,0.15); }
+    .heat-cell.l2 { background: rgba(14,165,233,0.3); }
+    .heat-cell.l3 { background: rgba(14,165,233,0.5); }
+    .heat-cell.l4 { background: rgba(14,165,233,0.7); }
+    .heat-cell.l5 { background: rgba(14,165,233,0.9); }
     .heat-cell.today { outline: 2px solid var(--c-primary); outline-offset: 1px; }
     .heat-legend {
       display: flex; align-items: center; gap: 4px;
@@ -495,30 +508,30 @@
     .stat-mini .v { font-size: 22px; font-weight: 700; color: var(--c-primary); }
     .stat-mini .l { font-size: 12px; color: var(--c-text-light); margin-top: 2px; }
     .milestone-card {
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      background: rgba(245,158,11,0.15);
       border-radius: var(--radius-md);
       padding: 12px;
       margin-bottom: 8px;
       border-left: 4px solid var(--c-gold-dark);
     }
-    .milestone-card .when { font-size: 11px; color: #92400e; }
-    .milestone-card .what { font-weight: 600; color: #78350f; margin-top: 2px; }
+    .milestone-card .when { font-size: 11px; color: var(--c-text-light); }
+    .milestone-card .what { font-weight: 600; color: var(--c-warning); margin-top: 2px; }
 
     /* ========== Settings ========== */
     .setting-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 16px;
+      padding: 16px 20px;
       background: var(--c-card);
       border-radius: var(--radius-md);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       box-shadow: var(--shadow-card);
     }
     .setting-item .label { font-size: 14px; font-weight: 500; }
     .setting-item .desc { font-size: 11px; color: var(--c-text-light); margin-top: 2px; }
-    .setting-group { margin-bottom: 16px; }
+    .setting-group { margin-bottom: 20px; }
     .setting-group .group-title {
       font-size: 12px; font-weight: 600; color: var(--c-text-light);
-      padding: 0 16px 6px; letter-spacing: 0.5px;
+      padding: 4px 20px 8px; letter-spacing: 0.5px;
     }
 
     /* ========== Modal ========== */
@@ -533,7 +546,7 @@
     }
     @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
     .modal {
-      background: white;
+      background: var(--c-card);
       border-radius: var(--radius-xl);
       padding: 22px;
       max-width: 420px; width: 100%;
@@ -627,7 +640,7 @@
     .celebration-content .ok-btn {
       margin-top: 24px;
       background: linear-gradient(135deg, var(--c-gold), var(--c-gold-dark));
-      color: #78350f;
+      color: var(--c-warning);
       border: none;
       padding: 12px 36px;
       border-radius: 100px;
@@ -669,7 +682,7 @@
     }
     .trend-stat {
       flex: 1; text-align: center; background: var(--c-bg-soft);
-      border-radius: 8px; padding: 8px;
+      border-radius: 8px; padding: 10px 12px;
     }
     .trend-stat .v { font-size: 16px; font-weight: 700; color: var(--c-primary); }
     .trend-stat .l { font-size: 10px; color: var(--c-text-light); margin-top: 2px; }
@@ -710,7 +723,7 @@
     }
     .dept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     .dept-item {
-      background: var(--c-bg-soft); border-radius: 8px; padding: 8px 10px;
+      background: var(--c-bg-soft); border-radius: 8px; padding: 10px 12px;
     }
     .dept-item .dept-name { font-size: 12px; font-weight: 600; }
     .dept-item .dept-person { color: var(--c-text-light); font-size: 11px; margin-top: 2px; }
@@ -720,13 +733,13 @@
     .shop-item {
       border: 1.5px solid var(--c-border);
       border-radius: var(--radius-md);
-      padding: 12px;
-      margin-bottom: 10px;
-      background: white;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      background: var(--c-card);
     }
     .shop-item-head {
       display: flex; justify-content: space-between; align-items: flex-start;
-      margin-bottom: 8px;
+      margin-bottom: 14px;
     }
     .shop-item-head .name { font-weight: 600; font-size: 14px; }
     .shop-item-head .desc { font-size: 12px; color: var(--c-text-light); margin-top: 3px; line-height: 1.4; }
@@ -754,12 +767,12 @@
     /* ========== Tip pills / chips ========== */
     .chip {
       display: inline-flex; align-items: center; gap: 4px;
-      padding: 4px 10px; border-radius: 100px;
+      padding: 6px 12px; border-radius: 100px;
       font-size: 11px; font-weight: 600;
     }
-    .chip-success { background: #dcfce7; color: #166534; }
-    .chip-warn { background: #fef3c7; color: #92400e; }
-    .chip-info { background: #dbeafe; color: #1e40af; }
+    .chip-success { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .chip-warn { background: rgba(245,158,11,0.15); color: var(--c-warning); }
+    .chip-info { background: rgba(14,165,233,0.15); color: var(--c-primary-light); }
 
     /* ========== Empty state ========== */
     .empty-state {
@@ -785,11 +798,153 @@
     .network-indicator.show { display: block; animation: fade-in 0.3s; }
 
     /* ========== Reduce motion ========== */
+    /* v2.7 徽章系统 */
+    .badge-wall { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 8px 0; }
+    .badge-cell { text-align: center; padding: 14px 10px; border-radius: var(--radius-md); border: 1px solid var(--c-border); background: var(--c-bg-soft); transition: transform 0.2s; }
+    .badge-cell.badge-owned { border-color: var(--c-primary); background: rgba(56,189,248,0.05); }
+    .badge-cell.badge-locked { opacity: 0.4; }
+    .badge-icon { font-size: 28px; margin-bottom: 4px; }
+    .badge-name { font-size: 10px; font-weight: 600; color: var(--c-text-light); line-height: 1.3; }
+    .badge-desc-tip { font-size: 9px; color: var(--c-text-faint); margin-top: 2px; }
+    .badge-unlock-card { background: var(--c-card); border: 2px solid gold; border-radius: 20px; padding: 32px 24px; max-width: 280px; width: 85%; text-align: center; box-shadow: 0 0 60px rgba(255,215,0,0.2); }
+    .badge-unlock-icon { font-size: 52px; margin-bottom: 12px; }
+    .badge-unlock-title { font-size: 14px; color: gold; font-weight: 700; margin-bottom: 8px; }
+    .badge-unlock-name { font-size: 20px; font-weight: 700; color: var(--c-text); margin-bottom: 6px; }
+    .badge-unlock-desc { font-size: 13px; color: var(--c-text-light); }
+
+    /* v2.7 机器人工厂 */
+    .robot-select-card { background: var(--c-bg-soft); border: 1px solid var(--c-border); border-radius: 12px; padding: 18px 20px; margin-bottom: 10px; }
+    .robot-select-top { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 12px; }
+    .robot-select-avatar { width: 72px; height: 72px; border-radius: 12px; background: var(--c-bg); border: 1px solid var(--c-border); display: flex; align-items: center; justify-content: center; font-size: 36px; flex-shrink: 0; }
+    .robot-select-header { flex: 1; }
+    .robot-select-model { font-size: 11px; color: var(--c-primary); font-weight: 600; letter-spacing: 1px; font-family: monospace; }
+    .robot-select-name { font-size: 20px; font-weight: 700; margin: 2px 0; }
+    .robot-select-type { font-size: 12px; color: var(--c-text-faint); }
+    .robot-select-desc { font-size: 12px; color: var(--c-text-light); line-height: 1.6; margin-bottom: 12px; padding: 10px 12px; background: var(--c-bg); border-radius: 8px; border-left: 3px solid var(--c-primary); }
+    .robot-select-specs { display: flex; gap: 8px; font-size: 12px; color: var(--c-text-faint); margin-bottom: 4px; }
+    .robot-select-specs span { flex: 1; text-align: center; padding: 12px 10px; background: var(--c-bg); border-radius: 10px; }
+    .robot-select-specs .spec-val { display: block; font-size: 16px; font-weight: 700; color: var(--c-primary); }
+    .robot-select-specs .spec-label { display: block; font-size: 10px; color: var(--c-text-faint); margin-top: 4px; }
+    .rp-progress { display: flex; align-items: center; gap: 10px; }
+    .rp-progress-bar { flex: 1; height: 6px; background: var(--c-bg); border-radius: 3px; overflow: hidden; }
+    .rp-progress-fill { height: 100%; background: linear-gradient(90deg, var(--c-primary-dark), var(--c-primary)); border-radius: 3px; transition: width 0.5s; }
+    .rp-progress-label { font-size: 11px; color: var(--c-text-faint); font-weight: 600; }
+    .rp-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--c-bg-soft); border-radius: 10px; border: 1px solid var(--c-border); margin-bottom: 8px; }
+    .rp-card.rp-owned { border-color: #22c55e; background: rgba(34,197,94,0.05); }
+    .rp-card.rp-next { border-color: var(--c-primary); box-shadow: 0 0 10px rgba(56,189,248,0.1); }
+    .rp-card.rp-locked { opacity: 0.45; }
+    .rp-icon { font-size: 20px; width: 32px; text-align: center; flex-shrink: 0; }
+    .rp-info { flex: 1; min-width: 0; }
+    .rp-name { font-size: 13px; font-weight: 600; }
+    .rp-desc { font-size: 11px; color: var(--c-text-faint); margin-top: 2px; line-height: 1.4; }
+    .rp-action { flex-shrink: 0; }
+    .rp-badge { font-size: 11px; padding: 6px 12px; border-radius: 100px; font-weight: 600; display: inline-block; }
+    .rp-done { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .rp-buy { background: var(--c-primary); color: #fff; cursor: pointer; padding: 8px 16px; font-size: 11px; border: none; border-radius: 100px; }
+    .rp-lock { background: rgba(100,116,139,0.15); color: var(--c-text-faint); }
+    /* 机器人浮窗 */
+    .robot-widget { position: fixed; bottom: 80px; right: 16px; width: 44px; height: 44px; background: var(--c-card); border: 2px solid var(--c-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: float 3s ease-in-out infinite; }
+    .robot-widget-icon { font-size: 22px; }
+    .robot-speech { position: fixed; bottom: 130px; right: 16px; background: var(--c-card); border: 1px solid var(--c-border); border-radius: 12px 12px 4px 12px; padding: 10px 14px; max-width: 200px; z-index: 101; animation: eventSlideIn 0.3s ease-out; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+    .robot-speech-submit { border-color: var(--c-primary); }
+    .robot-speech-name { font-size: 10px; color: var(--c-primary); font-weight: 600; margin-bottom: 4px; }
+    .robot-speech-text { font-size: 12px; color: var(--c-text); line-height: 1.5; }
+
+    /* v2.7 随机事件卡片 */
+    .event-card-overlay { z-index: 9999; }
+    .event-card {
+      background: var(--c-card);
+      border: 2px solid var(--c-primary);
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 320px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(56,189,248,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .event-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent 0%, var(--c-primary-light) 10%, transparent 20%);
+      animation: eventGlow 3s linear infinite;
+      opacity: 0.08;
+    }
+    @keyframes eventGlow { to { transform: rotate(360deg); } }
+    .event-type-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+    .event-title { font-size: 20px; font-weight: 700; color: var(--c-text); margin-bottom: 10px; }
+    .event-desc { font-size: 13px; color: var(--c-text-light); line-height: 1.6; margin-bottom: 12px; }
+    .event-npc { font-size: 12px; color: var(--c-text-faint); font-style: italic; margin-bottom: 14px; }
+    .event-reward { font-size: 14px; font-weight: 600; color: var(--c-primary-light); margin-bottom: 8px; }
+    .event-condition { font-size: 12px; color: #f59e0b; background: rgba(245,158,11,0.1); padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; }
+    .event-ok-btn { width: 100%; margin-top: 8px; font-size: 15px; padding: 12px; }
+    @keyframes eventSlideIn {
+      from { transform: translateY(40px) scale(0.9); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @keyframes eventSlideOut {
+      to { transform: translateY(-30px) scale(0.9); opacity: 0; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
         transition-duration: 0.01ms !important;
       }
+    }
+
+    /* ========== 平板适配 (≥600px) ========== */
+    @media (min-width: 600px) {
+      body { font-size: 15px; }
+      .page { max-width: 720px; margin: 0 auto; }
+      .section { padding: 20px 32px 10px; }
+      .card { padding: 18px; border-radius: 16px; }
+      .header { border-radius: 0 0 20px 20px !important; padding: 24px 28px 22px !important; }
+      .nav { justify-content: center; gap: 8px; }
+      .nav-item { flex: unset; min-width: 80px; padding: 8px 12px; }
+      .nav-icon { font-size: 24px; }
+      .task-item { padding: 14px 18px; }
+      .task-label { font-size: 15px; }
+      .task-check { width: 32px; height: 32px; font-size: 14px; }
+      .shop-item { padding: 18px 24px; }
+      .shop-item-head .name { font-size: 15px; }
+      .modal { max-width: 520px; padding: 28px; }
+      .robot-select-card { padding: 20px; }
+      .rp-card { padding: 16px 20px; }
+      .robot-select-top { gap: 18px; }
+      .robot-select-avatar { width: 80px; height: 80px; }
+      .robot-select-name { font-size: 22px; }
+      .section-title { font-size: 14px; }
+      .setting-item { padding: 18px 24px; }
+      .setting-item .label { font-size: 15px; }
+      .inv-card { padding: 16px 20px; }
+      .badge-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+
+    /* ========== 大平板/横屏 (≥1024px) ========== */
+    @media (min-width: 1024px) {
+      .page { max-width: 860px; }
+      .section { padding: 24px 40px 12px; }
+      .task-item { padding: 16px 20px; }
+      .badge-grid { grid-template-columns: repeat(6, 1fr); }
+      .robot-select-card { display: flex; flex-wrap: wrap; gap: 16px; }
+      .robot-select-top { width: 100%; }
+      .robot-select-desc { flex: 1; min-width: 200px; }
+      .robot-select-specs { flex: unset; width: 260px; }
     }
   </style>
 </head>
@@ -806,7 +961,7 @@
   <div class="header">
     <div class="header-top">
       <div class="greeting">
-        <h1>👋 小塔</h1>
+        <h1>👋 小塔 <span id="custom-title-display" style="font-size:13px;font-weight:600;color:var(--c-primary-light);margin-left:6px;"></span></h1>
         <p id="greeting-text">加油，今天也要努力！</p>
       </div>
       <div class="rank-chip" onclick="switchPage('achievements')">
@@ -902,17 +1057,17 @@
         </div>
         <div class="progress-bar"><div class="progress-fill green" id="level-fill" style="width:0%"></div></div>
       </div>
-      <p class="hint warn">⚠️ 当日 XP 凌晨清零，记得当天兑换</p>
+      <p class="hint warn">⚠️ 当日 XP 将在凌晨清零，记得在当天尽快兑换 SC</p>
     </div>
   </div>
 
-  <!-- Inventory drawer -->
+  <!-- Inventory / Backpack -->
   <div class="section">
     <div class="section-title">
       <span>🧰 装备库</span>
-      <a onclick="showShopModal()" style="color:var(--c-primary);font-weight:600;cursor:pointer;">✦ 研发部</a>
+      <a onclick="showShopModal()" style="color:var(--c-primary);font-weight:600;cursor:pointer;">✦ 研发部商店</a>
     </div>
-    <div class="inv-drawer" id="inventory-bar"></div>
+    <div class="inv-list" id="inventory-bar"></div>
   </div>
 
   <!-- Task tabs -->
@@ -951,6 +1106,19 @@
       <div id="redeem-list"></div>
     </div>
   </div>
+</div>
+
+<!-- ========== ROBOT PAGE ========== -->
+<div id="robot-page" class="page">
+  <div class="header" style="border-radius:0;padding-bottom:18px;">
+    <div class="header-top">
+      <div class="greeting">
+        <h1>🤖 机器人工厂</h1>
+        <p>选择并组装你的专属机器人</p>
+      </div>
+    </div>
+  </div>
+  <div class="section" id="robot-page-content"></div>
 </div>
 
 <!-- ========== GROWTH PAGE ========== -->
@@ -1008,6 +1176,12 @@
     <div class="card">
       <div class="section-title" style="margin-bottom:10px;"><span>🏆 里程碑</span></div>
       <div id="milestone-list"></div>
+    </div>
+    <div class="card" onclick="showBadgeWall()" style="cursor:pointer;">
+      <div class="section-title" style="margin-bottom:8px;"><span>🏅 荣誉墙</span></div>
+      <div id="badge-preview" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:12px;color:var(--c-text-light)">点击查看全部徽章 →</span>
+      </div>
     </div>
   </div>
 </div>
@@ -1108,7 +1282,7 @@
           <div class="label">版本</div>
           <div class="desc">Siatar 工业 · 系统版本</div>
         </div>
-        <span style="color:var(--c-text-light);font-variant-numeric:tabular-nums;" id="version-text">v2.3.1</span>
+        <span style="color:var(--c-text-light);font-variant-numeric:tabular-nums;" id="version-text">v2.7.0</span>
       </div>
       <div class="setting-item">
         <div>
@@ -1123,6 +1297,18 @@
           <div class="desc">公司简介、组织架构与部门介绍</div>
         </div>
         <button class="btn btn-ghost" onclick="showCompanyInfo()">查看</button>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="group-title">CEO 专区</div>
+      <div class="setting-item" onclick="switchPage('verify')" style="cursor:pointer;">
+        <div>
+          <div class="label">✅ 任务审批</div>
+          <div class="desc">审核已提交的任务</div>
+        </div>
+        <span class="badge" id="settings-verify-badge" style="display:none;margin-right:8px;">0</span>
+        <span style="color:var(--c-text-faint);font-size:18px;">→</span>
       </div>
     </div>
 
@@ -1145,10 +1331,9 @@
     <div class="nav-icon">📋</div>
     <div>任务</div>
   </div>
-  <div class="nav-item" data-page="verify" onclick="switchPage('verify')">
-    <div class="nav-icon">✅</div>
-    <div>审批</div>
-    <span class="badge" id="nav-verify-badge" style="display:none">0</span>
+  <div class="nav-item" data-page="robot" onclick="switchPage('robot')">
+    <div class="nav-icon">🤖</div>
+    <div>工厂</div>
   </div>
   <div class="nav-item" data-page="growth" onclick="switchPage('growth')">
     <div class="nav-icon">📈</div>
@@ -1166,7 +1351,7 @@
 
 <script>
 /* ===========================================================
-   Siatar 工业 · 任务面板 v2.5.0
+   Siatar 工业 · 任务面板 v2.7.0
    架构说明：
    - localStorage 作为主存储（key: 'xta-game-data'）
    - 历史记录单独存储（key: 'xta-game-history'）
@@ -1174,7 +1359,7 @@
    - 兼容旧数据自动迁移
    =========================================================== */
 
-const VERSION = 'v2.6.0';
+const VERSION = 'v2.7.0';
 
 // 本地日期字符串 YYYY-MM-DD（避免 toISOString() 在非 UTC 时区造成的偏移）
 function localDateStr(d) {
@@ -1295,6 +1480,25 @@ const initialState = {
   totalEarnedXP: 0,
   scClaimedCycles: [],
   earlyBirdAwardedCycles: [],
+  // v2.7
+  unlockedThemes: ['deep-space'],
+  currentTheme: 'deep-space',
+  customTitle: '',
+  weeklyDinnerUsed: 0,
+  weeklyLateSleepUsed: 0,
+  weeklyPsGameUsed: 0,
+  monthlyWeekendChoiceUsed: 0,
+  lastMonthReset: null,
+  shopPurchaseCount: 0,
+  activeChallenge: null,
+  eventHistory: [],
+  unlockedBadges: [],
+  earlyBirdCount: 0,
+  totalScEarned: 0,
+  // 机器人工厂
+  robotSelected: null,    // 'sx-01' | 'sp-9' | null
+  robotParts: 0,          // 已购买零件数 (0-8)
+  robotCompleted: false,
 };
 
 // v2.5：精简为 6 档，节奏缩短到 ~1 年
@@ -1321,7 +1525,7 @@ const XP_REWARDS = {
 // - 学习按时：必做三科都需在 LEARNING_DEADLINE 之前提交
 // - scCost 改为 60（更易达成正常一天的目标）
 const EXCHANGE_RULES = {
-  scCost: 60,
+  scCost: 75,
   required: ['chinese', 'math', 'english'],
   auxiliaryGroups: ['sports', 'life', 'nutrition'],
   minAuxiliary: 2,
@@ -1336,8 +1540,124 @@ const TIME_PAUSE_ITEM = { name: '⏸️ 时间暂停器', cost: 50, description:
 const MASSAGE_ITEM = { name: '💆 睡前按摩券', cost: 50, validity: '7 天', description: '睡前 10-15 分钟按摩，需预约' };
 // v2.5：科学实验已下线，保留常量定义以兼容历史数据
 const SCIENCE_EXPERIMENT_ITEM = { name: '🔬 科学实验', cost: 50, validity: '7 天', description: '（已下线）' };
+// v2.7：新增实体道具（SC 消耗）
+const SC_SHOP_ITEMS = [
+  { id: 'tv', name: '🎬 看电视 20 分钟', cost: 1, currency: 'sc', limit: '每周 3 次', desc: '行政部福利 · 周末使用，需 CEO 批准' },
+  { id: 'dinner', name: '🍕 选晚餐权', cost: 1, currency: 'sc', limit: '每周 1 次', desc: '小塔决定今天吃什么' },
+  { id: 'lateSleep', name: '🌙 晚睡 30 分钟', cost: 2, currency: 'sc', limit: '每周 1 次', desc: '周末可以晚睡半小时，需 CEO 批准' },
+  { id: 'book', name: '📖 自选书/漫画', cost: 3, currency: 'sc', limit: '无限制', desc: '去书店选一本想要的书' },
+  { id: 'psGame', name: '🎮 周末 PS 游戏 30 分钟', cost: 3, currency: 'sc', limit: '每周 1 次', desc: '周末使用，需 CEO 批准' },
+  { id: 'weekendChoice', name: '🎯 周末活动选择权', cost: 4, currency: 'sc', limit: '每月 1 次', desc: '小塔决定周末去哪玩' },
+];
+// v2.7：XP 大额兑换 SC
+const XP_TO_SC_RATES = [
+  { xp: 300, sc: 1 },
+  { xp: 550, sc: 2 },
+  { xp: 800, sc: 3 },
+];
+// v2.7：主题皮肤
+const THEMES = [
+  { id: 'deep-space', name: '🌊 深空蓝', cost: 0, vars: {} },
+  { id: 'forest', name: '🌿 森林绿', cost: 150, vars: { '--c-primary': '#22c55e', '--c-primary-dark': '#16a34a', '--c-primary-light': '#4ade80', '--c-secondary': '#1a3a2a', '--c-header-from': '#0f2918', '--c-header-to': '#1a3a2a' } },
+  { id: 'flame', name: '🔥 烈焰红', cost: 150, vars: { '--c-primary': '#ef4444', '--c-primary-dark': '#dc2626', '--c-primary-light': '#f87171', '--c-secondary': '#3f1515', '--c-header-from': '#1a0505', '--c-header-to': '#3f1515' } },
+  { id: 'galaxy', name: '🟣 星际紫', cost: 150, vars: { '--c-primary': '#a855f7', '--c-primary-dark': '#9333ea', '--c-primary-light': '#c084fc', '--c-secondary': '#2e1065', '--c-header-from': '#1a0533', '--c-header-to': '#2e1065' } },
+  { id: 'dark', name: '🌙 暗夜模式', cost: 150, vars: { '--c-primary': '#60a5fa', '--c-primary-dark': '#3b82f6', '--c-primary-light': '#93c5fd', '--c-secondary': '#111827', '--c-header-from': '#030712', '--c-header-to': '#111827', '--c-bg': '#030712', '--c-card': '#111827', '--c-text': '#f1f5f9', '--c-text-light': '#9ca3af', '--c-text-faint': '#6b7280', '--c-border': '#1f2937', '--c-bg-soft': '#111827' } },
+];
 // v2.5：看电视取代游戏时间
 const TV_LIMITS = { maxPerWeek: 3, scCost: 1 };
+
+/* ===== v2.7 随机事件系统 ===== */
+const RANDOM_EVENTS = [
+  // 即时奖励类 (60%)
+  { id: 'slip', type: 'reward', weight: 15, title: '📋 老张手滑', desc: 'HR 老张操作工资系统时不小心多按了一下……', reward: { xp: 5 }, npc: '人事部 老张' },
+  { id: 'redpacket', type: 'reward', weight: 12, title: '🧧 财务部红包', desc: '财务部 Data 今天心情好，给全员发了红包！', reward: { xp: 8 }, npc: '财务部 Data' },
+  { id: 'goodiebag', type: 'reward', weight: 10, title: '🎁 研发部福袋', desc: '研发部年度清仓，随机发放测试奖励。', reward: { xp: 6 }, npc: '研发部' },
+  { id: 'praise', type: 'reward', weight: 12, title: '👏 曾主任表扬', desc: '曾主任在全公司大会上点名表扬了你的工作态度！', reward: { xp: 10 }, npc: '人事部 曾主任' },
+  { id: 'energy', type: 'reward', weight: 11, title: '⚡ 能量涌动', desc: '今天状态超好，身体核心能量充盈！', reward: { xp: 4 }, npc: '系统' },
+  // 挑战类 (25%)
+  { id: 'cto_project', type: 'challenge', weight: 5, title: '🚀 CTO 特别项目', desc: 'CTO Siatar 下发紧急项目：今日额外完成一项附加任务可获得双倍奖励！', reward: { xp: 15 }, condition: '完成一项附加任务', npc: 'CTO Siatar' },
+  { id: 'speed_run', type: 'challenge', weight: 8, title: '⏱️ 极速挑战', desc: '行政部发起效率竞赛：如果所有核心任务在 20:30 前提交，额外奖励！', reward: { xp: 12 }, condition: '核心任务 20:30 前提交', npc: '行政部 小杨' },
+  { id: 'tidy_bonus', type: 'challenge', weight: 7, title: '🧹 整洁达人', desc: 'Sam 教练说：今天书桌整理特别干净的话，有额外奖励哦！', reward: { xp: 8 }, condition: '完成"基地秩序恢复"', npc: '健康部 Sam 教练' },
+  { id: 'streak_dare', type: 'challenge', weight: 5, title: '🔥 连续打卡挑战', desc: '人事部赌你连续 3 天不会断签……证明给他们看！', reward: { xp: 20 }, condition: '连续 3 天全勤', npc: '人事部' },
+  // 中性/趣味类 (15%)
+  { id: 'coffee', type: 'flavor', weight: 4, title: '☕ 茶水间偶遇', desc: '你在茶水间遇到了 CTO Siatar，他跟你聊了聊最近的项目进展。', reward: null, npc: 'CTO Siatar' },
+  { id: 'cat', type: 'flavor', weight: 4, title: '🐱 办公室猫咪', desc: '一只猫咪溜进了办公室，在你的工位上打了个盹。', reward: null, npc: '系统' },
+  { id: 'weather', type: 'flavor', weight: 3, title: '🌤️ 好天气通知', desc: '行政部通知：今天天气特别好，建议大家午休时出去走走！', reward: null, npc: '行政部 小杨' },
+  { id: 'snack', type: 'flavor', weight: 2, title: '🍪 零食补给', desc: '后勤组在休息区放了新零食，先到先得！', reward: null, npc: '行政部' },
+  { id: 'music', type: 'flavor', weight: 2, title: '🎵 BGM 切换', desc: '研发部今天换了办公室背景音乐，氛围很棒。', reward: null, npc: '研发部' },
+];
+const EVENT_TRIGGER_CHANCE = 0.20; // 20% per confirmed task
+
+/* ===== v2.7 机器人工厂 ===== */
+const ROBOTS = {
+  'sx-01': {
+    id: 'sx-01', name: '铁卫', model: 'SX-01', type: '战术机甲',
+    desc: 'Siatar 研发部的第一代战术机甲。全身钛合金骨架搭配纳米装甲，搭载 HUD 战术系统和 360° 传感阵列。性格沉稳可靠，是你最忠诚的战术搭档。',
+    parts: [
+      { name: '核心框架', icon: '⚙️', cost: 20, desc: '每台机甲的起点。钛合金骨架从研发部的 3D 打印机里一根根成型，这是铁卫的"脊椎"。' },
+      { name: '动力模组', icon: '💚', cost: 25, desc: '心脏上线。微型聚变反应堆开始输出能量，胸口的绿光意味着——铁卫活了。' },
+      { name: '装甲外壳', icon: '🛡️', cost: 40, desc: '深蓝色纳米装甲一片片贴合骨架，就像给铁卫穿上了防弹外套。研发部说这能抗住陨石碎片。' },
+      { name: '战术面罩', icon: '😎', cost: 50, desc: '一条冰蓝色的光带亮起——铁卫睁开了"眼睛"。它能扫描 360° 范围内的所有目标。' },
+      { name: '双臂组件', icon: '💪', cost: 60, desc: '液压关节嵌入肩膀，两条机械臂完成对接。现在铁卫可以搬运、操作、甚至挥手了。' },
+      { name: '行走系统', icon: '🦿', cost: 70, desc: '双腿驱动器启动，铁卫第一次站了起来。地板微微震动——它比你想象的要重。' },
+      { name: 'HUD 系统', icon: '📡', cost: 80, desc: '战术数据浮层加载完毕。铁卫的视野里出现了温度、距离、任务状态……一切尽在掌握。' },
+      { name: '传感阵列', icon: '🔴', cost: 100, desc: '最后的传感器阵列接入主板。铁卫全系统激活，发出第一声语音："系统就绪，等待指令。"' },
+    ],
+    lines: {
+      submit: ['收到，已录入系统。', '执行确认。继续保持。', '数据同步中……完毕。', '不错的效率，士兵。', '任务入库，等待上级签批。', '铁卫确认。你今天状态不错。'],
+      idle: ['系统正常运转中。', '等待下一条指令。', '全天候待命。', '今日任务完成度：需要加把劲。', '检测到能量波动……可能是你饿了。', '建议：先完成核心任务，再执行附加项。'],
+    },
+  },
+  'sp-9': {
+    id: 'sp-9', name: '脉冲', model: 'SP-9', type: '浮游核心',
+    desc: 'Siatar 研发部的第九代探测单元。悬浮球体设计，双轨道环提供超强算力，能量翼让它来去自如。性格活泼好奇，是你身边最聪明的 AI 伙伴。',
+    parts: [
+      { name: '能量种子', icon: '✨', cost: 20, desc: '一颗拇指大小的光点在实验室里悬浮起来。研发部说这是"脉冲"的胚胎——纯能量态。' },
+      { name: '核心球壳', icon: '🔵', cost: 25, desc: '力场发生器将能量约束成球形。光点有了"身体"，一个半透明的蓝色球体安静地漂浮着。' },
+      { name: '主视觉单元', icon: '👁️', cost: 40, desc: '球体中心凝聚出一个明亮光瞳——脉冲第一次"看见"了这个世界。它好奇地左右张望。' },
+      { name: '第一轨道环', icon: '💫', cost: 50, desc: '一条光环出现在球体周围，开始匀速旋转。这是脉冲的信号接收天线，现在它能"听"了。' },
+      { name: '能量翼组', icon: '⚡', cost: 60, desc: '两道光翼从球体两侧展开，像蜂鸟的翅膀。脉冲的飞行速度瞬间提升了三倍。' },
+      { name: '第二轨道环', icon: '🪐', cost: 70, desc: '外层轨道环上线，与内环反向旋转。双环结构让脉冲的算力翻了一番——它开始变聪明了。' },
+      { name: '扫描光束', icon: '🔦', cost: 80, desc: '底部投射出一道淡蓝色的扫描光柱。脉冲可以分析地面上的任何物体——包括你的作业本。' },
+      { name: '数据流模块', icon: '💾', cost: 100, desc: '二进制数据流环绕球体流动。脉冲全功率启动，发出第一声："嗡——信号连接完毕，你好！"' },
+    ],
+    lines: {
+      submit: ['嗡——数据捕获成功！', '哦？又一条，效率不错嘛。', '脉冲已记录，正在分析中~', '收到收到！信号清晰！', '嘀——任务波形正常，继续！', '观测到稳定输出，好现象。'],
+      idle: ['正在扫描周围环境……一切正常。', '嗡嗡嗡……待机中。', '有新任务吗？我的传感器在等信号。', '今天的数据看起来不错哦。', '检测到一股零食气息……你是不是偷吃了？', '建议适当休息，电池也需要充电呀。'],
+    },
+  },
+};
+
+/* ===== v2.7 徽章图鉴 ===== */
+const BADGES = [
+  // 坚持类
+  { id: 'streak3', name: '初露锋芒', icon: '🔥', desc: '连续打卡 3 天', check: s => s.streak >= 3 },
+  { id: 'streak7', name: '稳定输出', icon: '🔥', desc: '连续打卡 7 天', check: s => s.streak >= 7 },
+  { id: 'streak14', name: '钢铁意志', icon: '💎', desc: '连续打卡 14 天', check: s => s.streak >= 14 },
+  { id: 'streak30', name: '不可阻挡', icon: '🏆', desc: '连续打卡 30 天', check: s => s.maxStreak >= 30 },
+  // XP 里程碑
+  { id: 'xp100', name: '百分起步', icon: '⭐', desc: '累计获得 100 XP', check: s => (s.totalEarnedXP || 0) >= 100 },
+  { id: 'xp500', name: '小有积累', icon: '⭐', desc: '累计获得 500 XP', check: s => (s.totalEarnedXP || 0) >= 500 },
+  { id: 'xp1500', name: '实力担当', icon: '🌟', desc: '累计获得 1500 XP', check: s => (s.totalEarnedXP || 0) >= 1500 },
+  { id: 'xp3000', name: '顶级精英', icon: '💫', desc: '累计获得 3000 XP', check: s => (s.totalEarnedXP || 0) >= 3000 },
+  // 效率类
+  { id: 'earlyBird', name: '早鸟达人', icon: '🐦', desc: '累计 5 次早鸟完成', check: s => (s.earlyBirdCount || 0) >= 5 },
+  { id: 'earlyBird20', name: '时间管理大师', icon: '⏰', desc: '累计 20 次早鸟完成', check: s => (s.earlyBirdCount || 0) >= 20 },
+  // 消费类
+  { id: 'firstBuy', name: '初次消费', icon: '🛒', desc: '第一次在商店兑换', check: s => (s.shopPurchaseCount || 0) >= 1 },
+  { id: 'bigSpender', name: '消费达人', icon: '💳', desc: '商店兑换 10 次', check: s => (s.shopPurchaseCount || 0) >= 10 },
+  // SC 类
+  { id: 'firstSc', name: '首张星币', icon: '🪙', desc: '获得第一枚 SC', check: s => (s.sc || 0) >= 1 || (s.totalScEarned || 0) >= 1 },
+  { id: 'sc10', name: '星币收藏家', icon: '💰', desc: '累计获得 10 SC', check: s => (s.totalScEarned || 0) >= 10 },
+  // 探索类
+  { id: 'themeUnlock', name: '审美觉醒', icon: '🎨', desc: '解锁任意一款主题', check: s => (s.unlockedThemes || []).length >= 2 },
+  { id: 'allThemes', name: '全色收藏', icon: '🌈', desc: '解锁全部主题', check: s => (s.unlockedThemes || []).length >= 5 },
+  { id: 'customTitle', name: '命名权', icon: '🏷️', desc: '设置自定义称号', check: s => !!s.customTitle },
+  // 特殊
+  { id: 'fullDay', name: '全勤一日', icon: '✅', desc: '一天内完成所有可选任务', check: s => { const keys = Object.keys(s.todayTasks || {}); return keys.length >= 7; } },
+  { id: 'event5', name: '幸运体质', icon: '🍀', desc: '触发 5 次随机事件', check: s => (s.eventHistory || []).length >= 5 },
+  { id: 'event20', name: '事件磁铁', icon: '🧲', desc: '触发 20 次随机事件', check: s => (s.eventHistory || []).length >= 20 },
+];
 
 const TASK_NAMES = {
   bringHome: '📁 资料回收任务（作业带回家）',
@@ -1449,6 +1769,24 @@ function loadState() {
   if (!Array.isArray(s.scClaimedCycles)) s.scClaimedCycles = [];
   if (!Array.isArray(s.earlyBirdAwardedCycles)) s.earlyBirdAwardedCycles = [];
   if (!s.taskTime || typeof s.taskTime !== 'object') s.taskTime = {};
+  // v2.7 migrations
+  if (!Array.isArray(s.unlockedThemes)) s.unlockedThemes = ['deep-space'];
+  if (!s.currentTheme) s.currentTheme = 'deep-space';
+  if (typeof s.customTitle !== 'string') s.customTitle = '';
+  if (typeof s.weeklyDinnerUsed !== 'number') s.weeklyDinnerUsed = 0;
+  if (typeof s.weeklyLateSleepUsed !== 'number') s.weeklyLateSleepUsed = 0;
+  if (typeof s.weeklyPsGameUsed !== 'number') s.weeklyPsGameUsed = 0;
+  if (typeof s.monthlyWeekendChoiceUsed !== 'number') s.monthlyWeekendChoiceUsed = 0;
+  if (typeof s.shopPurchaseCount !== 'number') s.shopPurchaseCount = 0;
+  // v2.7 随机事件 + 徽章 + 机器人
+  if (!s.activeChallenge) s.activeChallenge = null;
+  if (!Array.isArray(s.eventHistory)) s.eventHistory = [];
+  if (!s.robotSelected) s.robotSelected = null;
+  if (typeof s.robotParts !== 'number') s.robotParts = 0;
+  if (typeof s.robotCompleted !== 'boolean') s.robotCompleted = false;
+  if (!Array.isArray(s.unlockedBadges)) s.unlockedBadges = [];
+  if (typeof s.earlyBirdCount !== 'number') s.earlyBirdCount = 0;
+  if (typeof s.totalScEarned !== 'number') s.totalScEarned = 0;
 
   // v2.5：totalEarnedXP = 历史累计 XP（只增不减），用于头衔判定
   // levelXP = 可花余额（买道具扣这里，不影响头衔）
@@ -1486,7 +1824,16 @@ function loadState() {
     // Weekly reset (Monday)
     if (new Date().getDay() === 1) {
       s.weeklyGameUsed = 0;
+      s.weeklyDinnerUsed = 0;
+      s.weeklyLateSleepUsed = 0;
+      s.weeklyPsGameUsed = 0;
       s.lastWeekReset = today;
+    }
+    // Monthly reset (1st of month)
+    const monthKey = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+    if (s.lastMonthReset !== monthKey) {
+      s.monthlyWeekendChoiceUsed = 0;
+      s.lastMonthReset = monthKey;
     }
 
     // 旧周期记录裁剪（只保留最近 30 条，避免无限增长）
@@ -1687,6 +2034,9 @@ function updateUI(animateXP = false) {
   // Greeting
   const gIdx = (new Date().getDate()) % GREETINGS.length;
   document.getElementById('greeting-text').textContent = GREETINGS[gIdx];
+  // 自定义称号显示
+  const titleEl = document.getElementById('custom-title-display');
+  if (titleEl) titleEl.textContent = state.customTitle ? `「${state.customTitle}」` : '';
 
   // Today XP progress
   document.getElementById('today-xp').textContent = state.dailyXP;
@@ -1710,9 +2060,11 @@ function updateUI(animateXP = false) {
   banner.textContent = count;
   banner.classList.toggle('zero', count === 0);
   document.getElementById('verify-sub').textContent = count > 0 ? `有 ${count} 项任务待 CEO 审批` : '暂无待审批任务';
-  const navBadge = document.getElementById('nav-verify-badge');
-  if (count > 0) { navBadge.textContent = count; navBadge.style.display = ''; }
-  else { navBadge.style.display = 'none'; }
+  const navBadge = document.getElementById('settings-verify-badge');
+  if (navBadge) {
+    if (count > 0) { navBadge.textContent = count; navBadge.style.display = ''; }
+    else { navBadge.style.display = 'none'; }
+  }
 
   renderTasks();
   renderInventory();
@@ -1780,7 +2132,7 @@ function renderTasks() {
   let html = '';
   const showGroup = (title, items, showCard = true) => {
     if (!items) return '';
-    return `<div class="section-title" style="padding:8px 0 6px;">${title}</div>${items}`;
+    return `<div class="section-title" style="padding:8px 16px 6px;">${title}</div>${items}`;
   };
 
   const learningHtml = TASK_GROUPS.learning.map(t => renderTaskItem(t.id, t.xp)).join('');
@@ -1814,26 +2166,73 @@ function renderTasks() {
 }
 
 function renderInventory() {
-  const items = [];
+  const cards = [];
+
   if (state.inventory.timePause >= 1) {
-    const n = state.inventory.timePause > 1 ? ` x${state.inventory.timePause}` : '';
-    items.push(`<div class="inv-item" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);">⏸️ 时间暂停器${n}</div>`);
+    const disabled = state.usedTimePauseToday ? ' disabled' : '';
+    const label = state.usedTimePauseToday ? '已用' : '使用';
+    cards.push(`<div class="inv-card">
+      <div class="inv-left"><div class="inv-icon">⏸️</div><div class="inv-info"><div class="inv-name">时间暂停器</div><div class="inv-desc">延长截止 20 分钟 · 研发部出品</div></div></div>
+      <div style="display:flex;align-items:center;"><span class="inv-qty">×${state.inventory.timePause}</span><button class="inv-use-btn" onclick="useTimePause()"${disabled}>${label}</button></div>
+    </div>`);
   }
   if (state.inventory.massage >= 1) {
-    const n = state.inventory.massage > 1 ? ` x${state.inventory.massage}` : '';
-    items.push(`<div class="inv-item" style="background:linear-gradient(135deg,#f59e0b,#d97706);" onclick="redeemMassage()">💆 按摩券${n}</div>`);
+    cards.push(`<div class="inv-card">
+      <div class="inv-left"><div class="inv-icon">💆</div><div class="inv-info"><div class="inv-name">按摩券</div><div class="inv-desc">睡前 10-15 分钟按摩 · 需 CEO 核销</div></div></div>
+      <div style="display:flex;align-items:center;"><span class="inv-qty">×${state.inventory.massage}</span><button class="inv-use-btn" onclick="useItem('massage')">使用</button></div>
+    </div>`);
   }
   if (state.inventory.scienceExperiment >= 1) {
-    const n = state.inventory.scienceExperiment > 1 ? ` x${state.inventory.scienceExperiment}` : '';
-    items.push(`<div class="inv-item" style="background:linear-gradient(135deg,#9333ea,#7e22ce);" onclick="redeemScienceExperiment()">🔬 科学实验${n}</div>`);
+    cards.push(`<div class="inv-card">
+      <div class="inv-left"><div class="inv-icon">🔬</div><div class="inv-info"><div class="inv-name">科学实验</div><div class="inv-desc">已下线道具</div></div></div>
+      <div style="display:flex;align-items:center;"><span class="inv-qty">×${state.inventory.scienceExperiment}</span><button class="inv-use-btn" onclick="useItem('scienceExperiment')">使用</button></div>
+    </div>`);
   }
+  // 本周看电视次数（只展示，不可使用）
   if (state.weeklyGameUsed >= 1) {
-    items.push(`<div class="inv-item" style="background:linear-gradient(135deg,#22c55e,#16a34a);">🎬 本周看电视 ${state.weeklyGameUsed} 次</div>`);
+    cards.push(`<div class="inv-card">
+      <div class="inv-left"><div class="inv-icon">🎬</div><div class="inv-info"><div class="inv-name">本周看电视</div><div class="inv-desc">已使用 ${state.weeklyGameUsed}/${TV_LIMITS.maxPerWeek} 次</div></div></div>
+      <div style="display:flex;align-items:center;"><span class="inv-qty">${state.weeklyGameUsed}次</span></div>
+    </div>`);
   }
-  if (items.length === 0) {
-    items.push('<span class="inv-empty">暂无装备，前往研发部领取 →</span>');
+  // 主题皮肤（如果有解锁的非默认皮肤）
+  if (state.unlockedThemes && state.unlockedThemes.length > 1) {
+    const current = state.currentTheme || 'deep-space';
+    const themeName = THEMES.find(t => t.id === current)?.name || '深空蓝';
+    cards.push(`<div class="inv-card">
+      <div class="inv-left"><div class="inv-icon">🎨</div><div class="inv-info"><div class="inv-name">当前主题</div><div class="inv-desc">${themeName}</div></div></div>
+      <div style="display:flex;align-items:center;"><button class="inv-use-btn equipped" onclick="showThemeSelector()">切换</button></div>
+    </div>`);
   }
-  document.getElementById('inventory-bar').innerHTML = items.join('');
+  // 自定义称号不再出现在装备库（已应用即消耗，修改需重新购买）
+
+  if (cards.length === 0) {
+    cards.push('<div class="inv-empty">暂无装备，前往研发部商店领取 →</div>');
+  }
+  document.getElementById('inventory-bar').innerHTML = cards.join('');
+}
+
+// 统一使用道具入口
+function useItem(type) {
+  if (type === 'massage') {
+    showConfirmModal('💆 使用按摩券', '<p>使用后将提交 CEO 核销申请。</p><p>核销通过后，行政部小杨将在睡前安排 10-15 分钟按摩。</p>', '确认使用', () => { closeAllModals(); redeemMassage(); });
+  } else if (type === 'scienceExperiment') {
+    showConfirmModal('🔬 使用科学实验', '<p>使用后将提交 CEO 核销申请。</p>', '确认使用', () => { closeAllModals(); redeemScienceExperiment(); });
+  }
+}
+
+function useTimePause() {
+  if (state.usedTimePauseToday) { showToast('⚠️ 今日已使用'); return; }
+  if (state.inventory.timePause < 1) { showToast('❌ 没有时间暂停器'); return; }
+  showConfirmModal('⏸️ 使用时间暂停器', '<p>激活后，今日兑换截止时间延长 20 分钟。</p><p>每日限用 1 次，确认使用？</p>', '激活', () => {
+    state.inventory.timePause -= 1;
+    state.usedTimePauseToday = true;
+    saveState();
+    recordHistory({ type: 'item_used', name: '⏸️ 时间暂停器' });
+    closeAllModals();
+    updateUI();
+    showToast('⚡ 时间暂停器已激活！截止延长 20 分钟');
+  });
 }
 
 /* ===========================================================
@@ -1863,6 +2262,8 @@ function completeTask(taskId) {
 
   updateUI();
   showToast(`✅ ${TASK_DEPT[taskId] || ''}已确认提交，等待 CEO 审批`);
+  // 机器人反应
+  setTimeout(() => robotReactToSubmit(), 600);
 }
 
 function toggleMeal(mealId) {
@@ -1908,11 +2309,14 @@ function applyConfirmTask(index) {
   updateUI(true);
   renderVerifyPage();
 
+  // 审批时不弹庆祝/事件，存入队列等用户回首页再触发
   if (afterRank > beforeRank) {
-    celebrateRankUp(ranks[afterRank]);
-  } else {
-    showToast(`🎉 财务部 Data 已结算：+${task.xp} XP`);
+    state._pendingCelebration = ranks[afterRank];
   }
+  state._pendingRewards = (state._pendingRewards || 0) + task.xp;
+  state._pendingEventCheck = true;
+  saveState();
+  showToast(`✅ 已签发 +${task.xp} XP`);
 }
 
 async function confirmAllTasks() {
@@ -1936,11 +2340,14 @@ async function confirmAllTasks() {
   const afterRank = getRankIndex();
   updateUI(true);
   renderVerifyPage();
+  // 存入队列等用户回首页再触发
   if (afterRank > beforeRank) {
-    celebrateRankUp(ranks[afterRank]);
-  } else {
-    showToast(`🎉 财务部 Data 已结算：+${totalXp} XP`);
+    state._pendingCelebration = ranks[afterRank];
   }
+  state._pendingRewards = (state._pendingRewards || 0) + totalXp;
+  state._pendingEventCheck = true;
+  saveState();
+  showToast(`✅ 已签发 ${state.pendingVerify.length === 0 ? '全部' : ''} +${totalXp} XP`);
 }
 
 async function confirmRedeem(index) {
@@ -2086,6 +2493,16 @@ function renderGrowthPage() {
         <div class="when">${m.when}</div>
         <div class="what">${m.what}</div>
       </div>`).join('');
+  }
+
+  // Badge preview
+  const bp = document.getElementById('badge-preview');
+  if (bp) {
+    const owned = state.unlockedBadges || [];
+    if (owned.length > 0) {
+      const icons = BADGES.filter(b => owned.includes(b.id)).slice(0, 8).map(b => b.icon).join(' ');
+      bp.innerHTML = `<span style="font-size:22px;letter-spacing:4px;">${icons}</span><span style="font-size:12px;color:var(--c-text-faint);margin-left:8px;">${owned.length}/${BADGES.length} →</span>`;
+    }
   }
 }
 
@@ -2353,7 +2770,7 @@ function showExchangeModal() {
   if (!check.eligible) {
     const body = '<p><strong>检查结果：</strong></p>'
       + check.messages.map(m => `<p>${m}</p>`).join('')
-      + (check.suggestions ? `<p style="margin-top:14px;padding:10px;background:#fef3c7;border-radius:8px;">💡 ${check.suggestions}</p>` : '');
+      + (check.suggestions ? `<p style="margin-top:14px;padding:10px;background:rgba(245,158,11,0.15);border-radius:8px;">💡 ${check.suggestions}</p>` : '');
     showInfoModal('❌ 暂不能兑换 SC', body);
     return;
   }
@@ -2406,19 +2823,48 @@ function exchangeSC() {
 
 function showShopModal() {
   const body = `
-    <div style="background:var(--c-bg-soft);padding:10px;border-radius:8px;margin-bottom:14px;">
+    <div style="background:var(--c-bg-soft);padding:14px 16px;border-radius:8px;margin-bottom:16px;">
       <p style="font-size:12px;color:var(--c-text-light);">研发部 老张 · 装备发放中心</p>
-      <p style="margin-top:4px;">SC：<strong>${state.sc}</strong> · XP 余额：<strong>${state.levelXP}</strong></p>
-      <p style="font-size:11px;color:var(--c-text-light);margin-top:2px;">头衔总 XP：${state.totalEarnedXP || 0}（兑换装备不影响职级）</p>
+      <p style="margin-top:6px;">SC：<strong>${state.sc}</strong> · XP 余额：<strong>${state.levelXP}</strong></p>
+      <p style="font-size:11px;color:var(--c-text-light);margin-top:4px;">头衔总 XP：${state.totalEarnedXP || 0}（兑换装备不影响职级）</p>
     </div>
+
+    <div class="shop-item" style="border-color:var(--c-primary);background:rgba(14,165,233,0.08);cursor:pointer;" onclick="closeAllModals();switchPage('robot')">
+      <div class="shop-item-head" style="margin-bottom:0;">
+        <div><div class="name">🤖 机器人工厂</div><div class="desc">用 XP 组装专属机器人 · 已装配 ${state.robotParts || 0}/8 零件</div></div>
+        <div class="price"><span style="color:var(--c-primary);font-size:18px;">→</span></div>
+      </div>
+    </div>
+
+    <p style="font-size:12px;font-weight:700;color:var(--c-primary);margin:4px 0 12px;padding:0 4px;">⚡ 虚拟装备（XP）</p>
 
     <div class="shop-item">
       <div class="shop-item-head">
         <div><div class="name">⏸️ 时间暂停器</div><div class="desc">研发部出品 · 延长 20 分钟截止</div></div>
-        <div class="price"><div class="cost">50 XP</div><div class="limit">每日限 1 次</div></div>
+        <div class="price"><div class="cost">50 XP</div><div class="limit">可囤积</div></div>
       </div>
       <button class="btn" style="width:100%;" onclick="buyTimePause()">兑换</button>
     </div>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">🎨 主题皮肤</div><div class="desc">解锁 app 新配色方案</div></div>
+        <div class="price"><div class="cost">150 XP</div><div class="limit">每次</div></div>
+      </div>
+      <button class="btn" style="width:100%;" onclick="closeAllModals();showThemeShop()">查看可选主题</button>
+    </div>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">🏷️ 自定义称号</div><div class="desc">首页名字旁显示你的专属称号</div></div>
+        <div class="price"><div class="cost">200 XP</div><div class="limit">每次</div></div>
+      </div>
+      <button class="btn" style="width:100%;" onclick="buyCustomTitle()">
+        ${state.customTitle ? '修改称号（200 XP）' : '兑换'}
+      </button>
+    </div>
+
+    <p style="font-size:12px;font-weight:700;color:var(--c-gold-dark);margin:16px 0 12px;padding:0 4px;">🏷️ 实体福利（XP / SC）</p>
 
     <div class="shop-item">
       <div class="shop-item-head">
@@ -2431,26 +2877,622 @@ function showShopModal() {
     <div class="shop-item">
       <div class="shop-item-head">
         <div><div class="name">🎬 看电视 20 分钟</div><div class="desc">行政部福利 · 周末使用，需 CEO 批准</div></div>
-        <div class="price"><div class="cost">1 SC</div><div class="limit">每周限 3 次</div></div>
+        <div class="price"><div class="cost">1 SC</div><div class="limit">每周 3 次（已用 ${state.weeklyGameUsed}）</div></div>
       </div>
       <button class="btn btn-verify" style="width:100%;" ${state.weeklyGameUsed >= TV_LIMITS.maxPerWeek ? 'disabled' : ''} onclick="buyTVTime()">
         ${state.weeklyGameUsed >= TV_LIMITS.maxPerWeek ? '本周已达上限' : '兑换'}
       </button>
+    </div>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">🍕 选晚餐权</div><div class="desc">小塔决定今天吃什么</div></div>
+        <div class="price"><div class="cost">1 SC</div><div class="limit">每周 1 次（已用 ${state.weeklyDinnerUsed}）</div></div>
+      </div>
+      <button class="btn btn-verify" style="width:100%;" ${state.weeklyDinnerUsed >= 1 ? 'disabled' : ''} onclick="buyScItem('dinner')">
+        ${state.weeklyDinnerUsed >= 1 ? '本周已达上限' : '兑换'}
+      </button>
+    </div>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">🌙 晚睡 30 分钟</div><div class="desc">周末可以晚睡半小时，需 CEO 批准</div></div>
+        <div class="price"><div class="cost">2 SC</div><div class="limit">每周 1 次（已用 ${state.weeklyLateSleepUsed}）</div></div>
+      </div>
+      <button class="btn btn-verify" style="width:100%;" ${state.weeklyLateSleepUsed >= 1 ? 'disabled' : ''} onclick="buyScItem('lateSleep')">
+        ${state.weeklyLateSleepUsed >= 1 ? '本周已达上限' : '兑换'}
+      </button>
+    </div>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">🎮 周末 PS 游戏 30 分钟</div><div class="desc">周末使用，需 CEO 批准</div></div>
+        <div class="price"><div class="cost">3 SC</div><div class="limit">每周 1 次（已用 ${state.weeklyPsGameUsed}）</div></div>
+      </div>
+      <button class="btn btn-verify" style="width:100%;" ${state.weeklyPsGameUsed >= 1 ? 'disabled' : ''} onclick="buyScItem('psGame')">
+        ${state.weeklyPsGameUsed >= 1 ? '本周已达上限' : '兑换'}
+      </button>
+    </div>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">📖 自选书/漫画</div><div class="desc">去书店选一本想要的书</div></div>
+        <div class="price"><div class="cost">3 SC</div><div class="limit">无限制</div></div>
+      </div>
+      <button class="btn btn-verify" style="width:100%;" onclick="buyScItem('book')">兑换</button>
+    </div>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">🎯 周末活动选择权</div><div class="desc">小塔决定周末去哪玩</div></div>
+        <div class="price"><div class="cost">5 SC</div><div class="limit">每月 1 次（已用 ${state.monthlyWeekendChoiceUsed}）</div></div>
+      </div>
+      <button class="btn btn-verify" style="width:100%;" ${state.monthlyWeekendChoiceUsed >= 1 ? 'disabled' : ''} onclick="buyScItem('weekendChoice')">
+        ${state.monthlyWeekendChoiceUsed >= 1 ? '本月已达上限' : '兑换'}
+      </button>
+    </div>
+
+    <p style="font-size:12px;font-weight:700;color:var(--c-text-light);margin:16px 0 12px;padding:0 4px;">💱 财务部 · 大额兑换（XP → SC）</p>
+
+    <div class="shop-item">
+      <div class="shop-item-head">
+        <div><div class="name">💱 XP 兑换 SC</div><div class="desc">用累积 XP 余额兑换 SC 币（不限次数）</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        ${XP_TO_SC_RATES.map(r => `<button class="btn" style="flex:1;font-size:11px;padding:10px 8px;" onclick="exchangeXpToSc(${r.xp},${r.sc})" ${state.levelXP < r.xp ? 'disabled' : ''}>${r.xp}XP→${r.sc}SC</button>`).join('')}
+      </div>
     </div>`;
+
   showInfoModal('✦ 研发部 · 装备与福利', body);
 }
 
+// SC 商品购买通用函数
+function buyScItem(itemId) {
+  const item = SC_SHOP_ITEMS.find(i => i.id === itemId);
+  if (!item) return;
+  if (state.sc < item.cost) { showToast(`❌ SC 不足（需 ${item.cost}，当前 ${state.sc}）`); return; }
+
+  // 检查限制
+  if (itemId === 'dinner' && state.weeklyDinnerUsed >= 1) { showToast('⚠️ 本周已使用'); return; }
+  if (itemId === 'lateSleep' && state.weeklyLateSleepUsed >= 1) { showToast('⚠️ 本周已使用'); return; }
+  if (itemId === 'psGame' && state.weeklyPsGameUsed >= 1) { showToast('⚠️ 本周已使用'); return; }
+  if (itemId === 'weekendChoice' && state.monthlyWeekendChoiceUsed >= 1) { showToast('⚠️ 本月已使用'); return; }
+
+  state.sc -= item.cost;
+  state.shopPurchaseCount = (state.shopPurchaseCount || 0) + 1;
+  if (itemId === 'tv') { state.weeklyGameUsed += 1; }
+  else if (itemId === 'dinner') { state.weeklyDinnerUsed += 1; }
+  else if (itemId === 'lateSleep') { state.weeklyLateSleepUsed += 1; }
+  else if (itemId === 'psGame') { state.weeklyPsGameUsed += 1; }
+  else if (itemId === 'weekendChoice') { state.monthlyWeekendChoiceUsed += 1; }
+
+  // 实体类 → 进入 CEO 核销
+  state.pendingRedeem.push({
+    type: itemId,
+    name: item.name,
+    time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+    note: item.desc
+  });
+
+  saveState();
+  recordHistory({ type: 'sc_item_bought', itemId, name: item.name, cost: item.cost });
+  closeAllModals();
+  updateUI();
+  showToast(`✅ 已兑换 ${item.name}，等待 CEO 核销`);
+}
+
+// XP 大额兑换 SC
+function exchangeXpToSc(xpCost, scGain) {
+  if (state.levelXP < xpCost) { showToast(`❌ XP 余额不足（需 ${xpCost}，当前 ${state.levelXP}）`); return; }
+  showConfirmModal('💱 财务部大额兑换', `<p>消耗 <strong>${xpCost} XP</strong> 兑换 <strong>${scGain} SC</strong></p><p style="margin-top:8px;font-size:12px;color:var(--c-text-light);">兑换后 XP 余额：${state.levelXP - xpCost}</p>`, '确认兑换', () => {
+    state.levelXP -= xpCost;
+    state.sc += scGain;
+    state.totalScEarned = (state.totalScEarned || 0) + scGain;
+    state.shopPurchaseCount = (state.shopPurchaseCount || 0) + 1;
+    saveState();
+    recordHistory({ type: 'xp_to_sc', xpCost, scGain });
+    closeAllModals();
+    updateUI(true);
+    showToast(`✅ 财务部已结算：-${xpCost} XP → +${scGain} SC`);
+  });
+}
+
+// 主题商店
+function showThemeShop() {
+  const current = state.currentTheme || 'deep-space';
+  const body = THEMES.map(t => {
+    const isCurrent = t.id === current;
+    let btn = '';
+    if (isCurrent) btn = `<button class="btn" style="width:100%;" disabled>当前使用中</button>`;
+    else if (t.cost === 0) btn = `<button class="btn btn-success" style="width:100%;" onclick="buyTheme('${t.id}')">免费切换</button>`;
+    else btn = `<button class="btn btn-verify" style="width:100%;" onclick="buyTheme('${t.id}')">切换 ${t.cost} XP</button>`;
+    return `<div class="shop-item"><div class="shop-item-head"><div><div class="name">${t.name}</div><div class="desc">${isCurrent ? '✅ 使用中' : t.cost === 0 ? '默认' : `每次 ${t.cost} XP`}</div></div></div>${btn}</div>`;
+  }).join('');
+  showInfoModal('🎨 主题商店', body);
+}
+
+function buyTheme(themeId) {
+  const theme = THEMES.find(t => t.id === themeId);
+  if (!theme) return;
+  if (theme.cost > 0 && state.levelXP < theme.cost) { showToast(`❌ XP 余额不足（需 ${theme.cost}）`); return; }
+  if (theme.cost > 0) {
+    state.levelXP -= theme.cost;
+    state.shopPurchaseCount = (state.shopPurchaseCount || 0) + 1;
+    recordHistory({ type: 'theme_bought', themeId, cost: theme.cost });
+  }
+  // 记录解锁（用于徽章判定）
+  if (!state.unlockedThemes) state.unlockedThemes = ['deep-space'];
+  if (!state.unlockedThemes.includes(themeId)) state.unlockedThemes.push(themeId);
+  saveState();
+  applyTheme(themeId);
+  closeAllModals();
+  showToast(`✅ 已切换到：${theme.name}${theme.cost > 0 ? ` (-${theme.cost} XP)` : ''}`);
+}
+
+function applyTheme(themeId) {
+  const theme = THEMES.find(t => t.id === themeId);
+  if (!theme) return;
+  // Reset to defaults first
+  const defaults = THEMES[0]; // deep-space has empty vars = use CSS defaults
+  const root = document.documentElement;
+  // Remove all custom properties set by previous theme
+  THEMES.forEach(t => {
+    Object.keys(t.vars).forEach(k => root.style.removeProperty(k));
+  });
+  // Apply new theme vars
+  Object.entries(theme.vars).forEach(([k, v]) => root.style.setProperty(k, v));
+  state.currentTheme = themeId;
+  saveState();
+  updateUI();
+}
+
+function showThemeSelector() {
+  showThemeShop();
+}
+
+// 自定义称号
+function buyCustomTitle() {
+  if (state.levelXP < 200) { showToast('❌ XP 余额不足（需 200）'); return; }
+  closeAllModals();
+  const html = `
+    <div class="modal-overlay" id="title-modal">
+      <div class="modal">
+        <div class="modal-title">🏷️ ${state.customTitle ? '修改称号' : '自定义称号'}</div>
+        <div class="modal-body"><p>${state.customTitle ? `当前：「${state.customTitle}」<br>输入新称号（2-6 个字）：` : '给自己起一个专属称号吧（2-6 个字）：'}</p></div>
+        <input type="text" maxlength="6" placeholder="输入称号..." value="${state.customTitle || ''}" style="width:100%;padding:12px;font-size:16px;border:2px solid var(--c-border);border-radius:var(--radius-md);text-align:center;" id="title-input">
+        <div class="modal-actions" style="margin-top:16px;">
+          <button class="btn btn-ghost" onclick="document.getElementById('title-modal').remove()">取消</button>
+          <button class="btn" onclick="confirmBuyTitle()">确认（200 XP）</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+  document.getElementById('title-input').focus();
+}
+
+function confirmBuyTitle() {
+  const input = document.getElementById('title-input');
+  const title = input.value.trim();
+  if (!title || title.length < 2) { showToast('⚠️ 至少 2 个字'); return; }
+  if (state.levelXP < 200) { showToast('❌ XP 不足'); return; }
+  state.levelXP -= 200;
+  state.customTitle = title;
+  state.shopPurchaseCount = (state.shopPurchaseCount || 0) + 1;
+  saveState();
+  recordHistory({ type: 'title_bought', title });
+  document.getElementById('title-modal').remove();
+  updateUI();
+  showToast(`✅ 称号已设定：「${title}」`);
+}
+
+// editCustomTitle / confirmEditTitle 已移除，修改称号统一走 buyCustomTitle（每次 200 XP）
+
+/* ===== v2.7 机器人工厂 ===== */
+function openRobotFactory() {
+  switchPage('robot');
+}
+
+function renderRobotPage() {
+  const container = document.getElementById('robot-page-content');
+  if (!state.robotSelected) {
+    renderRobotSelectContent(container);
+  } else {
+    renderRobotAssemblyContent(container);
+  }
+}
+
+function getRobotSVG(id) {
+  if (id === 'sx-01') {
+    // 战术机甲 — 方正机甲头，蓝光面罩，绿色能量核心
+    return `<svg viewBox="0 0 64 64" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+      <rect x="12" y="8" width="40" height="10" rx="3" fill="#1e3a5f"/>
+      <rect x="8" y="18" width="48" height="32" rx="4" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5"/>
+      <rect x="14" y="24" width="36" height="10" rx="2" fill="#0c1a2e"/>
+      <rect x="16" y="26" width="32" height="6" rx="1" fill="#38bdf8" opacity="0.8"/>
+      <circle cx="32" cy="44" r="4" fill="#22c55e"/>
+      <circle cx="32" cy="44" r="2" fill="#4ade80"/>
+      <rect x="10" y="52" width="18" height="6" rx="2" fill="#1e3a5f"/>
+      <rect x="36" y="52" width="18" height="6" rx="2" fill="#1e3a5f"/>
+    </svg>`;
+  } else {
+    // 浮游核心 — 球体 + 双环轨道
+    return `<svg viewBox="0 0 64 64" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="#a855f7" stroke-width="1.2" opacity="0.5" transform="rotate(-25 32 32)"/>
+      <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="#a855f7" stroke-width="1.2" opacity="0.5" transform="rotate(25 32 32)"/>
+      <circle cx="32" cy="32" r="14" fill="#1e1045"/>
+      <circle cx="32" cy="32" r="14" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+      <circle cx="32" cy="32" r="6" fill="#c084fc"/>
+      <circle cx="32" cy="32" r="3" fill="#e9d5ff"/>
+      <circle cx="28" cy="26" r="2" fill="#e9d5ff" opacity="0.4"/>
+    </svg>`;
+  }
+}
+
+function renderRobotSelectContent(container) {
+  const totalCosts = { 'sx-01': 445, 'sp-9': 445 };
+  const body = Object.values(ROBOTS).map(r => `
+    <div class="robot-select-card" onclick="selectRobot('${r.id}')">
+      <div class="robot-select-top">
+        <div class="robot-select-avatar">${getRobotSVG(r.id)}</div>
+        <div class="robot-select-header">
+          <div class="robot-select-model">${r.model}</div>
+          <div class="robot-select-name">${r.name}</div>
+          <div class="robot-select-type">${r.type} · ${r.id === 'sx-01' ? 'Tactical Mech' : 'Floating Core'}</div>
+        </div>
+      </div>
+      <div class="robot-select-desc">${r.desc}</div>
+      <div class="robot-select-specs">
+        <span><span class="spec-val">8</span><span class="spec-label">零件数</span></span>
+        <span><span class="spec-val">${totalCosts[r.id]}</span><span class="spec-label">总 XP</span></span>
+        <span><span class="spec-val">${r.type.substring(0, 2)}</span><span class="spec-label">类型</span></span>
+      </div>
+      <button class="btn" style="width:100%;margin-top:12px;">开始组装 ${r.name}</button>
+    </div>
+  `).join('<div style="text-align:center;color:var(--c-text-faint);font-size:12px;margin:12px 0;">— 或者 —</div>');
+  container.innerHTML = `
+    <div class="card">
+      <div style="font-size:12px;color:var(--c-text-faint);text-align:center;margin-bottom:16px;">选择你要组装的机器人型号<br>研发部将为你启动生产线</div>
+      ${body}
+    </div>`;
+}
+
+function selectRobot(robotId) {
+  state.robotSelected = robotId;
+  state.robotParts = 0;
+  state.robotCompleted = false;
+  saveState();
+  recordHistory({ type: 'robot_selected', robotId });
+  showToast(`🏭 生产线启动：${ROBOTS[robotId].model}「${ROBOTS[robotId].name}」`);
+  renderRobotPage();
+}
+
+function getRobotAssemblySVG(robotId, partsOwned) {
+  const own = (i) => i < partsOwned ? 'opacity="1"' : 'opacity="0.15" stroke-dasharray="4 3"';
+  if (robotId === 'sx-01') {
+    return `<svg viewBox="0 0 200 240" width="180" height="216" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;">
+      <!-- 1: 核心框架 -->
+      <g ${own(0)}><rect x="70" y="80" width="60" height="90" rx="6" fill="none" stroke="#38bdf8" stroke-width="2"/><line x1="100" y1="80" x2="100" y2="170" stroke="#1e3a5f" stroke-width="1"/><line x1="70" y1="125" x2="130" y2="125" stroke="#1e3a5f" stroke-width="1"/></g>
+      <!-- 2: 动力模组 -->
+      <g ${own(1)}><circle cx="100" cy="125" r="10" fill="#0b1929" stroke="#22c55e" stroke-width="2"/><circle cx="100" cy="125" r="5" fill="#22c55e" opacity="0.8"/><circle cx="100" cy="125" r="3" fill="#4ade80"/></g>
+      <!-- 3: 装甲外壳 -->
+      <g ${own(2)}><rect x="64" y="76" width="72" height="98" rx="10" fill="none" stroke="#38bdf8" stroke-width="2.5"/><path d="M64 100 L56 105 L56 145 L64 150" fill="none" stroke="#38bdf8" stroke-width="1.5"/><path d="M136 100 L144 105 L144 145 L136 150" fill="none" stroke="#38bdf8" stroke-width="1.5"/></g>
+      <!-- 4: 战术面罩 -->
+      <g ${own(3)}><rect x="72" y="50" width="56" height="30" rx="8" fill="none" stroke="#38bdf8" stroke-width="2"/><rect x="78" y="58" width="44" height="14" rx="3" fill="none" stroke="#38bdf8" stroke-width="1.5"/><line x1="100" y1="58" x2="100" y2="72" stroke="#38bdf8" stroke-width="1"/></g>
+      <!-- 5: 双臂组件 -->
+      <g ${own(4)}><rect x="30" y="90" width="24" height="60" rx="6" fill="none" stroke="#38bdf8" stroke-width="2"/><rect x="146" y="90" width="24" height="60" rx="6" fill="none" stroke="#38bdf8" stroke-width="2"/><circle cx="42" cy="155" r="8" fill="none" stroke="#38bdf8" stroke-width="1.5"/><circle cx="158" cy="155" r="8" fill="none" stroke="#38bdf8" stroke-width="1.5"/></g>
+      <!-- 6: 行走系统 -->
+      <g ${own(5)}><rect x="74" y="178" width="20" height="45" rx="4" fill="none" stroke="#38bdf8" stroke-width="2"/><rect x="106" y="178" width="20" height="45" rx="4" fill="none" stroke="#38bdf8" stroke-width="2"/><rect x="70" y="220" width="28" height="10" rx="3" fill="none" stroke="#38bdf8" stroke-width="1.5"/><rect x="102" y="220" width="28" height="10" rx="3" fill="none" stroke="#38bdf8" stroke-width="1.5"/></g>
+      <!-- 7: HUD 系统 -->
+      <g ${own(6)}><path d="M72 45 L68 35 L132 35 L128 45" fill="none" stroke="#38bdf8" stroke-width="1.5"/><circle cx="80" cy="35" r="3" fill="none" stroke="#38bdf8" stroke-width="1"/><circle cx="120" cy="35" r="3" fill="none" stroke="#38bdf8" stroke-width="1"/></g>
+      <!-- 8: 传感阵列 -->
+      <g ${own(7)}><circle cx="60" cy="65" r="4" fill="none" stroke="#ef4444" stroke-width="1.5"/><circle cx="140" cy="65" r="4" fill="none" stroke="#ef4444" stroke-width="1.5"/><circle cx="100" cy="28" r="4" fill="none" stroke="#ef4444" stroke-width="1.5"/></g>
+    </svg>`;
+  } else {
+    // SP-9 脉冲：球体 + 双环 + 翼 + 光束
+    return `<svg viewBox="0 0 200 200" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;">
+      <!-- 1: 核心球体 -->
+      <g ${own(0)}><circle cx="100" cy="100" r="20" fill="#0b1929" stroke="#a855f7" stroke-width="2"/></g>
+      <!-- 2: 悬浮引擎 -->
+      <g ${own(1)}><circle cx="100" cy="100" r="10" fill="#7c3aed" opacity="0.6"/><circle cx="100" cy="100" r="5" fill="#c084fc"/></g>
+      <!-- 3: 内环轨道 -->
+      <g ${own(2)}><ellipse cx="100" cy="100" rx="35" ry="12" fill="none" stroke="#a855f7" stroke-width="1.5" transform="rotate(-20 100 100)"/></g>
+      <!-- 4: 外环轨道 -->
+      <g ${own(3)}><ellipse cx="100" cy="100" rx="50" ry="14" fill="none" stroke="#a855f7" stroke-width="1.2" transform="rotate(20 100 100)"/></g>
+      <!-- 5: 能量翼·左 -->
+      <g ${own(4)}><path d="M60 90 L30 70 L35 100 L60 110 Z" fill="none" stroke="#c084fc" stroke-width="1.5"/></g>
+      <!-- 6: 能量翼·右 -->
+      <g ${own(5)}><path d="M140 90 L170 70 L165 100 L140 110 Z" fill="none" stroke="#c084fc" stroke-width="1.5"/></g>
+      <!-- 7: 扫描光束 -->
+      <g ${own(6)}><line x1="100" y1="120" x2="80" y2="170" stroke="#a855f7" stroke-width="1" opacity="0.7"/><line x1="100" y1="120" x2="100" y2="175" stroke="#a855f7" stroke-width="1.2" opacity="0.7"/><line x1="100" y1="120" x2="120" y2="170" stroke="#a855f7" stroke-width="1" opacity="0.7"/></g>
+      <!-- 8: AI 意识核 -->
+      <g ${own(7)}><circle cx="100" cy="100" r="3" fill="#e9d5ff"/><circle cx="96" cy="94" r="2" fill="#e9d5ff" opacity="0.5"/><circle cx="104" cy="94" r="2" fill="#e9d5ff" opacity="0.5"/></g>
+    </svg>`;
+  }
+}
+
+function renderRobotAssemblyContent(container) {
+  const robot = ROBOTS[state.robotSelected];
+  if (!robot) return;
+  const partsOwned = state.robotParts;
+  const totalParts = robot.parts.length;
+  const isComplete = partsOwned >= totalParts;
+  const progressPct = Math.round((partsOwned / totalParts) * 100);
+
+  let partsHtml = robot.parts.map((p, i) => {
+    const owned = i < partsOwned;
+    const isNext = i === partsOwned;
+    const cls = owned ? 'rp-owned' : isNext ? 'rp-next' : 'rp-locked';
+    const actionHtml = owned
+      ? '<span class="rp-badge rp-done">✓ 已装配</span>'
+      : isNext
+        ? `<button class="rp-badge rp-buy" onclick="buyRobotPart()">${p.cost} XP 装配</button>`
+        : `<span class="rp-badge rp-lock">${p.cost} XP</span>`;
+    return `
+      <div class="rp-card ${cls}">
+        <div class="rp-icon">${p.icon}</div>
+        <div class="rp-info">
+          <div class="rp-name">${p.name}</div>
+          <div class="rp-desc">${p.desc}</div>
+        </div>
+        <div class="rp-action">${actionHtml}</div>
+      </div>`;
+  }).join('');
+
+  const statusText = isComplete ? `✅ 组装完毕 · 已激活` : `组装中 · ${partsOwned}/${totalParts}`;
+  const robotSvg = getRobotAssemblySVG(state.robotSelected, partsOwned);
+  container.innerHTML = `
+    <div class="card" style="margin-bottom:12px;padding:24px 16px;">
+      <div style="filter:drop-shadow(0 0 8px rgba(14,165,233,0.2));">${robotSvg}</div>
+      <div style="text-align:center;margin-top:16px;">
+        <div style="font-size:18px;font-weight:700;">${robot.model}「${robot.name}」</div>
+        <div style="font-size:12px;color:${isComplete ? '#22c55e' : 'var(--c-text-faint)'};margin-top:4px;">${statusText}</div>
+      </div>
+      <div class="rp-progress" style="margin-top:12px;"><div class="rp-progress-bar"><div class="rp-progress-fill" style="width:${progressPct}%;${isComplete ? 'background:linear-gradient(90deg,#22c55e,#4ade80)' : ''}"></div></div><div class="rp-progress-label">${partsOwned}/${totalParts}</div></div>
+    </div>
+    <div class="card">
+      <div>${partsHtml}</div>
+    </div>`;
+}
+
+function buyRobotPart() {
+  const robot = ROBOTS[state.robotSelected];
+  if (!robot) return;
+  const partIndex = state.robotParts;
+  if (partIndex >= robot.parts.length) return;
+  const part = robot.parts[partIndex];
+  if (state.levelXP < part.cost) { showToast(`❌ XP 余额不足（需 ${part.cost}，当前 ${state.levelXP}）`); return; }
+  state.levelXP -= part.cost;
+  state.robotParts += 1;
+  state.shopPurchaseCount = (state.shopPurchaseCount || 0) + 1;
+  if (state.robotParts >= robot.parts.length) {
+    state.robotCompleted = true;
+  }
+  saveState();
+  recordHistory({ type: 'robot_part_bought', robotId: state.robotSelected, partIndex, partName: part.name, cost: part.cost });
+  if (state.robotCompleted) {
+    showRobotCompleteAnimation(robot);
+  } else {
+    showToast(`🔧 ${part.icon} ${part.name} 装配完成！`);
+  }
+  renderRobotPage();
+  updateUI();
+  checkAndAwardBadges();
+}
+
+function showRobotCompleteAnimation(robot) {
+  const html = `
+    <div class="modal-overlay" id="robot-complete-overlay">
+      <div class="event-card" style="animation: eventSlideIn 0.4s ease-out; border-color: #22c55e;">
+        <div class="event-type-badge" style="background:#22c55e">组装完成</div>
+        <div class="event-title">🎉 ${robot.model}「${robot.name}」已激活！</div>
+        <div class="event-desc">${robot.parts[robot.parts.length - 1].desc}</div>
+        <div class="event-reward" style="color:#22c55e;">机器人将出现在首页陪伴你</div>
+        <button class="btn" style="width:100%;margin-top:12px;" onclick="document.getElementById('robot-complete-overlay').remove()">太棒了！</button>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+// 首页机器人浮窗
+function renderRobotWidget() {
+  const existing = document.getElementById('robot-widget');
+  if (existing) existing.remove();
+  if (!state.robotCompleted || !state.robotSelected) return;
+  const robot = ROBOTS[state.robotSelected];
+  const html = `
+    <div id="robot-widget" class="robot-widget" onclick="showRobotIdleLine()">
+      <div class="robot-widget-icon">${state.robotSelected === 'sx-01' ? '🤖' : '🔮'}</div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function showRobotIdleLine() {
+  const robot = ROBOTS[state.robotSelected];
+  if (!robot) return;
+  const lines = robot.lines.idle;
+  const line = lines[Math.floor(Math.random() * lines.length)];
+  // Show speech bubble
+  const existing = document.getElementById('robot-speech');
+  if (existing) existing.remove();
+  const html = `
+    <div id="robot-speech" class="robot-speech" onclick="this.remove()">
+      <div class="robot-speech-name">${robot.model}「${robot.name}」</div>
+      <div class="robot-speech-text">${line}</div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+  setTimeout(() => { const el = document.getElementById('robot-speech'); if (el) el.remove(); }, 4000);
+}
+
+// 任务提交时机器人反应
+function robotReactToSubmit() {
+  if (!state.robotCompleted || !state.robotSelected) return;
+  const robot = ROBOTS[state.robotSelected];
+  const lines = robot.lines.submit;
+  const line = lines[Math.floor(Math.random() * lines.length)];
+  const existing = document.getElementById('robot-speech');
+  if (existing) existing.remove();
+  const html = `
+    <div id="robot-speech" class="robot-speech robot-speech-submit" onclick="this.remove()">
+      <div class="robot-speech-name">${robot.model}</div>
+      <div class="robot-speech-text">${line}</div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+  setTimeout(() => { const el = document.getElementById('robot-speech'); if (el) el.remove(); }, 2500);
+}
+
+/* ===== v2.7 随机事件系统 ===== */
+function tryTriggerRandomEvent() {
+  if (Math.random() > EVENT_TRIGGER_CHANCE) return;
+  const event = pickWeightedEvent();
+  if (!event) return;
+  showEventCard(event);
+}
+
+function pickWeightedEvent() {
+  const totalWeight = RANDOM_EVENTS.reduce((s, e) => s + e.weight, 0);
+  let roll = Math.random() * totalWeight;
+  for (const evt of RANDOM_EVENTS) {
+    roll -= evt.weight;
+    if (roll <= 0) return evt;
+  }
+  return RANDOM_EVENTS[RANDOM_EVENTS.length - 1];
+}
+
+function showEventCard(event) {
+  // Remove any existing event card
+  const existing = document.getElementById('event-card-overlay');
+  if (existing) existing.remove();
+
+  const rewardHtml = event.reward
+    ? `<div class="event-reward">🎁 奖励：+${event.reward.xp} XP</div>`
+    : `<div class="event-reward" style="opacity:0.6">— 趣味事件，无奖励 —</div>`;
+
+  const typeLabel = event.type === 'reward' ? '即时奖励' : event.type === 'challenge' ? '挑战任务' : '公司趣闻';
+  const typeColor = event.type === 'reward' ? '#22c55e' : event.type === 'challenge' ? '#f59e0b' : '#60a5fa';
+
+  const html = `
+    <div class="modal-overlay event-card-overlay" id="event-card-overlay">
+      <div class="event-card" style="animation: eventSlideIn 0.4s ease-out">
+        <div class="event-type-badge" style="background:${typeColor}">${typeLabel}</div>
+        <div class="event-title">${event.title}</div>
+        <div class="event-desc">${event.desc}</div>
+        <div class="event-npc">— ${event.npc}</div>
+        ${rewardHtml}
+        ${event.type === 'challenge' ? `<div class="event-condition">📋 条件：${event.condition}</div>` : ''}
+        <button class="btn event-ok-btn" onclick="dismissEvent('${event.id}', '${event.type}', ${event.reward ? event.reward.xp : 0})">${event.type === 'challenge' ? '接受挑战！' : '收到！'}</button>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function dismissEvent(eventId, eventType, xpReward) {
+  const overlay = document.getElementById('event-card-overlay');
+  if (overlay) {
+    overlay.querySelector('.event-card').style.animation = 'eventSlideOut 0.3s ease-in forwards';
+    setTimeout(() => overlay.remove(), 300);
+  }
+  // Instant reward: grant XP immediately
+  if (eventType === 'reward' && xpReward > 0) {
+    state.levelXP += xpReward;
+    state.totalEarnedXP = (state.totalEarnedXP || 0) + xpReward;
+    state.dailyXP += xpReward;
+    state.level = Math.floor(state.levelXP / 100) + 1;
+    saveState();
+    updateUI(true);
+    setTimeout(() => showToast(`💰 +${xpReward} XP 已入账`), 350);
+    recordHistory({ type: 'random_event_reward', eventId, xp: xpReward });
+  }
+  // Challenge: record it for tracking (simplified: no auto-verify, just log)
+  if (eventType === 'challenge') {
+    state.activeChallenge = { id: eventId, xp: xpReward, accepted: new Date().toISOString() };
+    saveState();
+    recordHistory({ type: 'challenge_accepted', eventId });
+  }
+  // Flavor: just log
+  if (eventType === 'flavor') {
+    recordHistory({ type: 'random_event_flavor', eventId });
+  }
+  // Track event for badge progress
+  state.eventHistory.push({ id: eventId, type: eventType, time: new Date().toISOString() });
+  saveState();
+  // Check badges after event
+  setTimeout(() => checkAndAwardBadges(), 500);
+}
+
+/* ===== v2.7 徽章系统 ===== */
+function checkAndAwardBadges() {
+  let newBadges = [];
+  BADGES.forEach(badge => {
+    if (state.unlockedBadges.includes(badge.id)) return;
+    try {
+      if (badge.check(state)) {
+        state.unlockedBadges.push(badge.id);
+        newBadges.push(badge);
+      }
+    } catch(e) { /* ignore check errors */ }
+  });
+  if (newBadges.length > 0) {
+    saveState();
+    // Show first new badge (queue others)
+    showBadgeUnlock(newBadges[0]);
+    if (newBadges.length > 1) {
+      newBadges.slice(1).forEach((b, i) => {
+        setTimeout(() => showToast(`🏅 新徽章：${b.icon} ${b.name}`), (i + 1) * 1500);
+      });
+    }
+  }
+}
+
+function showBadgeUnlock(badge) {
+  const existing = document.getElementById('badge-unlock-overlay');
+  if (existing) existing.remove();
+  const html = `
+    <div class="modal-overlay" id="badge-unlock-overlay" onclick="this.remove()">
+      <div class="badge-unlock-card" style="animation: eventSlideIn 0.4s ease-out">
+        <div class="badge-unlock-icon">${badge.icon}</div>
+        <div class="badge-unlock-title">🏅 新徽章解锁！</div>
+        <div class="badge-unlock-name">${badge.name}</div>
+        <div class="badge-unlock-desc">${badge.desc}</div>
+        <button class="btn" onclick="document.getElementById('badge-unlock-overlay').remove()" style="margin-top:16px;">太棒了！</button>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function showBadgeWall() {
+  closeAllModals();
+  const unlocked = state.unlockedBadges || [];
+  let html = '<div class="badge-wall">';
+  BADGES.forEach(badge => {
+    const owned = unlocked.includes(badge.id);
+    html += `
+      <div class="badge-cell ${owned ? 'badge-owned' : 'badge-locked'}">
+        <div class="badge-icon">${owned ? badge.icon : '❓'}</div>
+        <div class="badge-name">${owned ? badge.name : '???'}</div>
+        ${owned ? `<div class="badge-desc-tip">${badge.desc}</div>` : ''}
+      </div>`;
+  });
+  html += '</div>';
+  const modal = `
+    <div class="modal-overlay" id="badge-modal">
+      <div class="modal" style="max-height:80vh;overflow-y:auto;">
+        <div class="modal-title">🏅 荣誉墙（${unlocked.length}/${BADGES.length}）</div>
+        <div class="modal-body">${html}</div>
+        <div class="modal-actions"><button class="btn" onclick="document.getElementById('badge-modal').remove()">关闭</button></div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', modal);
+}
+
 function buyTimePause() {
-  if (state.usedTimePauseToday) { showToast('⚠️ 今日已使用'); return; }
   if (state.levelXP < TIME_PAUSE_ITEM.cost) { showToast(`❌ XP 余额不足（需 ${TIME_PAUSE_ITEM.cost}，当前 ${state.levelXP}）`); return; }
   state.levelXP -= TIME_PAUSE_ITEM.cost;
   state.inventory.timePause += 1;
-  state.usedTimePauseToday = true;
   saveState();
   recordHistory({ type: 'item_bought', name: TIME_PAUSE_ITEM.name, cost: TIME_PAUSE_ITEM.cost });
   closeAllModals();
   updateUI();
-  showToast('✅ 研发部已发货：时间暂停器 ×1');
+  showToast('✅ 研发部已发货：时间暂停器 ×1（去装备库使用）');
 }
 
 function buyMassage() {
@@ -2522,7 +3564,32 @@ function switchPage(pageName) {
   if (pageName === 'verify') renderVerifyPage();
   if (pageName === 'growth') renderGrowthPage();
   if (pageName === 'achievements') updateAchievementsPage();
+  if (pageName === 'robot') renderRobotPage();
+  if (pageName === 'home') flushPendingRewards();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 审批后的奖励队列，等用户回首页再触发
+function flushPendingRewards() {
+  if (state._pendingCelebration) {
+    const rank = state._pendingCelebration;
+    delete state._pendingCelebration;
+    saveState();
+    setTimeout(() => celebrateRankUp(rank), 400);
+  }
+  if (state._pendingRewards && state._pendingRewards > 0) {
+    const xp = state._pendingRewards;
+    state._pendingRewards = 0;
+    saveState();
+    if (!state._pendingCelebration) {
+      showToast(`🎉 CEO 已签发：+${xp} XP 到账！`);
+    }
+  }
+  if (state._pendingEventCheck) {
+    delete state._pendingEventCheck;
+    saveState();
+    setTimeout(() => { tryTriggerRandomEvent(); checkAndAwardBadges(); }, 1000);
+  }
 }
 
 /* ===========================================================
@@ -2905,6 +3972,7 @@ async function init() {
 
   document.getElementById('version-text').textContent = VERSION;
   updateUI();
+  renderRobotWidget();
   updateLastBackupDisplay();
   setupNetworkIndicator();
   registerServiceWorker();
@@ -2917,6 +3985,9 @@ async function init() {
 
   // Show upgrade notice (first time only)
   setTimeout(() => showUpgradeNotice(false), 1200);
+
+  // 启动时如果有审批队列未弹出的奖励，延迟触发
+  setTimeout(() => flushPendingRewards(), 1800);
 
   // Handle admin URL
   await handleAdminURL();
