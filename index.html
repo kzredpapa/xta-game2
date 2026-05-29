@@ -1284,7 +1284,7 @@
           <div class="label">版本</div>
           <div class="desc">Siatar 工业 · 系统版本</div>
         </div>
-        <span style="color:var(--c-text-light);font-variant-numeric:tabular-nums;" id="version-text">v2.7.0</span>
+        <span style="color:var(--c-text-light);font-variant-numeric:tabular-nums;" id="version-text">v2.8.0</span>
       </div>
       <div class="setting-item">
         <div>
@@ -1353,7 +1353,7 @@
 
 <script>
 /* ===========================================================
-   Siatar 工业 · 任务面板 v2.7.0
+   Siatar 工业 · 任务面板 v2.8.0
    架构说明：
    - localStorage 作为主存储（key: 'xta-game-data'）
    - 历史记录单独存储（key: 'xta-game-history'）
@@ -1361,7 +1361,7 @@
    - 兼容旧数据自动迁移
    =========================================================== */
 
-const VERSION = 'v2.7.0';
+const VERSION = 'v2.8.0';
 
 // 本地日期字符串 YYYY-MM-DD（避免 toISOString() 在非 UTC 时区造成的偏移）
 function localDateStr(d) {
@@ -1664,6 +1664,84 @@ const ROBOTS = {
       ],
     },
   },
+  'mk-3': {
+    id: 'mk-3', name: '重锤', model: 'MK-3', type: '重型火炮',
+    desc: 'Siatar 军工部的终极火力平台。双肩炮台可以覆盖整个战场，履带底盘让它在任何地形都稳如磐石。沉默寡言的老兵，用火力说话。',
+    parts: [
+      { name: '履带底盘', icon: '⛓️', cost: 80, desc: '四条重型履带同时着地，地面微微下沉。重锤的根基——再大的后坐力也撼不动它。' },
+      { name: '装甲躯干', icon: '🏗️', cost: 100, desc: '30 毫米复合装甲板逐层焊接。这不是机甲，这是移动堡垒。' },
+      { name: '动力核心', icon: '⚡', cost: 120, desc: '双涡轮引擎点火。巨大的轰鸣声回荡在车间里，技师们都退后了三步。' },
+      { name: '主炮基座', icon: '🔩', cost: 130, desc: '360° 旋转炮塔安装到躯干顶部。液压锁定系统可以在 0.3 秒内完成瞄准。' },
+      { name: '左肩炮台', icon: '💥', cost: 140, desc: '速射型能量炮挂载到左肩。弹链自动装填，射速每分钟 200 发。' },
+      { name: '右肩炮台', icon: '💥', cost: 150, desc: '重型穿甲炮安装完毕。一发入魂——这是老兵的座右铭。' },
+      { name: '战术护盾', icon: '🛡️', cost: 170, desc: '正面展开一面能量护盾。蓝光闪烁中，重锤变得几乎不可摧毁。' },
+      { name: '火控系统', icon: '🎯', cost: 150, desc: '全息瞄准镜 + AI 弹道计算。重锤的主视觉亮起暗金色光芒："火力准备就绪。"' },
+      { name: '散热鳍片', icon: '🌡️', cost: 100, desc: '背部散热翼展开，金色热浪蒸腾而出。连续开火再也不会过热。' },
+      { name: '弹药仓', icon: '📦', cost: 80, desc: '背部弹药舱装满了各型弹药。重锤拍了拍弹仓："够用一整天。"' },
+      { name: '通讯天线', icon: '📡', cost: 90, desc: '超远程通讯阵列竖起。重锤可以呼叫轨道支援——虽然目前用不上。' },
+      { name: '作战AI', icon: '🧠', cost: 90, desc: '老兵级作战经验数据库加载完毕。重锤低沉地说："所有系统就位。开始执勤。"' },
+    ],
+    lines: {
+      submit: [
+        '收到。已记录。', '火力支援确认——任务已入库。', '目标达成。继续推进。',
+        '老兵的建议：保持节奏，不要急。', '弹道稳定。你的表现很稳。',
+        '重锤见证。这次完成得很扎实。', '一发命中。效率不错。',
+        '战场记录更新。继续保持火力覆盖。', '任务打击确认。下一个目标是什么？',
+        '可以。就是这个节奏。', '护盾稳定，前进无阻。', '又推进了一步。胜利在积累中到来。',
+        '重锤认可这次执行。', '弹药充足。还能继续。', '老兵只看行动，不听废话。你做到了。',
+        '好样的。继续轰。',
+      ],
+      idle: [
+        '引擎怠速中。随时可以出击。', '重锤待命。不着急。',
+        '战场很安静……有点太安静了。', '正在校准炮管。别担心，日常保养。',
+        '老兵不会催你，但任务不会自己消失。', '你在想什么？重锤可以等。',
+        '散热系统正常。温度适宜。', '检测到你的能量在下降。去吃点东西？',
+        '重锤见过太多战场。相信我，坚持最重要。', '履带保养完毕。随时可以移动。',
+        '弹药库还有存货。你呢？还有余力吗？', '今天的战况如何？重锤想听汇报。',
+        '沉默不代表无事可做。准备好了就来。', '重锤从不催促。但也从不放弃。',
+        '你是指挥官，我是你的火力。下令吧。', '日落之前，还有时间完成一切。',
+      ],
+    },
+  },
+  'vx-7': {
+    id: 'vx-7', name: '暗影', model: 'VX-7', type: '高速战甲',
+    desc: 'Siatar 特战部的绝密项目。钢铁侠式战甲搭载方舟反应堆，掌心推进器能释放毁灭性能量。冷酷精准，一击定胜负。',
+    parts: [
+      { name: '碳纤骨架', icon: '🦴', cost: 120, desc: '比钛合金轻 60%，比钢硬 3 倍。暗影的骨架几乎没有重量，却能承受极端冲击。' },
+      { name: '隐形护甲', icon: '👻', cost: 150, desc: '光学迷彩涂层激活。暗影的轮廓在空气中模糊、消散——你只能看到一道微微的热浪。' },
+      { name: '主视觉·红', icon: '🔴', cost: 130, desc: '单目红光传感器亮起。不需要两只眼睛——一只足够看穿一切。' },
+      { name: '左臂等离子刃', icon: '⚔️', cost: 160, desc: '左前臂展开一道炽白的等离子刃。温度两万度——没有什么切不开。' },
+      { name: '右臂等离子刃', icon: '⚔️', cost: 160, desc: '双刃齐备。暗影交叉挥动双臂，空气中留下两道灼热的 X 形痕迹。' },
+      { name: '推进器', icon: '🚀', cost: 170, desc: '背部微型推进器点火。暗影不是在跑——是在滑行。零到百公里，1.2 秒。' },
+      { name: '反应系统', icon: '⚡', cost: 180, desc: '神经级反应加速器上线。暗影的反应速度提升到人类的 50 倍。子弹对它来说像慢动作。' },
+      { name: '热成像', icon: '🌡️', cost: 140, desc: '红外视野叠加。黑暗中、烟雾后、墙壁后——没有什么能躲过暗影的眼睛。' },
+      { name: '消音模块', icon: '🤫', cost: 130, desc: '脚步声、关节声、呼吸声——全部归零。暗影移动时，世界是沉默的。' },
+      { name: '瞬移短闪', icon: '✨', cost: 150, desc: '空间折叠引擎微型化。暗影可以在 3 米内瞬间位移——眨眼之间，它已在你身后。' },
+      { name: '致命一击', icon: '💀', cost: 160, desc: '所有系统同步到攻击模式。双刃蓄能、推进器满载、反应拉满——下一击，将是最后一击。' },
+      { name: '觉醒协议', icon: '🖤', cost: 150, desc: '暗影的红色独眼闪烁了一下，低声说："目标锁定。从此刻起，我是你的影子。"' },
+    ],
+    lines: {
+      submit: [
+        '目标清除。', '……完成了。', '一击。干净利落。',
+        '不需要第二刀。', '任务抹消。下一个。', '暗影确认。无声完成。',
+        '速度不错。我喜欢快的。', '像切黄油一样简单。', '记录归档。痕迹已清除。',
+        '效率是最好的武器。你正在掌握它。', '从阴影中来，到阴影中去。完成。',
+        '零失误。保持这个精度。', '你的专注力……暗影认可。',
+        '又一个目标倒下了。继续狩猎。', '刃上无血。因为太快了。',
+        '暗影从不多说。但——干得好。',
+      ],
+      idle: [
+        '……', '待命中。不要出声。', '暗影在暗处观察。',
+        '你的对手不会休息。你呢？', '保持警觉。机会转瞬即逝。',
+        '我在这里。虽然你看不见我。', '推进器冷却中。随时可以启动。',
+        '想快一点完成？那就别犹豫。', '暗影没有情绪。只有目标。',
+        '黑暗中等待的时间，也是战斗的一部分。', '刀锋需要保养。人也是。去休息一下。',
+        '有些任务需要耐心。暗影理解。', '你今天的反应速度比昨天快。',
+        '不要怕犯错。怕的人出刀会慢。', '沉默是最好的伪装。准备好了再动。',
+        '暗影从不催促——但也从不原谅拖延。',
+      ],
+    },
+  },
 };
 
 /* ===== v2.7 徽章图鉴 ===== */
@@ -1869,6 +1947,8 @@ function loadState() {
     s.meals = { breakfast: false, lunch: false, dinner: false };
     s.taskTime = {};
     s.usedTimePauseToday = false;
+    s._mk3BonusToday = false;
+    s._todayConfirmedCount = 0;
     s.lastCycleKey = currentCycle;
     s.lastActiveDate = today;
 
@@ -2343,12 +2423,31 @@ async function confirmTask(index) {
   applyConfirmTask(index);
 }
 
+function getRobotBonus() {
+  const active = state.robotActive;
+  if (!active) return 0;
+  const rd = state.robotsOwned[active];
+  if (!rd || !rd.completed) return 0;
+  if (active === 'mk-3') {
+    // MK-3：每日首次任务 +5 XP
+    if (!state._mk3BonusToday) { state._mk3BonusToday = true; return 5; }
+  } else if (active === 'vx-7') {
+    // VX-7：连续完成3个任务时 +10 XP（基于当日已确认数）
+    const todayConfirmed = (state._todayConfirmedCount || 0) + 1;
+    state._todayConfirmedCount = todayConfirmed;
+    if (todayConfirmed % 3 === 0) return 10;
+  }
+  return 0;
+}
+
 function applyConfirmTask(index) {
   const task = state.pendingVerify[index];
   const beforeRank = getRankIndex();
-  state.levelXP += task.xp;
-  state.totalEarnedXP = (state.totalEarnedXP || 0) + task.xp;
-  state.dailyXP += task.xp;
+  const bonus = getRobotBonus();
+  const totalXpGain = task.xp + bonus;
+  state.levelXP += totalXpGain;
+  state.totalEarnedXP = (state.totalEarnedXP || 0) + totalXpGain;
+  state.dailyXP += totalXpGain;
   state.pendingVerify.splice(index, 1);
   state.level = Math.floor(state.levelXP / 100) + 1;
   state.streak = Math.max(state.streak, 1);  // 至少 1 天
@@ -2364,10 +2463,11 @@ function applyConfirmTask(index) {
   if (afterRank > beforeRank) {
     state._pendingCelebration = ranks[afterRank];
   }
-  state._pendingRewards = (state._pendingRewards || 0) + task.xp;
+  state._pendingRewards = (state._pendingRewards || 0) + totalXpGain;
   state._pendingEventCheck = true;
   saveState();
-  showToast(`✅ 已签发 +${task.xp} XP`);
+  const bonusText = bonus > 0 ? ` (含机器人加成 +${bonus})` : '';
+  showToast(`✅ 已签发 +${totalXpGain} XP${bonusText}`);
 }
 
 async function confirmAllTasks() {
@@ -2376,11 +2476,15 @@ async function confirmAllTasks() {
   if (!ok) return;
   const beforeRank = getRankIndex();
   let totalXp = 0;
+  let totalBonus = 0;
   state.pendingVerify.forEach(task => {
-    state.levelXP += task.xp;
-    state.totalEarnedXP = (state.totalEarnedXP || 0) + task.xp;
-    state.dailyXP += task.xp;
-    totalXp += task.xp;
+    const bonus = getRobotBonus();
+    const gain = task.xp + bonus;
+    state.levelXP += gain;
+    state.totalEarnedXP = (state.totalEarnedXP || 0) + gain;
+    state.dailyXP += gain;
+    totalXp += gain;
+    totalBonus += bonus;
     recordHistory({ type: 'task_confirmed', taskId: task.id, name: task.name, xp: task.xp });
   });
   state.pendingVerify = [];
@@ -2398,7 +2502,8 @@ async function confirmAllTasks() {
   state._pendingRewards = (state._pendingRewards || 0) + totalXp;
   state._pendingEventCheck = true;
   saveState();
-  showToast(`✅ 已签发 ${state.pendingVerify.length === 0 ? '全部' : ''} +${totalXp} XP`);
+  const batchBonusText = totalBonus > 0 ? ` (含机器人加成 +${totalBonus})` : '';
+  showToast(`✅ 已签发全部 +${totalXp} XP${batchBonusText}`);
 }
 
 async function confirmRedeem(index) {
@@ -3154,7 +3259,6 @@ function renderRobotPage() {
 
 function getRobotSVG(id) {
   if (id === 'sx-01') {
-    // 战术机甲 — 方正机甲头，蓝光面罩，绿色能量核心
     return `<svg viewBox="0 0 64 64" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
       <rect x="12" y="8" width="40" height="10" rx="3" fill="#1e3a5f"/>
       <rect x="8" y="18" width="48" height="32" rx="4" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5"/>
@@ -3165,8 +3269,7 @@ function getRobotSVG(id) {
       <rect x="10" y="52" width="18" height="6" rx="2" fill="#1e3a5f"/>
       <rect x="36" y="52" width="18" height="6" rx="2" fill="#1e3a5f"/>
     </svg>`;
-  } else {
-    // 浮游核心 — 球体 + 双环轨道
+  } else if (id === 'sp-9') {
     return `<svg viewBox="0 0 64 64" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="#a855f7" stroke-width="1.2" opacity="0.5" transform="rotate(-25 32 32)"/>
       <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="#a855f7" stroke-width="1.2" opacity="0.5" transform="rotate(25 32 32)"/>
@@ -3176,11 +3279,48 @@ function getRobotSVG(id) {
       <circle cx="32" cy="32" r="3" fill="#e9d5ff"/>
       <circle cx="28" cy="26" r="2" fill="#e9d5ff" opacity="0.4"/>
     </svg>`;
+  } else if (id === 'mk-3') {
+    // 重锤 — GM圆顶头 + 重型躯干 + 肩炮
+    return `<svg viewBox="0 0 64 64" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="32" cy="14" rx="9" ry="8" fill="#3d5a3d" stroke="#22c55e" stroke-width="1.2"/>
+      <rect x="30" y="5" width="4" height="4" rx="2" fill="#4b5563"/>
+      <circle cx="32" cy="4" r="1.5" fill="#4ade80"/>
+      <path d="M25 14 Q32 18 39 14" fill="#0f172a" stroke="#d4a017" stroke-width="1"/>
+      <rect x="20" y="22" width="24" height="22" rx="2" fill="#3d5a3d" stroke="#22c55e" stroke-width="1.5"/>
+      <rect x="23" y="26" width="18" height="6" rx="1" fill="#2d4a2d"/>
+      <circle cx="32" cy="38" r="3" fill="#22c55e" opacity="0.5"/>
+      <circle cx="32" cy="38" r="1.5" fill="#4ade80"/>
+      <rect x="10" y="20" width="11" height="10" rx="2" fill="#3d5a3d" stroke="#22c55e" stroke-width="1"/>
+      <rect x="43" y="20" width="11" height="10" rx="2" fill="#3d5a3d" stroke="#22c55e" stroke-width="1"/>
+      <rect x="52" y="16" width="6" height="20" rx="2" fill="#4b5563" stroke="#d4a017" stroke-width="1"/>
+      <rect x="53" y="13" width="4" height="4" rx="1" fill="#d4a017"/>
+      <rect x="22" y="44" width="8" height="12" rx="2" fill="#3d5a3d" stroke="#22c55e" stroke-width="1"/>
+      <rect x="34" y="44" width="8" height="12" rx="2" fill="#3d5a3d" stroke="#22c55e" stroke-width="1"/>
+    </svg>`;
+  } else {
+    // 暗影 — 钢铁侠风格
+    return `<svg viewBox="0 0 64 64" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="32" cy="14" rx="9" ry="10" fill="#8b1a1a" stroke="#ef4444" stroke-width="1.2"/>
+      <path d="M23 13 L32 17 L41 13" fill="none" stroke="#d4a017" stroke-width="0.8"/>
+      <rect x="27" y="11" width="3.5" height="2" rx="1" fill="#fff" opacity="0.9"/>
+      <rect x="33.5" y="11" width="3.5" height="2" rx="1" fill="#fff" opacity="0.9"/>
+      <path d="M25 24 L23 26 L23 42 L26 44 L38 44 L41 42 L41 26 L39 24 Z" fill="#8b1a1a" stroke="#ef4444" stroke-width="1"/>
+      <circle cx="32" cy="33" r="3.5" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+      <circle cx="32" cy="33" r="1.5" fill="#38bdf8" opacity="0.8"/>
+      <rect x="14" y="23" width="9" height="7" rx="2" fill="#8b1a1a" stroke="#ef4444" stroke-width="0.8"/>
+      <rect x="41" y="23" width="9" height="7" rx="2" fill="#8b1a1a" stroke="#ef4444" stroke-width="0.8"/>
+      <rect x="15" y="30" width="5" height="14" rx="2" fill="#8b1a1a" stroke="#d4a017" stroke-width="0.6"/>
+      <rect x="44" y="30" width="5" height="14" rx="2" fill="#8b1a1a" stroke="#d4a017" stroke-width="0.6"/>
+      <circle cx="17.5" cy="44" r="2" fill="#38bdf8" opacity="0.5"/>
+      <circle cx="46.5" cy="44" r="2" fill="#38bdf8" opacity="0.5"/>
+      <rect x="25" y="44" width="6" height="12" rx="2" fill="#8b1a1a" stroke="#d4a017" stroke-width="0.6"/>
+      <rect x="33" y="44" width="6" height="12" rx="2" fill="#8b1a1a" stroke="#d4a017" stroke-width="0.6"/>
+    </svg>`;
   }
 }
 
 function renderRobotSelectContent(container) {
-  const totalCosts = { 'sx-01': 1200, 'sp-9': 445 };
+  const totalCosts = { 'sx-01': 1200, 'sp-9': 445, 'mk-3': 1500, 'vx-7': 1800 };
   const body = Object.values(ROBOTS).map(r => {
     const rd = state.robotsOwned[r.id];
     const isComplete = rd && rd.completed;
@@ -3192,7 +3332,7 @@ function renderRobotSelectContent(container) {
     } else if (isComplete) {
       btnHtml = `<button class="btn" style="width:100%;margin-top:12px;" onclick="setActiveRobot('${r.id}')">装备为主机器人</button>`;
     } else if (inProgress) {
-      btnHtml = `<button class="btn" style="width:100%;margin-top:12px;" onclick="selectRobot('${r.id}')">继续组装 · ${rd.parts}/8</button>`;
+      btnHtml = `<button class="btn" style="width:100%;margin-top:12px;" onclick="selectRobot('${r.id}')">继续组装 · ${rd.parts}/${r.parts.length}</button>`;
     } else {
       btnHtml = `<button class="btn" style="width:100%;margin-top:12px;" onclick="selectRobot('${r.id}')">开始组装 ${r.name}</button>`;
     }
@@ -3203,15 +3343,16 @@ function renderRobotSelectContent(container) {
         <div class="robot-select-header">
           <div class="robot-select-model">${r.model}${isActive ? ' <span style="color:#22c55e;font-size:10px;">● 装备中</span>' : ''}</div>
           <div class="robot-select-name">${r.name}</div>
-          <div class="robot-select-type">${r.type} · ${r.id === 'sx-01' ? 'Tactical Mech' : 'Floating Core'}</div>
+          <div class="robot-select-type">${r.type} · ${r.parts.length} 部件</div>
         </div>
       </div>
       <div class="robot-select-desc">${r.desc}</div>
       <div class="robot-select-specs">
-        <span><span class="spec-val">8</span><span class="spec-label">零件数</span></span>
+        <span><span class="spec-val">${r.parts.length}</span><span class="spec-label">零件数</span></span>
         <span><span class="spec-val">${totalCosts[r.id]}</span><span class="spec-label">总 XP</span></span>
-        <span><span class="spec-val">${r.type.substring(0, 2)}</span><span class="spec-label">类型</span></span>
+        <span><span class="spec-val">${r.id === 'mk-3' ? '+5' : r.id === 'vx-7' ? '+10' : '—'}</span><span class="spec-label">加成</span></span>
       </div>
+      ${r.id === 'mk-3' ? '<div style="font-size:11px;color:#4ade80;margin-top:4px;text-align:center;">⚡ 每日首次任务额外 +5 XP</div>' : r.id === 'vx-7' ? '<div style="font-size:11px;color:#38bdf8;margin-top:4px;text-align:center;">⚡ 每完成3个任务额外 +10 XP</div>' : ''}
       ${btnHtml}
     </div>`;
   }).join('<div style="text-align:center;color:var(--c-text-faint);font-size:12px;margin:12px 0;">— 或者 —</div>');
@@ -3268,7 +3409,7 @@ function getRobotAssemblySVG(robotId, partsOwned) {
       <!-- 8: 传感阵列 -->
       <g ${own(7)}><circle cx="60" cy="65" r="4" fill="none" stroke="#ef4444" stroke-width="1.5"/><circle cx="140" cy="65" r="4" fill="none" stroke="#ef4444" stroke-width="1.5"/><circle cx="100" cy="28" r="4" fill="none" stroke="#ef4444" stroke-width="1.5"/></g>
     </svg>`;
-  } else {
+  } else if (robotId === 'sp-9') {
     // SP-9 脉冲：球体 + 双环 + 翼 + 光束
     return `<svg viewBox="0 0 200 200" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;">
       <!-- 1: 核心球体 -->
@@ -3287,6 +3428,62 @@ function getRobotAssemblySVG(robotId, partsOwned) {
       <g ${own(6)}><line x1="100" y1="120" x2="80" y2="170" stroke="#a855f7" stroke-width="1" opacity="0.7"/><line x1="100" y1="120" x2="100" y2="175" stroke="#a855f7" stroke-width="1.2" opacity="0.7"/><line x1="100" y1="120" x2="120" y2="170" stroke="#a855f7" stroke-width="1" opacity="0.7"/></g>
       <!-- 8: AI 意识核 -->
       <g ${own(7)}><circle cx="100" cy="100" r="3" fill="#e9d5ff"/><circle cx="96" cy="94" r="2" fill="#e9d5ff" opacity="0.5"/><circle cx="104" cy="94" r="2" fill="#e9d5ff" opacity="0.5"/></g>
+    </svg>`;
+  } else if (robotId === 'mk-3') {
+    // MK-3 重锤：GM圆顶头 + 重型躯干 + 肩炮（12 parts）
+    return `<svg viewBox="0 0 220 280" width="180" height="230" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;">
+      <!-- 1: 履带底盘 -->
+      <g ${own(0)}><rect x="68" y="230" width="36" height="16" rx="4" fill="none" stroke="#22c55e" stroke-width="2"/><rect x="116" y="230" width="36" height="16" rx="4" fill="none" stroke="#22c55e" stroke-width="2"/><rect x="70" y="233" width="10" height="10" rx="2" fill="none" stroke="#22c55e" stroke-width="1"/><rect x="82" y="233" width="10" height="10" rx="2" fill="none" stroke="#22c55e" stroke-width="1"/><rect x="118" y="233" width="10" height="10" rx="2" fill="none" stroke="#22c55e" stroke-width="1"/><rect x="130" y="233" width="10" height="10" rx="2" fill="none" stroke="#22c55e" stroke-width="1"/></g>
+      <!-- 2: 装甲躯干 -->
+      <g ${own(1)}><rect x="65" y="95" width="90" height="85" rx="6" fill="none" stroke="#22c55e" stroke-width="2.5"/><rect x="75" y="103" width="70" height="24" rx="4" fill="none" stroke="#22c55e" stroke-width="1"/></g>
+      <!-- 3: 动力核心 -->
+      <g ${own(2)}><circle cx="110" cy="148" r="14" fill="none" stroke="#22c55e" stroke-width="2"/><circle cx="110" cy="148" r="8" fill="#22c55e" opacity="0.3"/><circle cx="110" cy="148" r="4" fill="#4ade80"/></g>
+      <!-- 4: 主炮基座 -->
+      <g ${own(3)}><rect x="180" y="75" width="14" height="90" rx="4" fill="none" stroke="#d4a017" stroke-width="2"/><rect x="182" y="65" width="10" height="14" rx="3" fill="none" stroke="#d4a017" stroke-width="1.5"/><circle cx="187" cy="63" r="4" fill="none" stroke="#fbbf24" stroke-width="1.5"/></g>
+      <!-- 5: 左肩炮台 -->
+      <g ${own(4)}><rect x="30" y="74" width="36" height="28" rx="4" fill="none" stroke="#22c55e" stroke-width="2"/><rect x="14" y="78" width="18" height="8" rx="3" fill="none" stroke="#d4a017" stroke-width="1.5"/></g>
+      <!-- 6: 右肩炮台 -->
+      <g ${own(5)}><rect x="154" y="74" width="36" height="28" rx="4" fill="none" stroke="#22c55e" stroke-width="2"/><rect x="188" y="78" width="18" height="8" rx="3" fill="none" stroke="#d4a017" stroke-width="1.5"/></g>
+      <!-- 7: 战术护盾 -->
+      <g ${own(6)}><rect x="35" y="102" width="18" height="55" rx="6" fill="none" stroke="#22c55e" stroke-width="1.5"/><rect x="167" y="102" width="18" height="55" rx="6" fill="none" stroke="#22c55e" stroke-width="1.5"/><rect x="36" y="155" width="16" height="16" rx="5" fill="none" stroke="#22c55e" stroke-width="1.5"/><rect x="168" y="155" width="16" height="16" rx="5" fill="none" stroke="#22c55e" stroke-width="1.5"/></g>
+      <!-- 8: 火控系统（GM圆顶头+弧形面罩） -->
+      <g ${own(7)}><ellipse cx="110" cy="60" rx="26" ry="22" fill="none" stroke="#22c55e" stroke-width="2.5"/><path d="M88 60 Q110 72 132 60" fill="none" stroke="#d4a017" stroke-width="2"/><rect x="106" y="36" width="8" height="8" rx="4" fill="none" stroke="#22c55e" stroke-width="1"/><line x1="110" y1="36" x2="110" y2="26" stroke="#22c55e" stroke-width="2"/><circle cx="110" cy="24" r="4" fill="none" stroke="#4ade80" stroke-width="1.5"/></g>
+      <!-- 9: 散热鳍片 -->
+      <g ${own(8)}><line x1="75" y1="170" x2="65" y2="185" stroke="#22c55e" stroke-width="1.5"/><line x1="95" y1="170" x2="90" y2="185" stroke="#22c55e" stroke-width="1.5"/><line x1="125" y1="170" x2="130" y2="185" stroke="#22c55e" stroke-width="1.5"/><line x1="145" y1="170" x2="155" y2="185" stroke="#22c55e" stroke-width="1.5"/></g>
+      <!-- 10: 弹药仓 -->
+      <g ${own(9)}><rect x="80" y="185" width="60" height="18" rx="4" fill="none" stroke="#d4a017" stroke-width="1.5"/><line x1="100" y1="188" x2="100" y2="200" stroke="#d4a017" stroke-width="1"/><line x1="120" y1="188" x2="120" y2="200" stroke="#d4a017" stroke-width="1"/></g>
+      <!-- 11: 通讯天线 -->
+      <g ${own(10)}><line x1="130" y1="40" x2="145" y2="20" stroke="#22c55e" stroke-width="1.5"/><circle cx="145" cy="18" r="3" fill="none" stroke="#4ade80" stroke-width="1"/><line x1="90" y1="40" x2="75" y2="20" stroke="#22c55e" stroke-width="1.5"/><circle cx="75" cy="18" r="3" fill="none" stroke="#4ade80" stroke-width="1"/></g>
+      <!-- 12: 作战AI -->
+      <g ${own(11)}><rect x="75" y="205" width="26" height="26" rx="6" fill="none" stroke="#22c55e" stroke-width="2"/><rect x="119" y="205" width="26" height="26" rx="6" fill="none" stroke="#22c55e" stroke-width="2"/><circle cx="88" cy="218" r="3" fill="none" stroke="#d4a017" stroke-width="1.5"/><circle cx="132" cy="218" r="3" fill="none" stroke="#d4a017" stroke-width="1.5"/></g>
+    </svg>`;
+  } else {
+    // VX-7 暗影：钢铁侠风格（12 parts）
+    return `<svg viewBox="0 0 220 300" width="180" height="246" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;">
+      <!-- 1: 碳纤骨架 -->
+      <g ${own(0)}><path d="M78 80 L74 86 L74 155 L82 162 L138 162 L146 155 L146 86 L142 80 Z" fill="none" stroke="#ef4444" stroke-width="2"/><line x1="110" y1="80" x2="110" y2="162" stroke="#ef4444" stroke-width="0.8" opacity="0.4"/></g>
+      <!-- 2: 隐形护甲 -->
+      <g ${own(1)}><path d="M82 88 L110 96 L138 88 L138 115 L110 120 L82 115 Z" fill="none" stroke="#d4a017" stroke-width="1.5"/><rect x="90" y="130" width="40" height="20" rx="4" fill="none" stroke="#d4a017" stroke-width="1"/></g>
+      <!-- 3: 主视觉（钢铁侠头盔） -->
+      <g ${own(2)}><ellipse cx="110" cy="42" rx="24" ry="28" fill="none" stroke="#ef4444" stroke-width="2"/><path d="M86 40 L110 50 L134 40" fill="none" stroke="#d4a017" stroke-width="2"/><rect x="96" y="34" width="8" height="5" rx="2.5" fill="none" stroke="#fff" stroke-width="1.5"/><rect x="116" y="34" width="8" height="5" rx="2.5" fill="none" stroke="#fff" stroke-width="1.5"/></g>
+      <!-- 4: 左臂等离子刃 -->
+      <g ${own(3)}><rect x="42" y="104" width="18" height="42" rx="7" fill="none" stroke="#d4a017" stroke-width="1.5"/><rect x="40" y="146" width="20" height="38" rx="6" fill="none" stroke="#d4a017" stroke-width="1.5"/><rect x="42" y="155" width="16" height="6" rx="2" fill="none" stroke="#ef4444" stroke-width="1"/></g>
+      <!-- 5: 右臂等离子刃 -->
+      <g ${own(4)}><rect x="160" y="104" width="18" height="42" rx="7" fill="none" stroke="#d4a017" stroke-width="1.5"/><rect x="160" y="146" width="20" height="38" rx="6" fill="none" stroke="#d4a017" stroke-width="1.5"/><rect x="162" y="155" width="16" height="6" rx="2" fill="none" stroke="#ef4444" stroke-width="1"/></g>
+      <!-- 6: 推进器（掌心） -->
+      <g ${own(5)}><circle cx="50" cy="188" r="6" fill="none" stroke="#38bdf8" stroke-width="1.5"/><circle cx="50" cy="188" r="3" fill="#38bdf8" opacity="0.5"/><circle cx="170" cy="188" r="6" fill="none" stroke="#38bdf8" stroke-width="1.5"/><circle cx="170" cy="188" r="3" fill="#38bdf8" opacity="0.5"/></g>
+      <!-- 7: 反应系统（方舟反应堆） -->
+      <g ${own(6)}><circle cx="110" cy="110" r="16" fill="none" stroke="#38bdf8" stroke-width="2.5"/><circle cx="110" cy="110" r="11" fill="none" stroke="#38bdf8" stroke-width="1" opacity="0.6"/><circle cx="110" cy="110" r="4" fill="#38bdf8" opacity="0.6"/><polygon points="110,97 103,118 117,118" fill="none" stroke="#38bdf8" stroke-width="0.8" opacity="0.5"/></g>
+      <!-- 8: 热成像（肩甲） -->
+      <g ${own(7)}><ellipse cx="58" cy="90" rx="20" ry="16" fill="none" stroke="#ef4444" stroke-width="2"/><ellipse cx="162" cy="90" rx="20" ry="16" fill="none" stroke="#ef4444" stroke-width="2"/></g>
+      <!-- 9: 消音模块（腰部） -->
+      <g ${own(8)}><rect x="82" y="160" width="56" height="14" rx="4" fill="none" stroke="#d4a017" stroke-width="1.5"/><line x1="90" y1="164" x2="90" y2="170" stroke="#d4a017" stroke-width="1"/><line x1="110" y1="164" x2="110" y2="170" stroke="#d4a017" stroke-width="1"/><line x1="130" y1="164" x2="130" y2="170" stroke="#d4a017" stroke-width="1"/></g>
+      <!-- 10: 瞬移短闪（腿部） -->
+      <g ${own(9)}><rect x="82" y="174" width="22" height="52" rx="7" fill="none" stroke="#d4a017" stroke-width="1.5"/><rect x="116" y="174" width="22" height="52" rx="7" fill="none" stroke="#d4a017" stroke-width="1.5"/><rect x="84" y="205" width="18" height="10" rx="3" fill="none" stroke="#ef4444" stroke-width="1"/><rect x="118" y="205" width="18" height="10" rx="3" fill="none" stroke="#ef4444" stroke-width="1"/></g>
+      <!-- 11: 致命一击（脚部推进） -->
+      <g ${own(10)}><rect x="80" y="264" width="24" height="12" rx="4" fill="none" stroke="#d4a017" stroke-width="1.5"/><rect x="116" y="264" width="24" height="12" rx="4" fill="none" stroke="#d4a017" stroke-width="1.5"/><circle cx="92" cy="276" r="3" fill="none" stroke="#38bdf8" stroke-width="1"/><circle cx="128" cy="276" r="3" fill="none" stroke="#38bdf8" stroke-width="1"/></g>
+      <!-- 12: 觉醒协议（颈部连接） -->
+      <g ${own(11)}><rect x="102" y="68" width="16" height="12" rx="3" fill="none" stroke="#ef4444" stroke-width="1.5"/><line x1="105" y1="72" x2="115" y2="72" stroke="#d4a017" stroke-width="1"/><line x1="105" y1="76" x2="115" y2="76" stroke="#d4a017" stroke-width="1"/></g>
     </svg>`;
   }
 }
@@ -3370,16 +3567,30 @@ function buyRobotPart() {
 }
 
 function showRobotCompleteAnimation(robot) {
-  const isMech = robot.id === 'sx-01';
-  const themeColor = isMech ? '#38bdf8' : '#a855f7';
-  const glowColor = isMech ? 'rgba(56,189,248,0.3)' : 'rgba(168,85,247,0.3)';
-  const robotSvg = getRobotAssemblySVG(robot.id, 8);
-  const bootLines = isMech
-    ? ['核心框架 ▸ 已就位', '动力模组 ▸ 输出稳定', '装甲外壳 ▸ 完整覆盖', '战术系统 ▸ 全线激活', '⟫ SX-01 铁卫 · 系统启动完毕 ⟪']
-    : ['能量种子 ▸ 共振稳定', '力场球壳 ▸ 约束成功', '双环轨道 ▸ 同步运转', '意识核心 ▸ 已苏醒', '⟫ SP-9 脉冲 · 全系统上线 ⟪'];
-  const firstLine = isMech
-    ? '"系统就绪，等待指令。铁卫，为你而战。"'
-    : '"嗨！我是脉冲~从现在起，我会一直陪着你！"';
+  const themeMap = {
+    'sx-01': { color: '#38bdf8', glow: 'rgba(56,189,248,0.3)' },
+    'sp-9':  { color: '#a855f7', glow: 'rgba(168,85,247,0.3)' },
+    'mk-3':  { color: '#22c55e', glow: 'rgba(34,197,94,0.3)' },
+    'vx-7':  { color: '#ef4444', glow: 'rgba(239,68,68,0.3)' },
+  };
+  const tm = themeMap[robot.id] || themeMap['sx-01'];
+  const themeColor = tm.color;
+  const glowColor = tm.glow;
+  const robotSvg = getRobotAssemblySVG(robot.id, robot.parts.length);
+  const bootLinesMap = {
+    'sx-01': ['核心框架 ▸ 已就位', '动力模组 ▸ 输出稳定', '装甲外壳 ▸ 完整覆盖', '战术系统 ▸ 全线激活', '⟫ SX-01 铁卫 · 系统启动完毕 ⟪'],
+    'sp-9':  ['能量种子 ▸ 共振稳定', '力场球壳 ▸ 约束成功', '双环轨道 ▸ 同步运转', '意识核心 ▸ 已苏醒', '⟫ SP-9 脉冲 · 全系统上线 ⟪'],
+    'mk-3':  ['履带底盘 ▸ 锁定地面', '装甲焊接 ▸ 密封完毕', '双炮挂载 ▸ 弹药满载', '火控校准 ▸ 目标锁定', '⟫ MK-3 重锤 · 重炮就位 ⟪'],
+    'vx-7':  ['碳纤骨架 ▸ 轻量完毕', '反应堆 ▸ 能量充盈', '推进器 ▸ 全功率待命', '战甲合拢 ▸ 系统同步', '⟫ VX-7 暗影 · 觉醒完成 ⟪'],
+  };
+  const bootLines = bootLinesMap[robot.id] || bootLinesMap['sx-01'];
+  const firstLineMap = {
+    'sx-01': '"系统就绪，等待指令。铁卫，为你而战。"',
+    'sp-9':  '"嗨！我是脉冲~从现在起，我会一直陪着你！"',
+    'mk-3':  '"所有系统就位。开始执勤。"',
+    'vx-7':  '"目标锁定。从此刻起，我是你的影子。"',
+  };
+  const firstLine = firstLineMap[robot.id] || firstLineMap['sx-01'];
 
   const html = `
     <div class="modal-overlay" id="robot-complete-overlay" style="background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;flex-direction:column;">
