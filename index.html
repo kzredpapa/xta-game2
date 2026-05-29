@@ -317,7 +317,7 @@
     }
     .task-check.done { background: var(--c-success); color: white; border-color: var(--c-success); }
     .task-check.pending-verify { background: var(--c-warning); color: white; border-color: var(--c-warning); }
-    .task-label { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .task-label { font-size: clamp(13px, 2.8vw, 15px); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .task-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .task-xp { color: var(--c-success); font-weight: 700; font-size: 13px; }
     .task-stamp {
@@ -742,7 +742,7 @@
       margin-bottom: 14px;
     }
     .shop-item-head .name { font-weight: 600; font-size: 14px; }
-    .shop-item-head .desc { font-size: 12px; color: var(--c-text-light); margin-top: 3px; line-height: 1.4; }
+    .shop-item-head .desc { font-size: 12px; color: var(--c-text-light); margin-top: 3px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .shop-item-head .price { text-align: right; flex-shrink: 0; margin-left: 8px; }
     .shop-item-head .price .cost { color: var(--c-gold-dark); font-weight: 700; font-size: 13px; white-space: nowrap; }
     .shop-item-head .price .limit { font-size: 11px; color: var(--c-text-light); margin-top: 2px; }
@@ -836,7 +836,7 @@
     .rp-icon { font-size: 20px; width: 32px; text-align: center; flex-shrink: 0; }
     .rp-info { flex: 1; min-width: 0; }
     .rp-name { font-size: 13px; font-weight: 600; }
-    .rp-desc { font-size: 11px; color: var(--c-text-faint); margin-top: 2px; line-height: 1.4; }
+    .rp-desc { font-size: 11px; color: var(--c-text-faint); margin-top: 2px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .rp-action { flex-shrink: 0; }
     .rp-badge { font-size: 11px; padding: 6px 12px; border-radius: 100px; font-weight: 600; display: inline-block; }
     .rp-done { background: rgba(34,197,94,0.15); color: #22c55e; }
@@ -922,6 +922,8 @@
       .task-check { width: 32px; height: 32px; font-size: 14px; }
       .shop-item { padding: 18px 24px; }
       .shop-item-head .name { font-size: 15px; }
+      .shop-item-head .desc { -webkit-line-clamp: 3; }
+      .rp-desc { -webkit-line-clamp: 3; }
       .modal { max-width: 520px; padding: 28px; }
       .robot-select-card { padding: 20px; }
       .rp-card { padding: 16px 20px; }
@@ -1606,8 +1608,25 @@ const ROBOTS = {
       { name: '传感阵列', icon: '🔴', cost: 280, desc: '最后的传感器阵列接入主板。铁卫全系统激活，发出第一声语音："系统就绪，等待指令。"' },
     ],
     lines: {
-      submit: ['收到，已录入系统。', '执行确认。继续保持。', '数据同步中……完毕。', '不错的效率，士兵。', '任务入库，等待上级签批。', '铁卫确认。你今天状态不错。'],
-      idle: ['系统正常运转中。', '等待下一条指令。', '全天候待命。', '今日任务完成度：需要加把劲。', '检测到能量波动……可能是你饿了。', '建议：先完成核心任务，再执行附加项。'],
+      submit: [
+        '收到，已录入系统。', '执行确认。继续保持。', '数据同步中……完毕。',
+        '不错的效率，士兵。', '任务入库，等待上级签批。', '铁卫确认。你今天状态不错。',
+        '又完成一项。离目标更近了。', '战术面板已更新，进度+1。',
+        '高效执行，值得记录。', '记住：每一步都是积累。',
+        '铁卫监测到你的专注力很强。', '数据写入完毕。干得漂亮。',
+        '保持这个节奏，你会超越更多人。', '已标记为高优先完成。CEO会注意到的。',
+        '系统评估：表现超出预期。', '你正在变强。铁卫可以证明。',
+      ],
+      idle: [
+        '系统正常运转中。', '等待下一条指令。', '全天候待命。',
+        '今日任务完成度：需要加把劲。', '检测到能量波动……可能是你饿了。',
+        '建议：先完成核心任务，再执行附加项。',
+        '铁卫正在自检……一切正常。', '传感器报告：附近无威胁。',
+        '距离下一级还有一段路，但你走得很稳。', '休息也是战略的一部分。',
+        '你今天开始得比昨天早，不错。', '铁卫已进入低功耗巡逻模式。',
+        '有任务就来找我，随时准备出击。', '建议补充水分，保持最佳状态。',
+        '记住铁卫的第一条守则：坚持就是胜利。', '待命中……但别让我等太久。',
+      ],
     },
   },
   'sp-9': {
@@ -1624,8 +1643,25 @@ const ROBOTS = {
       { name: '数据流模块', icon: '💾', cost: 100, desc: '二进制数据流环绕球体流动。脉冲全功率启动，发出第一声："嗡——信号连接完毕，你好！"' },
     ],
     lines: {
-      submit: ['嗡——数据捕获成功！', '哦？又一条，效率不错嘛。', '脉冲已记录，正在分析中~', '收到收到！信号清晰！', '嘀——任务波形正常，继续！', '观测到稳定输出，好现象。'],
-      idle: ['正在扫描周围环境……一切正常。', '嗡嗡嗡……待机中。', '有新任务吗？我的传感器在等信号。', '今天的数据看起来不错哦。', '检测到一股零食气息……你是不是偷吃了？', '建议适当休息，电池也需要充电呀。'],
+      submit: [
+        '嗡——数据捕获成功！', '哦？又一条，效率不错嘛。', '脉冲已记录，正在分析中~',
+        '收到收到！信号清晰！', '嘀——任务波形正常，继续！', '观测到稳定输出，好现象。',
+        '哇！又完成了？你比我算得还快！', '数据入库~今天的波形很漂亮呢。',
+        '脉冲觉得你越来越厉害了！', '嘀嘀嘀——新记录诞生！也许吧。',
+        '轨道环加速旋转中……因为太开心了！', '信号强度满格！你状态真好。',
+        '每完成一个，脉冲就多积累一点经验值哦~', '分析完毕：这是一次高质量完成！',
+        '嗡~好想给你贴个小星星。', '脉冲记住了！你今天效率爆表。',
+      ],
+      idle: [
+        '正在扫描周围环境……一切正常。', '嗡嗡嗡……待机中。',
+        '有新任务吗？我的传感器在等信号。', '今天的数据看起来不错哦。',
+        '检测到一股零食气息……你是不是偷吃了？', '建议适当休息，电池也需要充电呀。',
+        '脉冲在这里转圈圈~等你回来。', '我刚才飘到窗边看了看外面，风好大。',
+        '嗡……你猜我在想什么？其实什么都没想。', '要不要先喝口水？脉冲觉得你该补充能量了。',
+        '今天还剩几个任务呢？我帮你数数~', '脉冲的轨道环一直在转，停不下来的那种。',
+        '无聊的时候可以点我玩，虽然我只会说话……', '你知道吗，认真完成每一天的人最酷了。',
+        '如果你累了就休息一下，脉冲帮你守着。', '嘀——检测到你正在思考，不打扰了~',
+      ],
     },
   },
 };
@@ -3334,14 +3370,55 @@ function buyRobotPart() {
 }
 
 function showRobotCompleteAnimation(robot) {
+  const isMech = robot.id === 'sx-01';
+  const themeColor = isMech ? '#38bdf8' : '#a855f7';
+  const glowColor = isMech ? 'rgba(56,189,248,0.3)' : 'rgba(168,85,247,0.3)';
+  const robotSvg = getRobotAssemblySVG(robot.id, 8);
+  const bootLines = isMech
+    ? ['核心框架 ▸ 已就位', '动力模组 ▸ 输出稳定', '装甲外壳 ▸ 完整覆盖', '战术系统 ▸ 全线激活', '⟫ SX-01 铁卫 · 系统启动完毕 ⟪']
+    : ['能量种子 ▸ 共振稳定', '力场球壳 ▸ 约束成功', '双环轨道 ▸ 同步运转', '意识核心 ▸ 已苏醒', '⟫ SP-9 脉冲 · 全系统上线 ⟪'];
+  const firstLine = isMech
+    ? '"系统就绪，等待指令。铁卫，为你而战。"'
+    : '"嗨！我是脉冲~从现在起，我会一直陪着你！"';
+
   const html = `
-    <div class="modal-overlay" id="robot-complete-overlay">
-      <div class="event-card" style="animation: eventSlideIn 0.4s ease-out; border-color: #22c55e;">
-        <div class="event-type-badge" style="background:#22c55e">组装完成</div>
-        <div class="event-title">🎉 ${robot.model}「${robot.name}」已激活！</div>
-        <div class="event-desc">${robot.parts[robot.parts.length - 1].desc}</div>
-        <div class="event-reward" style="color:#22c55e;">机器人将出现在首页陪伴你</div>
-        <button class="btn" style="width:100%;margin-top:12px;" onclick="document.getElementById('robot-complete-overlay').remove()">太棒了！</button>
+    <div class="modal-overlay" id="robot-complete-overlay" style="background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;flex-direction:column;">
+      <style>
+        @keyframes robotBootGlow { 0%,100% { box-shadow: 0 0 20px ${glowColor}; } 50% { box-shadow: 0 0 60px ${glowColor}, 0 0 100px ${glowColor}; } }
+        @keyframes bootLineIn { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
+        @keyframes robotReveal { from { opacity:0; transform:scale(0.5); } to { opacity:1; transform:scale(1); } }
+        @keyframes sparkle { 0%,100% { opacity:0; } 50% { opacity:1; } }
+        .boot-line { opacity:0; animation: bootLineIn 0.4s ease-out forwards; font-family: 'SF Mono',Consolas,monospace; font-size:12px; color:${themeColor}; margin:4px 0; }
+        .robot-reveal-container { animation: robotReveal 0.8s ease-out 2.5s both; }
+        .robot-glow-ring { animation: robotBootGlow 2s ease-in-out infinite; border-radius:50%; padding:20px; display:inline-block; }
+        .sparkle-dot { position:absolute; width:4px; height:4px; background:${themeColor}; border-radius:50%; animation: sparkle 1.5s ease-in-out infinite; }
+      </style>
+      <div style="text-align:center;position:relative;">
+        <!-- Boot sequence -->
+        <div id="boot-seq" style="text-align:left;margin-bottom:24px;min-height:120px;">
+          ${bootLines.map((line, i) => `<div class="boot-line" style="animation-delay:${i * 0.5}s">${line}</div>`).join('')}
+        </div>
+        <!-- Robot reveal -->
+        <div class="robot-reveal-container" style="position:relative;">
+          <div class="robot-glow-ring">
+            ${robotSvg}
+          </div>
+          <!-- Sparkles -->
+          ${Array.from({length:8}, (_, i) => {
+            const angle = (i/8) * Math.PI * 2;
+            const x = Math.cos(angle) * 100 + 90;
+            const y = Math.sin(angle) * 100 + 110;
+            return `<div class="sparkle-dot" style="left:${x}px;top:${y}px;animation-delay:${i*0.2}s"></div>`;
+          }).join('')}
+        </div>
+        <!-- Title & text -->
+        <div class="robot-reveal-container" style="margin-top:20px;animation-delay:3s;">
+          <div style="font-size:20px;font-weight:800;color:#fff;">${robot.model}「${robot.name}」</div>
+          <div style="font-size:14px;color:#22c55e;margin-top:8px;">✅ 全系统激活</div>
+          <div style="font-size:13px;color:${themeColor};margin-top:12px;font-style:italic;">${firstLine}</div>
+          <div style="font-size:11px;color:var(--c-text-faint);margin-top:16px;">机器人将出现在首页陪伴你完成每一个任务</div>
+          <button class="btn" style="margin-top:20px;min-width:160px;" onclick="document.getElementById('robot-complete-overlay').remove();renderRobotWidget();">开始冒险！</button>
+        </div>
       </div>
     </div>`;
   document.body.insertAdjacentHTML('beforeend', html);
