@@ -1,12 +1,12 @@
 // Siatar PWA Service Worker
-// v2.8.0 - 极简离线缓存策略
+// v2.8.2 - 极简离线缓存策略
 // 设计原则：
 //   - 只缓存 index.html 和 manifest.json（应用 shell）
 //   - 不缓存 localStorage 数据（数据完全本地，无需 SW 介入）
 //   - 网络优先 + 离线兜底：在线时永远拿最新版，离线时回退到缓存
 //   - 新版本发布后，旧 SW 自动失效（CACHE_NAME 改了即可）
 
-const CACHE_NAME = 'siatar-v2.8.0';
+const CACHE_NAME = 'siatar-v2.8.2';
 const APP_SHELL = [
   './',
   './index.html',

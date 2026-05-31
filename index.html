@@ -650,9 +650,10 @@
       box-shadow: 0 8px 20px rgba(252,211,77,0.4);
     }
     .confetti {
-      position: absolute; width: 8px; height: 16px;
+      position: fixed; width: 8px; height: 16px;
       background: var(--c-gold);
       animation: confetti-fall 3s linear forwards;
+      z-index: 9000; pointer-events: none;
     }
     @keyframes confetti-fall {
       0% { transform: translateY(-100vh) rotate(0); opacity: 1; }
@@ -1054,7 +1055,7 @@
       </div>
       <div class="progress-block">
         <div class="progress-head">
-          <span>📈 累积 XP（永久）</span>
+          <span>💰 可用 XP</span>
           <span class="right" id="level-xp-display">0 XP</span>
         </div>
         <div class="progress-bar"><div class="progress-fill green" id="level-fill" style="width:0%"></div></div>
@@ -1099,9 +1100,13 @@
     <div class="card">
       <div class="section-title" style="margin-bottom:10px;">
         <span>待确认任务</span>
-        <button class="btn btn-success" onclick="confirmAllTasks()">✅ 全部确认</button>
       </div>
       <div id="verify-list"></div>
+      <div id="verify-actions" style="display:none;margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-success" onclick="confirmAllTasks()" style="flex:1;min-width:100px;">✅ 全部通过</button>
+        <button class="btn" onclick="confirmSelectedTasks()" style="flex:1;min-width:100px;">✅ 通过选中</button>
+        <button class="btn" onclick="rejectSelectedTasks()" style="flex:1;min-width:100px;background:#ef4444;">❌ 驳回选中</button>
+      </div>
     </div>
     <div class="card" id="redeem-card" style="display:none;">
       <div class="section-title" style="margin-bottom:10px;"><span>📦 道具核销申请</span></div>
@@ -1284,7 +1289,7 @@
           <div class="label">版本</div>
           <div class="desc">Siatar 工业 · 系统版本</div>
         </div>
-        <span style="color:var(--c-text-light);font-variant-numeric:tabular-nums;" id="version-text">v2.8.0</span>
+        <span style="color:var(--c-text-light);font-variant-numeric:tabular-nums;" id="version-text">v2.8.1</span>
       </div>
       <div class="setting-item">
         <div>
@@ -1353,7 +1358,7 @@
 
 <script>
 /* ===========================================================
-   Siatar 工业 · 任务面板 v2.8.0
+   Siatar 工业 · 任务面板 v2.8.1
    架构说明：
    - localStorage 作为主存储（key: 'xta-game-data'）
    - 历史记录单独存储（key: 'xta-game-history'）
@@ -1361,7 +1366,7 @@
    - 兼容旧数据自动迁移
    =========================================================== */
 
-const VERSION = 'v2.8.0';
+const VERSION = 'v2.8.1';
 
 // 本地日期字符串 YYYY-MM-DD（避免 toISOString() 在非 UTC 时区造成的偏移）
 function localDateStr(d) {
@@ -1919,16 +1924,36 @@ function loadState() {
 
   // v2.5：totalEarnedXP = 历史累计 XP（只增不减），用于头衔判定
   // levelXP = 可花余额（买道具扣这里，不影响头衔）
-  if (typeof s.totalEarnedXP !== 'number' || s.totalEarnedXP === 0) {
-    // 迁移：首次加载 v2.5，用当前 levelXP 作为历史累计起点
-    s.totalEarnedXP = s.levelXP || 0;
+  // v2.8.2 修正：旧迁移从已消耗的 levelXP 初始化导致 totalEarnedXP 偏低
+  // 正确算法：totalEarnedXP = levelXP + 已花费的所有机器人零件 XP
+  {
+    let robotSpent = 0;
+    if (s.robotsOwned && typeof s.robotsOwned === 'object') {
+      Object.entries(s.robotsOwned).forEach(([rid, rd]) => {
+        const robotDef = ROBOTS[rid];
+        if (robotDef && rd && typeof rd.parts === 'number' && rd.parts > 0) {
+          const bought = Math.min(rd.parts, robotDef.parts.length);
+          for (let i = 0; i < bought; i++) {
+            robotSpent += robotDef.parts[i].cost;
+          }
+        }
+      });
+    }
+    // 也加上商城花费（shopPurchaseCount × 每次花费的 XP，但商城扣的是 SC 不是 XP，所以不算）
+    const recalculated = (s.levelXP || 0) + robotSpent;
+    if (typeof s.totalEarnedXP !== 'number' || s.totalEarnedXP < recalculated) {
+      s.totalEarnedXP = recalculated;
+    }
   }
 
-  // v2.5：头衔保护。首次升级到 v2.5 时锁定当前头衔档位，规则收紧后不会被降级
-  if (typeof s.protectedRankIndex !== 'number') {
+  // v2.5：头衔保护。根据 totalEarnedXP 锁定最高头衔档位，不会被降级
+  // v2.8.2：每次加载都重新校准 protectedRankIndex（取历史最高值）
+  {
     let idx = 0;
     ranks.forEach((r, i) => { if ((s.totalEarnedXP || 0) >= r.xp) idx = i; });
-    s.protectedRankIndex = idx;
+    if (typeof s.protectedRankIndex !== 'number' || idx > s.protectedRankIndex) {
+      s.protectedRankIndex = idx;
+    }
   }
 
   // v2.5：按"周期"重置（替代 v2.3 之前的按日历日重置）
@@ -2116,7 +2141,8 @@ async function askPasswordAndVerify(title, msg) {
    UI Rendering
    =========================================================== */
 function getCurrentRank() {
-  return [...ranks].reverse().find(r => state.levelXP >= r.xp) || ranks[0];
+  const idx = getRankIndex(); // 统一用 getRankIndex，含 protectedRankIndex 保底
+  return ranks[idx] || ranks[0];
 }
 
 function getNextRank() {
@@ -2176,14 +2202,14 @@ function updateUI(animateXP = false) {
   const elig = checkExchangeEligibility();
   document.getElementById('can-exchange').textContent = elig.eligible ? 1 : 0;
 
-  // Level progress（用 totalEarnedXP 显示头衔进度，levelXP 是可花余额）
+  // Level progress bar 用 totalEarnedXP（头衔进度），XP 数字显示可用余额
   const rankXP = state.totalEarnedXP || state.levelXP || 0;
   const prevRankXP = [...ranks].reverse().find(r => r.xp <= rankXP)?.xp || 0;
   const nextRank = getNextRank();
   const nextRankXP = nextRank ? nextRank.xp : rankXP + 1000;
   const progress = ((rankXP - prevRankXP) / (nextRankXP - prevRankXP)) * 100;
   document.getElementById('level-fill').style.width = Math.min(100, progress) + '%';
-  document.getElementById('level-xp-display').textContent = rankXP + ' XP';
+  document.getElementById('level-xp-display').textContent = state.levelXP + ' XP';
 
   // Verify badge
   const count = state.pendingVerify.length;
@@ -2206,9 +2232,8 @@ function updateUI(animateXP = false) {
 
 function updateCompanyCard() {
   const rank = getCurrentRank();
-  const xp = state.totalEarnedXP || state.levelXP || 0;
   const tag = document.getElementById('company-rank-tag');
-  if (tag) tag.textContent = `${rank.icon} ${rank.title} · ${xp} XP`;
+  if (tag) tag.textContent = `${rank.icon} ${rank.title} · ${state.levelXP} XP`;
   // 首次打开自动展开，之后记住折叠状态
   const card = document.getElementById('company-card');
   if (!card) return;
@@ -2378,6 +2403,8 @@ function completeTask(taskId) {
     name: TASK_NAMES[taskId],
     xp: XP_REWARDS[taskId],
     time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+    date: new Date().toDateString(),
+    cycleKey: getActiveCycleKey(),
     timestamp: ts,
   });
   state.completedTasks++;
@@ -2408,6 +2435,8 @@ function toggleMeal(mealId) {
     name: meal.name,
     xp: meal.xp,
     time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+    date: new Date().toDateString(),
+    cycleKey: getActiveCycleKey(),
     timestamp: ts,
   });
   state.completedTasks++;
@@ -2417,6 +2446,7 @@ function toggleMeal(mealId) {
   showToast('✅ 健康部已记录能量补给');
 }
 
+// 保留单条确认（可能仍有其他地方调用）
 async function confirmTask(index) {
   const ok = await askPasswordAndVerify('CEO 审批', '确认签发该任务的 XP？');
   if (!ok) return;
@@ -2506,6 +2536,70 @@ async function confirmAllTasks() {
   showToast(`✅ 已签发全部 +${totalXp} XP${batchBonusText}`);
 }
 
+function formatShortDate(dateStr) {
+  try {
+    const d = new Date(dateStr);
+    return `${d.getMonth()+1}/${d.getDate()}`;
+  } catch(e) { return ''; }
+}
+
+function getSelectedVerifyIndices() {
+  const checks = document.querySelectorAll('.verify-checkbox:checked');
+  return [...checks].map(c => parseInt(c.dataset.idx)).sort((a,b) => b - a); // 从大到小，方便splice
+}
+
+async function confirmSelectedTasks() {
+  const indices = getSelectedVerifyIndices();
+  if (indices.length === 0) { showToast('请先勾选要通过的任务'); return; }
+  const ok = await askPasswordAndVerify('CEO 审批', `确认签发选中的 ${indices.length} 项任务？`);
+  if (!ok) return;
+  const beforeRank = getRankIndex();
+  let totalXp = 0, totalBonus = 0;
+  indices.forEach(idx => {
+    const task = state.pendingVerify[idx];
+    if (!task) return;
+    const bonus = getRobotBonus();
+    const gain = task.xp + bonus;
+    state.levelXP += gain;
+    state.totalEarnedXP = (state.totalEarnedXP || 0) + gain;
+    state.dailyXP += gain;
+    totalXp += gain;
+    totalBonus += bonus;
+    recordHistory({ type: 'task_confirmed', taskId: task.id, name: task.name, xp: task.xp });
+  });
+  // splice 从大到小删
+  indices.forEach(idx => state.pendingVerify.splice(idx, 1));
+  state.level = Math.floor(state.levelXP / 100) + 1;
+  state.streak = Math.max(state.streak, 1);
+  if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+  saveState();
+  const afterRank = getRankIndex();
+  updateUI(true);
+  renderVerifyPage();
+  if (afterRank > beforeRank) state._pendingCelebration = ranks[afterRank];
+  state._pendingRewards = (state._pendingRewards || 0) + totalXp;
+  state._pendingEventCheck = true;
+  saveState();
+  const bonusText = totalBonus > 0 ? ` (含机器人加成 +${totalBonus})` : '';
+  showToast(`✅ 已签发 ${indices.length} 项 +${totalXp} XP${bonusText}`);
+}
+
+async function rejectSelectedTasks() {
+  const indices = getSelectedVerifyIndices();
+  if (indices.length === 0) { showToast('请先勾选要驳回的任务'); return; }
+  const ok = await askPasswordAndVerify('CEO 驳回', `确认驳回选中的 ${indices.length} 项任务？驳回后不计 XP。`);
+  if (!ok) return;
+  indices.forEach(idx => {
+    const task = state.pendingVerify[idx];
+    if (task) recordHistory({ type: 'task_rejected', taskId: task.id, name: task.name, xp: task.xp });
+  });
+  indices.forEach(idx => state.pendingVerify.splice(idx, 1));
+  saveState();
+  updateUI(true);
+  renderVerifyPage();
+  showToast(`❌ 已驳回 ${indices.length} 项任务`);
+}
+
 async function confirmRedeem(index) {
   const ok = await askPasswordAndVerify('CEO 核销', '确认签发该道具的使用权？');
   if (!ok) return;
@@ -2523,23 +2617,30 @@ async function confirmRedeem(index) {
    =========================================================== */
 function renderVerifyPage() {
   const list = document.getElementById('verify-list');
+  const actions = document.getElementById('verify-actions');
   if (state.pendingVerify.length === 0) {
     list.innerHTML = '<div class="empty-state"><div class="ic">📭</div><div class="msg">暂无待审批任务</div></div>';
+    if (actions) actions.style.display = 'none';
   } else {
-    list.innerHTML = state.pendingVerify.map((task, idx) => `
+    const today = new Date().toDateString();
+    list.innerHTML = state.pendingVerify.map((task, idx) => {
+      const isToday = task.date === today;
+      const dateLabel = isToday ? '今天' : (task.date ? formatShortDate(task.date) : '');
+      return `
       <div class="task-item pending-verify">
-        <div class="task-name">
-          <div class="task-check pending-verify">⏳</div>
+        <div class="task-name" style="align-items:center;">
+          <input type="checkbox" class="verify-checkbox" data-idx="${idx}" style="width:18px;height:18px;margin-right:8px;accent-color:#22c55e;flex-shrink:0;">
           <div>
             <div style="font-weight:600;font-size:14px;">${task.name}</div>
-            <div style="font-size:11px;color:var(--c-text-light);margin-top:2px;">${task.time} 提交</div>
+            <div style="font-size:11px;color:var(--c-text-light);margin-top:2px;">${dateLabel} ${task.time} 提交</div>
           </div>
         </div>
         <div class="task-right">
           <span class="task-xp">+${task.xp}</span>
-          <button class="btn btn-verify" onclick="confirmTask(${idx})">确认</button>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
+    if (actions) actions.style.display = 'flex';
   }
 
   const redeemCard = document.getElementById('redeem-card');
@@ -3593,7 +3694,7 @@ function showRobotCompleteAnimation(robot) {
   const firstLine = firstLineMap[robot.id] || firstLineMap['sx-01'];
 
   const html = `
-    <div class="modal-overlay" id="robot-complete-overlay" style="background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;flex-direction:column;">
+    <div class="modal-overlay" id="robot-complete-overlay" style="background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;flex-direction:column;" onclick="if(event.target===this){this.remove();renderRobotWidget();}">
       <style>
         @keyframes robotBootGlow { 0%,100% { box-shadow: 0 0 20px ${glowColor}; } 50% { box-shadow: 0 0 60px ${glowColor}, 0 0 100px ${glowColor}; } }
         @keyframes bootLineIn { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
@@ -3652,6 +3753,7 @@ function renderRobotWidget() {
       <div class="robot-widget-icon">${miniSvg}</div>
     </div>`;
   document.body.insertAdjacentHTML('beforeend', html);
+  scheduleRobotAutoTalk(); // 启动自动说话
 }
 
 function showRobotIdleLine() {
@@ -3668,8 +3770,33 @@ function showRobotIdleLine() {
       <div class="robot-speech-text">${line}</div>
     </div>`;
   document.body.insertAdjacentHTML('beforeend', html);
-  setTimeout(() => { const el = document.getElementById('robot-speech'); if (el) el.remove(); }, 4000);
+  setTimeout(() => { const el = document.getElementById('robot-speech'); if (el) el.remove(); }, 5000);
 }
+
+// 机器人自动说话：每 45~90 秒随机弹一句
+let _robotAutoTalkTimer = null;
+function scheduleRobotAutoTalk() {
+  if (_robotAutoTalkTimer) clearTimeout(_robotAutoTalkTimer);
+  if (!state.robotActive) return;
+  const rd = state.robotsOwned[state.robotActive];
+  if (!rd || !rd.completed) return;
+  const delay = (900 + Math.random() * 300) * 1000; // 15-20分钟，匹配小学生专注周期
+  _robotAutoTalkTimer = setTimeout(() => {
+    // 只在首页时自动弹出（不打扰其他页面操作）
+    if (document.getElementById('robot-widget')) {
+      showRobotIdleLine();
+    }
+    scheduleRobotAutoTalk(); // 循环
+  }, delay);
+}
+// 页面可见性：切后台停止，切回来恢复
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (_robotAutoTalkTimer) { clearTimeout(_robotAutoTalkTimer); _robotAutoTalkTimer = null; }
+  } else {
+    scheduleRobotAutoTalk();
+  }
+});
 
 // 任务提交时机器人反应
 function robotReactToSubmit() {
@@ -3722,7 +3849,7 @@ function showEventCard(event) {
   const typeColor = event.type === 'reward' ? '#22c55e' : event.type === 'challenge' ? '#f59e0b' : '#60a5fa';
 
   const html = `
-    <div class="modal-overlay event-card-overlay" id="event-card-overlay">
+    <div class="modal-overlay event-card-overlay" id="event-card-overlay" onclick="if(event.target===this){dismissEvent('${event.id}','${event.type}',${event.reward ? event.reward.xp : 0})}">
       <div class="event-card" style="animation: eventSlideIn 0.4s ease-out">
         <div class="event-type-badge" style="background:${typeColor}">${typeLabel}</div>
         <div class="event-title">${event.title}</div>
@@ -4007,13 +4134,13 @@ function spawnXpFloat(text, x, y) {
 
 function celebrateRankUp(rank) {
   const html = `
-    <div class="celebration-overlay">
-      <div class="celebration-content">
+    <div class="celebration-overlay" onclick="closeAllModals()">
+      <div class="celebration-content" onclick="event.stopPropagation()">
         <div class="icon">${rank.icon}</div>
         <div class="label">— 人事部 曾主任 · 任命通知 —</div>
         <div class="title">${rank.title}</div>
         <div class="quote">${rank.desc}<br><br>人事部已备案，新职级已解锁。<br>继续执行任务，前路无限。</div>
-        <button class="ok-btn" onclick="closeAllModals()">谢谢！</button>
+        <button class="ok-btn" onclick="closeAllModals()" style="position:relative;z-index:10001;">谢谢！</button>
       </div>
     </div>`;
   document.body.insertAdjacentHTML('beforeend', html);
