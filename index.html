@@ -864,7 +864,9 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(56,189,248,0.15);
       position: relative;
       overflow: hidden;
+      /* 确保子元素在 ::before 装饰层之上 */
     }
+    .event-card > * { position: relative; z-index: 1; }
     .event-card::before {
       content: '';
       position: absolute;
@@ -875,6 +877,7 @@
       background: conic-gradient(from 0deg, transparent 0%, var(--c-primary-light) 10%, transparent 20%);
       animation: eventGlow 3s linear infinite;
       opacity: 0.08;
+      pointer-events: none;
     }
     @keyframes eventGlow { to { transform: rotate(360deg); } }
     .event-type-badge {
@@ -892,7 +895,7 @@
     .event-npc { font-size: 12px; color: var(--c-text-faint); font-style: italic; margin-bottom: 14px; }
     .event-reward { font-size: 14px; font-weight: 600; color: var(--c-primary-light); margin-bottom: 8px; }
     .event-condition { font-size: 12px; color: #f59e0b; background: rgba(245,158,11,0.1); padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; }
-    .event-ok-btn { width: 100%; margin-top: 8px; font-size: 15px; padding: 12px; }
+    .event-ok-btn { width: 100%; margin-top: 8px; font-size: 15px; padding: 12px; position: relative; z-index: 1; }
     @keyframes eventSlideIn {
       from { transform: translateY(40px) scale(0.9); opacity: 0; }
       to { transform: translateY(0) scale(1); opacity: 1; }
@@ -1956,6 +1959,12 @@ function loadState() {
     }
   }
 
+  // v2.8.2 一次性修正：清除被跨周期审批污染的 dailyXP
+  if (!s._v282DailyXPFixed) {
+    s.dailyXP = 0;
+    s._v282DailyXPFixed = true;
+  }
+
   // v2.5：按"周期"重置（替代 v2.3 之前的按日历日重置）
   const today = new Date().toDateString();
   const currentCycle = getActiveCycleKey();
@@ -2477,7 +2486,11 @@ function applyConfirmTask(index) {
   const totalXpGain = task.xp + bonus;
   state.levelXP += totalXpGain;
   state.totalEarnedXP = (state.totalEarnedXP || 0) + totalXpGain;
-  state.dailyXP += totalXpGain;
+  // v2.8.2：只有同周期的任务才计入当日 dailyXP（影响 SC 进度条）
+  const currentCycle = getActiveCycleKey();
+  if (!task.cycleKey || task.cycleKey === currentCycle) {
+    state.dailyXP += totalXpGain;
+  }
   state.pendingVerify.splice(index, 1);
   state.level = Math.floor(state.levelXP / 100) + 1;
   state.streak = Math.max(state.streak, 1);  // 至少 1 天
@@ -2507,12 +2520,16 @@ async function confirmAllTasks() {
   const beforeRank = getRankIndex();
   let totalXp = 0;
   let totalBonus = 0;
+  const currentCycle = getActiveCycleKey();
   state.pendingVerify.forEach(task => {
     const bonus = getRobotBonus();
     const gain = task.xp + bonus;
     state.levelXP += gain;
     state.totalEarnedXP = (state.totalEarnedXP || 0) + gain;
-    state.dailyXP += gain;
+    // v2.8.2：只有同周期的任务才计入当日 dailyXP
+    if (!task.cycleKey || task.cycleKey === currentCycle) {
+      state.dailyXP += gain;
+    }
     totalXp += gain;
     totalBonus += bonus;
     recordHistory({ type: 'task_confirmed', taskId: task.id, name: task.name, xp: task.xp });
@@ -2555,6 +2572,7 @@ async function confirmSelectedTasks() {
   if (!ok) return;
   const beforeRank = getRankIndex();
   let totalXp = 0, totalBonus = 0;
+  const currentCycle = getActiveCycleKey();
   indices.forEach(idx => {
     const task = state.pendingVerify[idx];
     if (!task) return;
@@ -2562,7 +2580,10 @@ async function confirmSelectedTasks() {
     const gain = task.xp + bonus;
     state.levelXP += gain;
     state.totalEarnedXP = (state.totalEarnedXP || 0) + gain;
-    state.dailyXP += gain;
+    // v2.8.2：只有同周期的任务才计入当日 dailyXP
+    if (!task.cycleKey || task.cycleKey === currentCycle) {
+      state.dailyXP += gain;
+    }
     totalXp += gain;
     totalBonus += bonus;
     recordHistory({ type: 'task_confirmed', taskId: task.id, name: task.name, xp: task.xp });
