@@ -1164,7 +1164,7 @@
         <span>待确认任务</span>
       </div>
       <div id="verify-list"></div>
-      <div id="verify-actions" style="display:none;margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+      <div id="verify-actions" style="display:none;margin-top:12px;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-success" onclick="confirmAllTasks()" style="flex:1;min-width:100px;">✅ 全部通过</button>
         <button class="btn" onclick="confirmSelectedTasks()" style="flex:1;min-width:100px;">✅ 通过选中</button>
         <button class="btn" onclick="rejectSelectedTasks()" style="flex:1;min-width:100px;background:#ef4444;">❌ 驳回选中</button>
@@ -1351,7 +1351,7 @@
           <div class="label">版本</div>
           <div class="desc">Siatar 工业 · 系统版本</div>
         </div>
-        <span style="color:var(--c-text-light);font-variant-numeric:tabular-nums;" id="version-text">v2.8.1</span>
+        <span style="color:var(--c-text-light);font-variant-numeric:tabular-nums;" id="version-text">v2.9.0</span>
       </div>
       <div class="setting-item">
         <div>
@@ -1420,7 +1420,7 @@
 
 <script>
 /* ===========================================================
-   Siatar 工业 · 任务面板 v2.8.1
+   Siatar 工业 · 任务面板 v2.9.0
    架构说明：
    - localStorage 作为主存储（key: 'xta-game-data'）
    - 历史记录单独存储（key: 'xta-game-history'）
@@ -1428,7 +1428,7 @@
    - 兼容旧数据自动迁移
    =========================================================== */
 
-const VERSION = 'v2.8.1';
+const VERSION = 'v2.9.0';
 
 // 本地日期字符串 YYYY-MM-DD（避免 toISOString() 在非 UTC 时区造成的偏移）
 function localDateStr(d) {
@@ -1563,7 +1563,7 @@ const initialState = {
   eventHistory: [],
   unlockedBadges: [],
   earlyBirdCount: 0,
-  totalScEarned: 0,
+  // totalScEarned 已在上方定义
   // 机器人工厂
   robotSelected: null,    // 当前正在查看/组装的机器人 ID
   robotActive: null,      // 当前装备的主机器人（显示浮标）
@@ -2728,18 +2728,9 @@ function getRobotBonus() {
   if (!active) return 0;
   const rd = state.robotsOwned[active];
   if (!rd || !rd.completed) return 0;
-  // v2.9：使用 ROBOT_ABILITIES 被动加成
+  // v2.9：统一使用 ROBOT_ABILITIES 被动加成，无副作用
   const ability = ROBOT_ABILITIES[active];
-  if (ability && ability.xpPerTask) return ability.xpPerTask;
-  // 兼容旧逻辑（mk-3/vx-7 如果没有配 ROBOT_ABILITIES 则走旧逻辑）
-  if (active === 'mk-3') {
-    if (!state._mk3BonusToday) { state._mk3BonusToday = true; return 5; }
-  } else if (active === 'vx-7') {
-    const todayConfirmed = (state._todayConfirmedCount || 0) + 1;
-    state._todayConfirmedCount = todayConfirmed;
-    if (todayConfirmed % 3 === 0) return 10;
-  }
-  return 0;
+  return (ability && ability.xpPerTask) ? ability.xpPerTask : 0;
 }
 
 function applyConfirmTask(index) {
