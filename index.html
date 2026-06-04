@@ -846,8 +846,11 @@
     .rp-buy { background: var(--c-primary); color: #fff; cursor: pointer; padding: 8px 16px; font-size: 11px; border: none; border-radius: 100px; }
     .rp-lock { background: rgba(100,116,139,0.15); color: var(--c-text-faint); }
     /* 机器人浮窗 */
-    .robot-widget { position: fixed; bottom: 80px; right: 16px; width: 44px; height: 44px; background: var(--c-card); border: 2px solid var(--c-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: float 3s ease-in-out infinite; }
+    .robot-widget { position: fixed; bottom: 80px; right: 16px; width: 44px; height: 44px; background: var(--c-card); border: 2px solid var(--c-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: float 3s ease-in-out infinite; touch-action: manipulation; }
     .robot-widget-icon { font-size: 22px; }
+    /* v2.9：SP-9/SX-01 浮窗专属光效 */
+    .robot-widget.glow-sp9 { border-color: #a855f7; box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 12px rgba(168,85,247,0.4), 0 0 24px rgba(168,85,247,0.15); }
+    .robot-widget.glow-sx01 { border-color: #38bdf8; box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 12px rgba(56,189,248,0.4), 0 0 24px rgba(56,189,248,0.15); }
     .robot-speech { position: fixed; bottom: 130px; right: 16px; background: var(--c-card); border: 1px solid var(--c-border); border-radius: 12px 12px 4px 12px; padding: 10px 14px; max-width: 200px; z-index: 101; animation: eventSlideIn 0.3s ease-out; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
     .robot-speech-submit { border-color: var(--c-primary); }
     .robot-speech-name { font-size: 10px; color: var(--c-primary); font-weight: 600; margin-bottom: 4px; }
@@ -1615,6 +1618,14 @@ const STREAK_BONUSES = [
 // v2.8.2：全勤日奖励（必做三科 + 辅助 ≥2）
 const FULL_DAY_BONUS = 20;
 
+// v2.9：机器人被动能力（装备即生效，无需额外花费）
+const ROBOT_ABILITIES = {
+  'sp-9':  { xpPerTask: 2, streakProtect: true,   label: '📡 感知加成：每次完成任务 +2 XP，断签保护1天' },
+  'sx-01': { xpPerTask: 2, fullDayDouble: true,    label: '🛡️ 战术加成：每次完成任务 +2 XP，全勤奖励翻倍' },
+  'mk-3':  { xpPerTask: 1, label: '💥 火力加成：每次完成任务 +1 XP' },
+  'vx-7':  { xpPerTask: 1, label: '🔪 暗影加成：每次完成任务 +1 XP' },
+};
+
 const TIME_PAUSE_ITEM = { name: '⏸️ 时间暂停器', cost: 50, description: '延长 20 分钟截止时间' };
 const MASSAGE_ITEM = { name: '💆 睡前按摩券', cost: 50, validity: '7 天', description: '睡前 10-15 分钟按摩，需预约' };
 // v2.5：科学实验已下线，保留常量定义以兼容历史数据
@@ -1691,6 +1702,7 @@ const ROBOTS = {
         '铁卫监测到你的专注力很强。', '数据写入完毕。干得漂亮。',
         '保持这个节奏，你会超越更多人。', '已标记为高优先完成。CEO会注意到的。',
         '系统评估：表现超出预期。', '你正在变强。铁卫可以证明。',
+        '🛡️ 战术加成已生效——额外 XP 已计入。', '铁卫的护盾让你的每一次努力都更有价值。',
       ],
       idle: [
         '系统正常运转中。', '等待下一条指令。', '全天候待命。',
@@ -1701,6 +1713,8 @@ const ROBOTS = {
         '你今天开始得比昨天早，不错。', '铁卫已进入低功耗巡逻模式。',
         '有任务就来找我，随时准备出击。', '建议补充水分，保持最佳状态。',
         '记住铁卫的第一条守则：坚持就是胜利。', '待命中……但别让我等太久。',
+        '🛡️ 装甲系统升级后，你的全勤日收益翻倍了。', '战术核心在线——每完成一个任务，铁卫都会给你额外加成。',
+        '铁卫现在比以前更强了。这都是因为你的选择。', '指挥官权限已解锁，全力支援你的每一步行动。',
       ],
     },
   },
@@ -1726,6 +1740,7 @@ const ROBOTS = {
         '轨道环加速旋转中……因为太开心了！', '信号强度满格！你状态真好。',
         '每完成一个，脉冲就多积累一点经验值哦~', '分析完毕：这是一次高质量完成！',
         '嗡~好想给你贴个小星星。', '脉冲记住了！你今天效率爆表。',
+        '📡 感知加成！额外数据已捕获~', '嗡~升级后的脉冲让这次完成更有价值了！',
       ],
       idle: [
         '正在扫描周围环境……一切正常。', '嗡嗡嗡……待机中。',
@@ -1736,6 +1751,8 @@ const ROBOTS = {
         '今天还剩几个任务呢？我帮你数数~', '脉冲的轨道环一直在转，停不下来的那种。',
         '无聊的时候可以点我玩，虽然我只会说话……', '你知道吗，认真完成每一天的人最酷了。',
         '如果你累了就休息一下，脉冲帮你守着。', '嘀——检测到你正在思考，不打扰了~',
+        '📡 感知升级后，脉冲每次都能多给你一点XP哦~', '量子共鸣系统启动！就算你偶尔忘了打卡，我也会帮你守住连续记录！',
+        '嗡~升级后的脉冲可不一样了，数据分析能力翻倍！', '你选择了脉冲，脉冲会一直保护你的streak~',
       ],
     },
   },
@@ -2045,9 +2062,18 @@ function loadState() {
       const now = new Date();
       const diff = Math.floor((now - last) / (1000 * 60 * 60 * 24));
       if (diff > 1) {
-        s.streak = 0;
-        s._streakBonusesClaimed = []; // 断签后重置里程碑
+        // v2.9：SP-9 断签保护——miss 1天（diff=2）不清零，miss 2天以上才清零
+        const activeAbility = s.robotActive && ROBOT_ABILITIES[s.robotActive];
+        if (diff === 2 && activeAbility && activeAbility.streakProtect && !s._streakProtectUsed) {
+          s._streakProtectUsed = true; // 每轮 streak 只保护一次
+          // streak 不清零，但也不增加
+        } else {
+          s.streak = 0;
+          s._streakBonusesClaimed = []; // 断签后重置里程碑
+          s._streakProtectUsed = false;
+        }
       } else if (diff === 1 && s.streak >= 1) {
+        s._streakProtectUsed = false; // 正常连续时重置保护标记
         // v2.8.2：连续天 +1（之前 bug 导致 streak 卡在 1）
         s.streak += 1;
       }
@@ -2292,7 +2318,9 @@ function updateUI(animateXP = false) {
   const nextStreakBonus = STREAK_BONUSES.find(b => b.days > state.streak);
   const streakHint = document.getElementById('streak-hint');
   if (streakHint) {
-    streakHint.textContent = nextStreakBonus ? `${nextStreakBonus.days}天 +${nextStreakBonus.xp}XP` : '🏆 已满级';
+    const activeAb = state.robotActive && ROBOT_ABILITIES[state.robotActive];
+    const protectTag = activeAb && activeAb.streakProtect ? ' · 📡守护中' : '';
+    streakHint.textContent = (nextStreakBonus ? `${nextStreakBonus.days}天 +${nextStreakBonus.xp}XP` : '🏆 已满级') + protectTag;
   }
 
   // Greeting
@@ -2573,13 +2601,17 @@ function checkFullDayBonus() {
   if (auxDone < EXCHANGE_RULES.minAuxiliary) return;
   // 条件满足！
   state._fullDayBonusAwarded = true;
-  state.levelXP += FULL_DAY_BONUS;
-  state.totalEarnedXP = (state.totalEarnedXP || 0) + FULL_DAY_BONUS;
-  state.dailyXP += FULL_DAY_BONUS;
+  // v2.9：SX-01 全勤翻倍能力
+  const activeAbility = state.robotActive && ROBOT_ABILITIES[state.robotActive];
+  const bonusAmount = (activeAbility && activeAbility.fullDayDouble) ? FULL_DAY_BONUS * 2 : FULL_DAY_BONUS;
+  state.levelXP += bonusAmount;
+  state.totalEarnedXP = (state.totalEarnedXP || 0) + bonusAmount;
+  state.dailyXP += bonusAmount;
   saveState();
-  recordHistory({ type: 'full_day_bonus', xp: FULL_DAY_BONUS });
+  recordHistory({ type: 'full_day_bonus', xp: bonusAmount });
+  const doubleText = bonusAmount > FULL_DAY_BONUS ? '（🛡️ 铁卫指挥加成 ×2！）' : '';
   setTimeout(() => {
-    showToast(`🌟 全勤奖励 +${FULL_DAY_BONUS} XP！今日任务全面完成！`);
+    showToast(`🌟 全勤奖励 +${bonusAmount} XP！${doubleText}今日任务全面完成！`);
   }, 800);
 }
 
@@ -2696,11 +2728,13 @@ function getRobotBonus() {
   if (!active) return 0;
   const rd = state.robotsOwned[active];
   if (!rd || !rd.completed) return 0;
+  // v2.9：使用 ROBOT_ABILITIES 被动加成
+  const ability = ROBOT_ABILITIES[active];
+  if (ability && ability.xpPerTask) return ability.xpPerTask;
+  // 兼容旧逻辑（mk-3/vx-7 如果没有配 ROBOT_ABILITIES 则走旧逻辑）
   if (active === 'mk-3') {
-    // MK-3：每日首次任务 +5 XP
     if (!state._mk3BonusToday) { state._mk3BonusToday = true; return 5; }
   } else if (active === 'vx-7') {
-    // VX-7：连续完成3个任务时 +10 XP（基于当日已确认数）
     const todayConfirmed = (state._todayConfirmedCount || 0) + 1;
     state._todayConfirmedCount = todayConfirmed;
     if (todayConfirmed % 3 === 0) return 10;
@@ -3624,24 +3658,82 @@ function renderRobotPage() {
 function getRobotSVG(id) {
   if (id === 'sx-01') {
     return `<svg viewBox="0 0 64 64" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
-      <rect x="12" y="8" width="40" height="10" rx="3" fill="#1e3a5f"/>
-      <rect x="8" y="18" width="48" height="32" rx="4" fill="#1e3a5f" stroke="#38bdf8" stroke-width="1.5"/>
-      <rect x="14" y="24" width="36" height="10" rx="2" fill="#0c1a2e"/>
-      <rect x="16" y="26" width="32" height="6" rx="1" fill="#38bdf8" opacity="0.8"/>
-      <circle cx="32" cy="44" r="4" fill="#22c55e"/>
-      <circle cx="32" cy="44" r="2" fill="#4ade80"/>
-      <rect x="10" y="52" width="18" height="6" rx="2" fill="#1e3a5f"/>
-      <rect x="36" y="52" width="18" height="6" rx="2" fill="#1e3a5f"/>
+      <defs>
+        <linearGradient id="sx-armor" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a4a7f"/><stop offset="100%" stop-color="#1a2f4f"/></linearGradient>
+        <linearGradient id="sx-visor" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#0ea5e9"/><stop offset="50%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#0ea5e9"/></linearGradient>
+      </defs>
+      <!-- 头部 -->
+      <rect x="18" y="4" width="28" height="14" rx="4" fill="url(#sx-armor)" stroke="#38bdf8" stroke-width="1"/>
+      <rect x="14" y="6" width="4" height="8" rx="1" fill="#1e3a5f" stroke="#38bdf8" stroke-width="0.6"/>
+      <rect x="46" y="6" width="4" height="8" rx="1" fill="#1e3a5f" stroke="#38bdf8" stroke-width="0.6"/>
+      <circle cx="16" cy="6" r="1.5" fill="#38bdf8" opacity="0.8"/>
+      <circle cx="48" cy="6" r="1.5" fill="#38bdf8" opacity="0.8"/>
+      <!-- HUD 面罩 -->
+      <rect x="20" y="8" width="24" height="6" rx="2" fill="#0c1a2e"/>
+      <rect x="21" y="9" width="22" height="4" rx="1.5" fill="url(#sx-visor)" opacity="0.9"/>
+      <line x1="32" y1="9" x2="32" y2="13" stroke="#0c1a2e" stroke-width="0.5"/>
+      <!-- 躯干 -->
+      <rect x="12" y="19" width="40" height="26" rx="3" fill="url(#sx-armor)" stroke="#38bdf8" stroke-width="1.2"/>
+      <!-- 胸甲细节 -->
+      <path d="M18 22 L32 28 L46 22" fill="none" stroke="#38bdf8" stroke-width="0.8" opacity="0.5"/>
+      <path d="M18 24 L32 30 L46 24" fill="none" stroke="#38bdf8" stroke-width="0.5" opacity="0.3"/>
+      <!-- 能量核心 -->
+      <circle cx="32" cy="34" r="5" fill="#0c1a2e" stroke="#22c55e" stroke-width="1"/>
+      <circle cx="32" cy="34" r="3" fill="#22c55e" opacity="0.6"/>
+      <circle cx="32" cy="34" r="1.5" fill="#4ade80"/>
+      <!-- 肩甲 -->
+      <rect x="4" y="18" width="10" height="14" rx="3" fill="url(#sx-armor)" stroke="#38bdf8" stroke-width="1"/>
+      <rect x="50" y="18" width="10" height="14" rx="3" fill="url(#sx-armor)" stroke="#38bdf8" stroke-width="1"/>
+      <line x1="6" y1="22" x2="12" y2="22" stroke="#38bdf8" stroke-width="0.6" opacity="0.6"/>
+      <line x1="52" y1="22" x2="58" y2="22" stroke="#38bdf8" stroke-width="0.6" opacity="0.6"/>
+      <!-- 手臂 -->
+      <rect x="6" y="33" width="6" height="14" rx="2" fill="#1e3a5f" stroke="#38bdf8" stroke-width="0.6"/>
+      <rect x="52" y="33" width="6" height="14" rx="2" fill="#1e3a5f" stroke="#38bdf8" stroke-width="0.6"/>
+      <!-- 腿部 -->
+      <rect x="16" y="46" width="12" height="14" rx="2" fill="url(#sx-armor)" stroke="#38bdf8" stroke-width="0.8"/>
+      <rect x="36" y="46" width="12" height="14" rx="2" fill="url(#sx-armor)" stroke="#38bdf8" stroke-width="0.8"/>
+      <rect x="18" y="58" width="8" height="4" rx="1" fill="#1e3a5f" stroke="#38bdf8" stroke-width="0.5"/>
+      <rect x="38" y="58" width="8" height="4" rx="1" fill="#1e3a5f" stroke="#38bdf8" stroke-width="0.5"/>
+      <!-- 膝部能量线 -->
+      <line x1="18" y1="52" x2="26" y2="52" stroke="#22c55e" stroke-width="0.8" opacity="0.5"/>
+      <line x1="38" y1="52" x2="46" y2="52" stroke="#22c55e" stroke-width="0.8" opacity="0.5"/>
     </svg>`;
   } else if (id === 'sp-9') {
     return `<svg viewBox="0 0 64 64" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="#a855f7" stroke-width="1.2" opacity="0.5" transform="rotate(-25 32 32)"/>
-      <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="#a855f7" stroke-width="1.2" opacity="0.5" transform="rotate(25 32 32)"/>
-      <circle cx="32" cy="32" r="14" fill="#1e1045"/>
-      <circle cx="32" cy="32" r="14" fill="none" stroke="#a855f7" stroke-width="1.5"/>
-      <circle cx="32" cy="32" r="6" fill="#c084fc"/>
-      <circle cx="32" cy="32" r="3" fill="#e9d5ff"/>
-      <circle cx="28" cy="26" r="2" fill="#e9d5ff" opacity="0.4"/>
+      <defs>
+        <radialGradient id="sp-core" cx="50%" cy="50%"><stop offset="0%" stop-color="#c084fc"/><stop offset="60%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#1e1045"/></radialGradient>
+        <radialGradient id="sp-eye" cx="50%" cy="40%"><stop offset="0%" stop-color="#f5f3ff"/><stop offset="100%" stop-color="#c084fc"/></radialGradient>
+      </defs>
+      <!-- 外轨道环（反向旋转感） -->
+      <ellipse cx="32" cy="32" rx="30" ry="9" fill="none" stroke="#a855f7" stroke-width="0.8" opacity="0.3" transform="rotate(-30 32 32)"/>
+      <!-- 能量粒子（外环上） -->
+      <circle cx="8" cy="22" r="1.5" fill="#c084fc" opacity="0.6"/>
+      <circle cx="56" cy="42" r="1.5" fill="#c084fc" opacity="0.6"/>
+      <!-- 内轨道环 -->
+      <ellipse cx="32" cy="32" rx="24" ry="8" fill="none" stroke="#a855f7" stroke-width="1.2" opacity="0.6" transform="rotate(25 32 32)"/>
+      <!-- 能量粒子（内环上） -->
+      <circle cx="12" cy="38" r="1.2" fill="#e9d5ff" opacity="0.7"/>
+      <circle cx="52" cy="26" r="1.2" fill="#e9d5ff" opacity="0.7"/>
+      <!-- 能量翼 -->
+      <path d="M14 30 Q8 32 14 34" fill="none" stroke="#a855f7" stroke-width="1.5" opacity="0.7"/>
+      <path d="M50 30 Q56 32 50 34" fill="none" stroke="#a855f7" stroke-width="1.5" opacity="0.7"/>
+      <path d="M11 29 Q4 32 11 35" fill="none" stroke="#c084fc" stroke-width="0.8" opacity="0.4"/>
+      <path d="M53 29 Q60 32 53 35" fill="none" stroke="#c084fc" stroke-width="0.8" opacity="0.4"/>
+      <!-- 球体外壳 -->
+      <circle cx="32" cy="32" r="13" fill="url(#sp-core)" stroke="#a855f7" stroke-width="1.5"/>
+      <!-- 球体高光 -->
+      <ellipse cx="28" cy="26" rx="6" ry="3" fill="#c084fc" opacity="0.15"/>
+      <!-- 视觉单元（眼） -->
+      <circle cx="32" cy="30" r="5" fill="#0f0520" stroke="#c084fc" stroke-width="0.8"/>
+      <circle cx="32" cy="30" r="3.5" fill="url(#sp-eye)"/>
+      <circle cx="33" cy="29" r="1" fill="#fff" opacity="0.8"/>
+      <!-- 底部扫描光柱 -->
+      <path d="M28 44 L32 48 L36 44" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.5"/>
+      <line x1="32" y1="44" x2="32" y2="52" stroke="#a855f7" stroke-width="0.8" opacity="0.3"/>
+      <circle cx="32" cy="53" r="3" fill="#a855f7" opacity="0.1"/>
+      <!-- 数据流线条 -->
+      <path d="M20 32 Q16 28 20 24" fill="none" stroke="#e9d5ff" stroke-width="0.5" opacity="0.3"/>
+      <path d="M44 32 Q48 36 44 40" fill="none" stroke="#e9d5ff" stroke-width="0.5" opacity="0.3"/>
     </svg>`;
   } else if (id === 'mk-3') {
     // 重锤 — GM圆顶头 + 重型躯干 + 肩炮
@@ -3714,9 +3806,9 @@ function renderRobotSelectContent(container) {
       <div class="robot-select-specs">
         <span><span class="spec-val">${r.parts.length}</span><span class="spec-label">零件数</span></span>
         <span><span class="spec-val">${totalCosts[r.id]}</span><span class="spec-label">总 XP</span></span>
-        <span><span class="spec-val">${r.id === 'mk-3' ? '+5' : r.id === 'vx-7' ? '+10' : '—'}</span><span class="spec-label">加成</span></span>
+        <span><span class="spec-val">+${(ROBOT_ABILITIES[r.id] || {}).xpPerTask || 0}</span><span class="spec-label">加成/次</span></span>
       </div>
-      ${r.id === 'mk-3' ? '<div style="font-size:11px;color:#4ade80;margin-top:4px;text-align:center;">⚡ 每日首次任务额外 +5 XP</div>' : r.id === 'vx-7' ? '<div style="font-size:11px;color:#38bdf8;margin-top:4px;text-align:center;">⚡ 每完成3个任务额外 +10 XP</div>' : ''}
+      ${ROBOT_ABILITIES[r.id] ? `<div style="font-size:11px;color:#4ade80;margin-top:4px;text-align:center;">${ROBOT_ABILITIES[r.id].label}</div>` : ''}
       ${btnHtml}
     </div>`;
   }).join('<div style="text-align:center;color:var(--c-text-faint);font-size:12px;margin:12px 0;">— 或者 —</div>');
@@ -4017,8 +4109,10 @@ function renderRobotWidget() {
   const robot = ROBOTS[activeId];
   if (!robot) return;
   const miniSvg = getRobotSVG(activeId).replace(/width="56"/g, 'width="32"').replace(/height="56"/g, 'height="32"');
+  // v2.9：SP-9/SX-01 专属光效
+  const glowClass = activeId === 'sp-9' ? ' glow-sp9' : activeId === 'sx-01' ? ' glow-sx01' : '';
   const html = `
-    <div id="robot-widget" class="robot-widget">
+    <div id="robot-widget" class="robot-widget${glowClass}">
       <div class="robot-widget-icon">${miniSvg}</div>
     </div>`;
   document.body.insertAdjacentHTML('beforeend', html);
